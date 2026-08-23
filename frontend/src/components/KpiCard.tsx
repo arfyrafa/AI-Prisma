@@ -6,36 +6,6 @@ import { StatusPill } from './StatusPill'
 interface Props {
   snapshot: ParameterSnapshot
   emphasis?: boolean
-  symbol?: string
-}
-
-/** Parameter Symbol Dictionary */
-const PARAM_SYMBOLS: Record<string, string> = {
-  clo2_concentration: 'Y',
-  clo2_concentration_gpl: 'Y',
-  clo2: 'Y',
-  naclo3_feed: 'X₁',
-  naclo3_feed_m3h: 'X₁',
-  flow_rate: 'X₁',
-  naclo3_concentration: 'X₂',
-  naclo3_concentration_gpl: 'X₂',
-  nacl_concentration: 'X₃',
-  nacl_concentration_gpl: 'X₃',
-  hcl_feed: 'X₄',
-  hcl_feed_m3h: 'X₄',
-  so2_dosage: 'X₄',
-  hcl_concentration: 'X₅',
-  hcl_concentration_pct: 'X₅',
-  reaction_efficiency: 'X₅',
-  generator_temperature: 'X₇',
-  generator_temperature_c: 'X₇',
-  pressure: 'X₇',
-  absorber_water_temperature: 'X₉',
-  absorber_water_temperature_c: 'X₉',
-  temperature: 'X₉',
-  absorber_water_rate: 'X₁₀',
-  absorber_water_rate_m3h: 'X₁₀',
-  production_capacity: 'X₁₀',
 }
 
 /** Position of the current value inside the configured operating range (0–100%). */
@@ -84,13 +54,12 @@ function renderSparkline(snapshot: ParameterSnapshot) {
   )
 }
 
-export function KpiCard({ snapshot, emphasis = false, symbol }: Props) {
+export function KpiCard({ snapshot, emphasis = false }: Props) {
   const style = STATUS_STYLES[snapshot.status]
   const digits = decimalsFor(snapshot.parameter_name)
   const position = rangePosition(snapshot)
   const isUp = (snapshot.deviation ?? 0) > 0.001
   const isDown = (snapshot.deviation ?? 0) < -0.001
-  const displaySymbol = symbol ?? PARAM_SYMBOLS[snapshot.parameter_name] ?? ''
 
   const borderAccent =
     snapshot.status === 'critical'
@@ -108,24 +77,17 @@ export function KpiCard({ snapshot, emphasis = false, symbol }: Props) {
       {/* Top Header: Parameter Name & Status */}
       <div>
         <div className="flex items-start justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0">
-            {displaySymbol && (
-              <span className="flex h-6 min-w-6 items-center justify-center rounded-md bg-sky-100 dark:bg-sky-950/80 px-1.5 font-mono text-xs font-black text-sky-700 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/60">
-                {displaySymbol}
-              </span>
-            )}
-            <div className="min-w-0">
-              <h3 className="truncate text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200">
-                {snapshot.display_name}
-              </h3>
-            </div>
+          <div className="min-w-0 pr-2">
+            <h3 className="truncate text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200">
+              {snapshot.display_name}
+            </h3>
           </div>
           <StatusPill status={snapshot.status} label={snapshot.status_label} />
         </div>
 
         {/* Current Reading & Mini Trend */}
         <div className="mt-3.5 flex items-baseline justify-between gap-2">
-          <div className="flex items-baseline gap-1.5">
+          <div className="flex items-baseline gap-1.5 min-w-0">
             <span
               className={`tabular font-mono font-bold tracking-tight ${style.text} ${
                 emphasis ? 'text-4xl' : 'text-3xl'
@@ -141,7 +103,7 @@ export function KpiCard({ snapshot, emphasis = false, symbol }: Props) {
           </div>
 
           {/* Clean Sparkline */}
-          <div className="flex flex-col items-end">
+          <div className="flex flex-col items-end shrink-0">
             {renderSparkline(snapshot)}
             <div className="flex items-center gap-1 text-[10px] font-mono font-semibold text-slate-400 dark:text-slate-500">
               {isUp ? (

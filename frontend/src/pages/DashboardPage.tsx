@@ -37,8 +37,49 @@ export function DashboardPage() {
     return rows[0] ?? null
   }, [processId])
 
-  const primary = snapshot?.parameters.find((p) => p.parameter_name === PRIMARY_PARAMETER)
-  const others = snapshot?.parameters.filter((p) => p.parameter_name !== PRIMARY_PARAMETER) ?? []
+  // 8 Process Elements + Target Product Configuration
+  const PARAM_NAME_OVERRIDES: Record<string, { name: string; unit: string; order: number }> = {
+    clo2_concentration: { name: 'Konsentrasi ClO₂', unit: 'g/L', order: 0 },
+    naclo3_feed_m3h: { name: 'NaClO₃ Feed', unit: 'm³/h', order: 1 },
+    naclo3_feed: { name: 'NaClO₃ Feed', unit: 'm³/h', order: 1 },
+    flow_rate: { name: 'NaClO₃ Feed', unit: 'm³/h', order: 1 },
+    naclo3_concentration_gpl: { name: 'NaClO₃ Concentration', unit: 'g/L', order: 2 },
+    naclo3_concentration: { name: 'NaClO₃ Concentration', unit: 'g/L', order: 2 },
+    nacl_concentration_gpl: { name: 'NaCl Concentration', unit: 'g/L', order: 3 },
+    nacl_concentration: { name: 'NaCl Concentration', unit: 'g/L', order: 3 },
+    hcl_feed_m3h: { name: 'HCl Feed', unit: 'm³/h', order: 4 },
+    hcl_feed: { name: 'HCl Feed', unit: 'm³/h', order: 4 },
+    so2_dosage: { name: 'HCl Feed', unit: 'm³/h', order: 4 },
+    hcl_concentration_pct: { name: 'HCl Concentration', unit: '%', order: 5 },
+    hcl_concentration: { name: 'HCl Concentration', unit: '%', order: 5 },
+    reaction_efficiency: { name: 'HCl Concentration', unit: '%', order: 5 },
+    generator_temperature_c: { name: 'Generator Temperature', unit: '°C', order: 6 },
+    generator_temperature: { name: 'Generator Temperature', unit: '°C', order: 6 },
+    pressure: { name: 'Generator Temperature', unit: '°C', order: 6 },
+    absorber_water_temperature_c: { name: 'Absorber Water Temperature', unit: '°C', order: 7 },
+    absorber_water_temperature: { name: 'Absorber Water Temperature', unit: '°C', order: 7 },
+    temperature: { name: 'Absorber Water Temperature', unit: '°C', order: 7 },
+    absorber_water_rate_m3h: { name: 'Absorber Water Rate', unit: 'm³/h', order: 8 },
+    absorber_water_rate: { name: 'Absorber Water Rate', unit: 'm³/h', order: 8 },
+    production_capacity: { name: 'Absorber Water Rate', unit: 'm³/h', order: 8 },
+  }
+
+  // Filter snapshot parameters to ONLY include the 8 elements + Target, formatted cleanly
+  const modelParameters = (snapshot?.parameters ?? [])
+    .filter((p) => PARAM_NAME_OVERRIDES[p.parameter_name] !== undefined)
+    .map((p) => {
+      const meta = PARAM_NAME_OVERRIDES[p.parameter_name]
+      return {
+        ...p,
+        display_name: meta.name,
+        unit: meta.unit,
+        _order: meta.order,
+      }
+    })
+    .sort((a, b) => a._order - b._order)
+
+  const primary = modelParameters.find((p) => p.parameter_name === PRIMARY_PARAMETER)
+  const others = modelParameters.filter((p) => p.parameter_name !== PRIMARY_PARAMETER)
   const reference = parameters.data?.find((p) => p.parameter_name === PRIMARY_PARAMETER) ?? null
   const latestInsight = insights.data?.[0] ?? null
   const pendingRecommendations = (recommendations.data ?? []).filter((r) => r.status === 'pending')
@@ -255,7 +296,7 @@ export function DashboardPage() {
 
       {/* 3. Key values (8 Model Elements + Primary Target) */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {primary && <KpiCard snapshot={primary} emphasis symbol="Y" />}
+        {primary && <KpiCard snapshot={primary} emphasis />}
         {others.map((parameter) => (
           <KpiCard key={parameter.parameter_name} snapshot={parameter} />
         ))}
