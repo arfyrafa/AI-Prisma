@@ -101,45 +101,17 @@ server {
 
     client_max_body_size 50M;
 
-    # Frontend (React via Docker Nginx on port 8080)
+    # Proxy everything (SPA, /api/, /ws, /docs) through Frontend Docker container
     location / {
         proxy_pass http://127.0.0.1:8080;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-    }
-
-    # API Backend (FastAPI on port 8000)
-    location /api/ {
-        proxy_pass http://127.0.0.1:8000/api/;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-        proxy_read_timeout 60s;
-    }
-
-    # WebSocket (Realtime telemetry)
-    location /ws {
-        proxy_pass http://127.0.0.1:8000/ws;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
         proxy_read_timeout 3600s;
-    }
-
-    # FastAPI Docs
-    location /docs {
-        proxy_pass http://127.0.0.1:8000/docs;
-        proxy_set_header Host \$host;
-    }
-
-    location /openapi.json {
-        proxy_pass http://127.0.0.1:8000/openapi.json;
-        proxy_set_header Host \$host;
     }
 }
 NGINXCONF

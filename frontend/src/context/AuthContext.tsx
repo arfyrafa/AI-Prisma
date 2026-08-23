@@ -71,17 +71,17 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [users, setUsers] = useState<UserProfile[]>(DEFAULT_USERS_SEED)
 
-  // Current logged in session
+  // Current logged in session (null by default so it redirects to /login)
   const [user, setUser] = useState<UserProfile | null>(() => {
     const saved = localStorage.getItem('prisma_user_session')
     if (saved) {
       try {
         return JSON.parse(saved) as UserProfile
       } catch {
-        return DEFAULT_USERS_SEED[0]
+        return null
       }
     }
-    return DEFAULT_USERS_SEED[0]
+    return null
   })
 
   // Sync users from backend DB
