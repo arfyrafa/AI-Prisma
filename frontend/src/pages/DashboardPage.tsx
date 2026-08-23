@@ -64,20 +64,24 @@ export function DashboardPage() {
     production_capacity: { name: 'Absorber Water Rate', unit: 'm³/h', order: 8 },
   }
 
-  // Filter snapshot parameters to ONLY include the 8 elements + Target, formatted cleanly
-  const modelParameters = (snapshot?.parameters ?? [])
-    .filter((p) => PARAM_NAME_OVERRIDES[p.parameter_name] !== undefined)
-    .map((p) => {
+  // Filter and deduplicate snapshot parameters to ONLY include the 8 elements + Target, EXACTLY once
+  const dedupeParameters = (list: any[]) => {
+    const map = new Map<string, any>()
+    for (const p of list) {
       const meta = PARAM_NAME_OVERRIDES[p.parameter_name]
-      return {
-        ...p,
-        display_name: meta.name,
-        unit: meta.unit,
-        _order: meta.order,
+      if (meta && !map.has(meta.name)) {
+        map.set(meta.name, {
+          ...p,
+          display_name: meta.name,
+          unit: meta.unit,
+          _order: meta.order,
+        })
       }
-    })
-    .sort((a, b) => a._order - b._order)
+    }
+    return Array.from(map.values()).sort((a, b) => a._order - b._order)
+  }
 
+  const modelParameters = dedupeParameters(snapshot?.parameters ?? [])
   const primary = modelParameters.find((p) => p.parameter_name === PRIMARY_PARAMETER)
   const others = modelParameters.filter((p) => p.parameter_name !== PRIMARY_PARAMETER)
   const reference = parameters.data?.find((p) => p.parameter_name === PRIMARY_PARAMETER) ?? null

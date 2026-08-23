@@ -63,18 +63,25 @@ const PARAM_NAME_OVERRIDES: Record<string, { name: string; unit: string; order: 
 export function ParameterConfigPage() {
   const { processId, snapshot, refresh } = useProcessContext()
   const rawParameters = snapshot?.parameters ?? []
-  const parameters = rawParameters
-    .filter((p) => PARAM_NAME_OVERRIDES[p.parameter_name] !== undefined)
-    .map((p) => {
+  
+  // Deduplicate parameters so each of the 8 elements (+ ClO2) appears EXACTLY once
+  const dedupeParameters = (list: any[]) => {
+    const map = new Map<string, any>()
+    for (const p of list) {
       const meta = PARAM_NAME_OVERRIDES[p.parameter_name]
-      return {
-        ...p,
-        display_name: meta.name,
-        unit: meta.unit,
-        _order: meta.order,
+      if (meta && !map.has(meta.name)) {
+        map.set(meta.name, {
+          ...p,
+          display_name: meta.name,
+          unit: meta.unit,
+          _order: meta.order,
+        })
       }
-    })
-    .sort((a, b) => a._order - b._order)
+    }
+    return Array.from(map.values()).sort((a, b) => a._order - b._order)
+  }
+
+  const parameters = dedupeParameters(rawParameters)
 
   // Local state for editing thresholds per parameter ID
   const [edits, setEdits] = useState<
