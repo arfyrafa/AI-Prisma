@@ -1,0 +1,291 @@
+"""Schema creation and first-boot seeding.
+
+The MVP creates tables from the SQLAlchemy metadata. Swap this for Alembic
+migrations when the schema starts evolving in production.
+"""
+
+import logging
+
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from app.core.config import settings
+from app.db.base import Base
+from app.db.session import SessionLocal, engine
+from app.models import KnowledgeDocument, Process, ProcessParameter
+from app.simulations.simulator import seed_history
+
+logger = logging.getLogger(__name__)
+
+SEED_INTERVAL_SECONDS = 60.0
+
+PROCESS_SEED = {
+    "name": "Proses Produksi ClO₂",
+    "description": (
+        "Studi kasus awal PRISMA AI. Generator klorin dioksida dengan reduksi "
+        "natrium klorat menggunakan SO₂."
+    ),
+    "status": "active",
+}
+
+PARAMETER_SEED = [
+    # (name, display, unit, target, min, max)
+    ("clo2_concentration", "Konsentrasi ClO₂", "mg/L", 8.5, 5.0, 9.0),
+    ("temperature", "Suhu", "°C", 15.0, 12.0, 18.0),
+    ("pressure", "Tekanan", "bar", 9.5, 8.5, 10.5),
+    ("ph", "pH", "", 4.5, 4.0, 5.0),
+    ("flow_rate", "Laju Alir", "m³/jam", 28.0, 25.0, 30.0),
+    ("so2_dosage", "Dosis SO₂", "kg/jam", 0.42, 0.35, 0.55),
+    ("orp", "ORP", "mV", 180.0, 150.0, 220.0),
+    ("turbidity", "Turbiditas", "NTU", 0.8, 0.0, 1.5),
+    ("production_capacity", "Kapasitas Produksi", "ton/hari", 50.0, 40.0, 60.0),
+    ("reaction_efficiency", "Efisiensi Reaksi", "%", 95.0, 90.0, 99.0),
+]
+
+KNOWLEDGE_SEED = [
+    {
+        "title": "SOP Pengendalian Konsentrasi ClO₂",
+        "doc_type": "SOP",
+        "reference_code": "SOP-CLO2-01",
+        "version": "3.1",
+        "summary": "Langkah pengendalian ketika konsentrasi ClO₂ mendekati atau melewati batas atas.",
+        "tags": ["clo2_concentration", "so2_dosage", "ph"],
+        "content": (
+            "1. Verifikasi pembacaan analyzer terhadap hasil laboratorium terakhir.\n"
+            "2. Periksa dosis SO₂ terhadap set point yang berlaku pada laju produksi saat ini.\n"
+            "3. Periksa pH larutan umpan; pH di bawah rentang mempercepat pembentukan ClO₂.\n"
+            "4. Jika konsentrasi tetap di atas batas atas selama lebih dari 15 menit, "
+            "turunkan laju produksi sesuai instruksi supervisor shift.\n"
+            "5. Catat seluruh tindakan pada logsheet dan sistem audit."
+        ),
+    },
+    {
+        "title": "Rentang Operasi Normal Generator ClO₂",
+        "doc_type": "Rentang Operasi",
+        "reference_code": "OPR-CLO2-02",
+        "version": "2.0",
+        "summary": "Rentang operasi yang dijadikan acuan deteksi penyimpangan pada dashboard.",
+        "tags": ["clo2_concentration", "ph", "flow_rate", "temperature", "pressure"],
+        "content": (
+            "Konsentrasi ClO₂: 5,0–9,0 mg/L (target 8,5)\n"
+            "Suhu reaktor: 12,0–18,0 °C (target 15,0)\n"
+            "Tekanan: 8,5–10,5 bar (target 9,5)\n"
+            "pH: 4,0–5,0 (target 4,5)\n"
+            "Laju alir: 25,0–30,0 m³/jam (target 28,0)\n"
+            "Dosis SO₂: 0,35–0,55 kg/jam (target 0,42)\n"
+            "ORP: 150–220 mV (target 180)\n"
+            "Turbiditas: 0,0–1,5 NTU (target 0,8)"
+        ),
+    },
+    {
+        "title": "Troubleshooting pH Turun di Bawah Target",
+        "doc_type": "Troubleshooting",
+        "reference_code": "TRB-PH-04",
+        "version": "1.4",
+        "summary": "Penyebab umum dan pemeriksaan awal ketika pH bergerak turun.",
+        "tags": ["ph", "so2_dosage"],
+        "content": (
+            "Penyebab umum:\n"
+            "• Dosis SO₂ berlebih terhadap laju umpan klorat.\n"
+            "• Kalibrasi probe pH sudah kedaluwarsa.\n"
+            "• Perubahan konsentrasi larutan umpan.\n\n"
+            "Pemeriksaan awal:\n"
+            "1. Bandingkan pembacaan probe dengan pengukuran manual.\n"
+            "2. Periksa tanggal kalibrasi terakhir.\n"
+            "3. Periksa stroke dosing pump SO₂ dan tekanan suplai."
+        ),
+    },
+    {
+        "title": "Prosedur Pengambilan Sampel dan Verifikasi Laboratorium",
+        "doc_type": "Prosedur",
+        "reference_code": "PRC-LAB-07",
+        "version": "1.0",
+        "summary": "Cara memverifikasi pembacaan analyzer dengan hasil laboratorium.",
+        "tags": ["clo2_concentration", "turbidity"],
+        "content": (
+            "1. Gunakan APD lengkap sebelum mengambil sampel.\n"
+            "2. Bilas sampling line minimal 30 detik.\n"
+            "3. Ambil sampel pada titik SP-02 dan tutup rapat wadah.\n"
+            "4. Serahkan ke laboratorium dengan label waktu pengambilan.\n"
+            "5. Bandingkan hasil dengan pembacaan analyzer pada waktu yang sama."
+        ),
+    },
+    {
+        "title": "Kinetika Reaksi & Neraca Massa Integrated ClO₂ Plant",
+        "doc_type": "Teori Proses",
+        "reference_code": "DOC-CLO2-KB01",
+        "version": "2.0",
+        "summary": "Teori proses reaksi generator Mathieson/ERCO R3, elektrolisis klorat, dan absorpsi ClO₂.",
+        "tags": ["clo2_concentration", "reaction_efficiency", "temperature", "flow_rate"],
+        "content": (
+            "1. Sodium Chlorate Electrolysis: 2NaCl + 6H₂O + Listrik -> 2NaClO₃ + 6H₂.\n"
+            "2. ClO₂ Generation: 2NaClO₃ + 4.8HCl -> 1.8ClO₂ + 2NaCl + 2.4H₂O + 1.5Cl₂.\n"
+            "3. HCl Synthesis: 2.4H₂ + 2.4Cl₂ -> 4.8HCl.\n"
+            "Target konsentrasi larutan ClO₂ produk di absorber adalah 9–11 g/L. "
+            "Kestabilan suhu pendingin (chilled water) dan laju alir absorber H₂O menentukan efektivitas penyerapan gas."
+        ),
+    },
+    {
+        "title": "Panduan Standar Operasional Penyesuaian Lapangan 4-Tingkat",
+        "doc_type": "SOP Lapangan",
+        "reference_code": "SOP-CLO2-ADJ04",
+        "version": "1.5",
+        "summary": "Aturan penyesuaian bertahap: Prioritas 1 Absorber, Prioritas 2 Generator, Prioritas 3 Kualitas Kimia, Prioritas 4 Validasi Lab.",
+        "tags": ["clo2_concentration", "so2_dosage", "ph", "flow_rate"],
+        "content": (
+            "Hierarki Penyesuaian Bertahap:\n"
+            "• Prioritas 1 (Absorber): Evaluasi laju air absorber dan jaga kestabilan suhu chilled water.\n"
+            "• Prioritas 2 (Generator): Koreksi rasio HCl dan NaClO₃ Feed secara bertahap (2–5% per interval 15 menit).\n"
+            "• Prioritas 3 (Kualitas): Periksa konsentrasi HCl (±32%) dan strong chlorate (460 g/L).\n"
+            "• Prioritas 4 (Validasi): Konfirmasi trend DCS dan titrasi lab iodometri sebelum perubahan drastis."
+        ),
+    },
+    {
+        "title": "Model Prediksi Regresi Linier Berganda (MLR) & Analisis Dominansi T-Value",
+        "doc_type": "Riset Prediktif",
+        "reference_code": "MLR-CLO2-MOD01",
+        "version": "1.0",
+        "summary": "Persamaan regresi empiris Y = f(X1..X10) dan urutan signifikansi parameter operasional.",
+        "tags": ["clo2_concentration", "production_capacity", "reaction_efficiency"],
+        "content": (
+            "Persamaan MLR:\n"
+            "Y = 3.11 - 0.1407*X1 + 0.003192*X2 + 0.00613*X3 + 0.799*X4 + 0.2343*X5 - 0.0220*X7 - 0.0607*X9 - 0.02148*X10\n\n"
+            "Dominansi |T-Value|: (1) X5 Konsentrasi HCl, (2) X2 Konsentrasi NaClO₃, (3) X3 Konsentrasi NaCl, "
+            "(4) X4 Umpan HCl, (5) X1 Umpan NaClO₃, (6) X10 Laju Air Absorber, (7) X7 Suhu Generator, (8) X9 Suhu Air Pendingin."
+        ),
+    },
+    {
+        "title": "Standar Batas Toleransi Error Prediksi & Evaluasi Lab",
+        "doc_type": "Kriteria KPI",
+        "reference_code": "TOL-CLO2-KPI02",
+        "version": "1.1",
+        "summary": "Kriteria evaluasi deviasi prediksi terhadap analisa aktual lab.",
+        "tags": ["clo2_concentration", "turbidity"],
+        "content": (
+            "Evaluasi Akurasi Prediksi:\n"
+            "• Error <= 1%: Sangat Akurat (Target Utama)\n"
+            "• Error > 1% s/d 2%: Akurat (Masuk toleransi KPI utama)\n"
+            "• Error > 2% s/d 5%: Cukup (Di luar KPI utama, perlu review setpoint)\n"
+            "• Error > 5%: Kurang Akurat (Lakukan kalibrasi probe dan validasi reagen lab)"
+        ),
+    },
+    {
+        "title": "Catatan Kasus: Kenaikan ClO₂ akibat Dosis SO₂ Berlebih",
+        "doc_type": "Kasus Historis",
+        "reference_code": "CASE-2024-11",
+        "version": "1.0",
+        "summary": "Kasus historis dengan pola penyimpangan yang serupa.",
+        "tags": ["clo2_concentration", "so2_dosage", "ph"],
+        "content": (
+            "Kronologi: pH turun bertahap selama 40 menit, dosis SO₂ naik 12% dari set point, "
+            "konsentrasi ClO₂ melewati batas atas 25 menit kemudian.\n\n"
+            "Tindakan: dosis SO₂ dikembalikan ke set point, pH pulih dalam 20 menit, "
+            "konsentrasi ClO₂ kembali normal dalam 35 menit.\n\n"
+            "Pelajaran: pemantauan dini pada pH memberi waktu koreksi sebelum "
+            "konsentrasi ClO₂ menyimpang."
+        ),
+    },
+]
+
+
+def seed_process(db: Session) -> Process:
+    process = db.scalars(select(Process).limit(1)).first()
+    if process is None:
+        process = Process(
+            **PROCESS_SEED,
+            data_source="simulation" if settings.SIMULATION_MODE else "external",
+        )
+        db.add(process)
+        db.commit()
+        db.refresh(process)
+        logger.info("Seed proses: %s", process.name)
+
+    existing = {p.parameter_name for p in process.parameters}
+    added = [
+        ProcessParameter(
+            process_id=process.id,
+            parameter_name=name,
+            display_name=display,
+            unit=unit,
+            target_value=target,
+            minimum_value=minimum,
+            maximum_value=maximum,
+            display_order=index,
+        )
+        for index, (name, display, unit, target, minimum, maximum) in enumerate(PARAMETER_SEED)
+        if name not in existing
+    ]
+    if added:
+        db.add_all(added)
+        db.commit()
+        logger.info("Seed %s parameter proses", len(added))
+    return process
+
+
+def seed_knowledge(db: Session) -> None:
+    existing_refs = {doc.reference_code for doc in db.scalars(select(KnowledgeDocument)).all()}
+    new_docs = [
+        KnowledgeDocument(**doc)
+        for doc in KNOWLEDGE_SEED
+        if doc.get("reference_code") not in existing_refs
+    ]
+    if new_docs:
+        db.add_all(new_docs)
+        db.commit()
+        logger.info("Seed %s dokumen knowledge base baru", len(new_docs))
+
+
+import hashlib
+from app.models.user import User
+
+USER_SEED = [
+    {
+        "name": "Alex Rivera",
+        "email": "admin@prisma.ai",
+        "password_hash": hashlib.sha256(b"admin123").hexdigest(),
+        "role": "Admin",
+        "department": "Kepala Operasi & Chemical Plant",
+        "engineer_id": "ENG-ADM-001",
+        "is_active": True,
+    },
+    {
+        "name": "Budi Santoso",
+        "email": "operator@prisma.ai",
+        "password_hash": hashlib.sha256(b"operator123").hexdigest(),
+        "role": "Operator",
+        "department": "Operator Shift A - ClO₂ Unit",
+        "engineer_id": "OPR-2026-102",
+        "is_active": True,
+    },
+    {
+        "name": "Luqman Hakim",
+        "email": "luqman@prisma.ai",
+        "password_hash": hashlib.sha256(b"luqman123").hexdigest(),
+        "role": "Operator",
+        "department": "Process Engineering Specialist",
+        "engineer_id": "ENG-CLO2-77",
+        "is_active": True,
+    },
+]
+
+
+def seed_users(db: Session) -> None:
+    existing_emails = {u.email for u in db.scalars(select(User)).all()}
+    new_users = [User(**u) for u in USER_SEED if u["email"] not in existing_emails]
+    if new_users:
+        db.add_all(new_users)
+        db.commit()
+        logger.info("Seed %s pengguna awal ke database", len(new_users))
+
+
+def init_db() -> None:
+    Base.metadata.create_all(bind=engine)
+    db = SessionLocal()
+    try:
+        seed_users(db)
+        process = seed_process(db)
+        seed_knowledge(db)
+        if settings.SIMULATION_MODE:
+            seed_history(db, process.id, settings.SIMULATION_SEED_HOURS, SEED_INTERVAL_SECONDS)
+    finally:
+        db.close()

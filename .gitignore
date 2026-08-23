@@ -1,0 +1,16 @@
+.env
+.env.local
+*.db
+*.sqlite
+*.sqlite3
+*.log
+node_modules/
+dist/
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
+.vscode/
+.idea/
+scratch/
+.openclaw/

@@ -1,0 +1,387 @@
+import { Download, Printer, RefreshCw, Sparkles } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
+
+import { DeviationPanel } from '../components/DeviationPanel'
+import { InsightCard } from '../components/InsightCard'
+import { KpiCard } from '../components/KpiCard'
+import { Panel } from '../components/Panel'
+import { PipelineStrip, type PipelineStage } from '../components/PipelineStrip'
+import { RecommendationCard } from '../components/RecommendationCard'
+import { StatusPill } from '../components/StatusPill'
+import { TimeRangeSelector } from '../components/TimeRangeSelector'
+import { TrendChart } from '../components/TrendChart'
+import { AgentUnavailableState, EmptyState, ErrorState, LoadingState } from '../components/StateViews'
+import { useAsync } from '../hooks/useAsync'
+import { useProcessContext } from '../hooks/useProcessContext'
+import { api, isAgentUnavailable } from '../services/api'
+import type { Recommendation, TimeRange } from '../types'
+import { exportParametersToCSV, printProcessReport } from '../utils/exportReport'
+import { formatDateTime, formatNumber, formatRelative } from '../utils/format'
+
+const PRIMARY_PARAMETER = 'clo2_concentration'
+
+export function DashboardPage() {
+  const { processId, snapshot, loading, error, refresh } = useProcessContext()
+  const [range, setRange] = useState<TimeRange>('6h')
+  const [analyzing, setAnalyzing] = useState(false)
+  const [agentDown, setAgentDown] = useState(false)
+  const [analysisError, setAnalysisError] = useState<string | null>(null)
+
+  const history = useAsync(() => api.getHistory(processId, range, [PRIMARY_PARAMETER]), [processId, range])
+  const deviations = useAsync(() => api.getDeviations(processId), [processId, snapshot?.reading?.id])
+  const parameters = useAsync(() => api.getParameters(processId), [processId])
+  const insights = useAsync(() => api.listInsights(processId, 1), [processId])
+  const recommendations = useAsync(() => api.listRecommendations(processId, undefined, 3), [processId])
+  const prediction = useAsync(async () => {
+    const rows = await api.listPredictions(processId, PRIMARY_PARAMETER, 1)
+    return rows[0] ?? null
+  }, [processId])
+
+  const primary = snapshot?.parameters.find((p) => p.parameter_name === PRIMARY_PARAMETER)
+  const others = snapshot?.parameters.filter((p) => p.parameter_name !== PRIMARY_PARAMETER) ?? []
+  const reference = parameters.data?.find((p) => p.parameter_name === PRIMARY_PARAMETER) ?? null
+  const latestInsight = insights.data?.[0] ?? null
+  const pendingRecommendations = (recommendations.data ?? []).filter((r) => r.status === 'pending')
+
+  const stages: PipelineStage[] = useMemo(() => {
+    const hasReading = Boolean(snapshot?.reading)
+    const deviationCount = deviations.data?.length ?? 0
+    const verified = (recommendations.data ?? []).some((r) => r.status !== 'pending')
+    return [
+      {
+        key: 'data',
+        label: 'Data',
+        detail: hasReading ? `Pembaruan ${formatRelative(snapshot?.reading?.timestamp)}` : 'Menunggu data',
+        state: hasReading ? 'done' : 'idle',
+      },
+      {
+        key: 'validasi',
+        label: 'Validasi',
+        detail: hasReading
+          ? `${snapshot?.parameters.length ?? 0} parameter tervalidasi`
+          : 'Belum ada pembacaan',
+        state: hasReading ? 'done' : 'idle',
+      },
+      {
+        key: 'prediksi',
+        label: 'Prediksi',
+        detail: prediction.data
+          ? `${formatNumber(prediction.data.predicted_value, 2)} ${prediction.data.unit}`
+          : 'Belum dijalankan',
+        state: prediction.data ? 'done' : 'idle',
+      },
+      {
+        key: 'insight',
+        label: 'Insight',
+        detail: latestInsight ? formatRelative(latestInsight.timestamp) : 'Belum ada analisis',
+        state: latestInsight ? 'done' : deviationCount > 0 ? 'active' : 'idle',
+      },
+      {
+        key: 'rekomendasi',
+        label: 'Rekomendasi',
+        detail: pendingRecommendations.length
+          ? `${pendingRecommendations.length} menunggu verifikasi`
+          : (recommendations.data?.length ?? 0) > 0
+            ? 'Sudah diverifikasi'
+            : 'Belum ada rekomendasi',
+        state: pendingRecommendations.length ? 'active' : recommendations.data?.length ? 'done' : 'idle',
+      },
+      {
+        key: 'keputusan',
+        label: 'Keputusan Engineer',
+        detail: pendingRecommendations.length
+          ? 'Menunggu keputusan Anda'
+          : verified
+            ? 'Keputusan tercatat'
+            : 'Belum diperlukan',
+        state: pendingRecommendations.length ? 'active' : verified ? 'done' : 'idle',
+      },
+    ]
+  }, [snapshot, deviations.data, prediction.data, latestInsight, recommendations.data, pendingRecommendations.length])
+
+  const runAnalysis = async () => {
+    setAnalyzing(true)
+    setAgentDown(false)
+    setAnalysisError(null)
+    try {
+      await api.analyze(processId)
+      await Promise.all([insights.reload(), recommendations.reload()])
+    } catch (err) {
+      if (isAgentUnavailable(err)) setAgentDown(true)
+      else setAnalysisError(err instanceof Error ? err.message : 'Analisis gagal dijalankan.')
+    } finally {
+      setAnalyzing(false)
+    }
+  }
+
+  const verify = async (
+    recommendation: Recommendation,
+    payload: { decision: string; notes: string; reviewed: boolean },
+  ) => {
+    await api.verifyRecommendation(recommendation.id, {
+      decision: payload.decision,
+      notes: payload.notes,
+      verified_by: 'engineer',
+      reviewed: payload.reviewed,
+    })
+    await recommendations.reload()
+  }
+
+  if (loading && !snapshot) return <LoadingState />
+
+  if (error && !snapshot) {
+    return (
+      <ErrorState
+        title="Tidak dapat mengambil data proses"
+        description={error}
+        action={
+          <button type="button" className="btn-secondary" onClick={() => void refresh()}>
+            Coba lagi
+          </button>
+        }
+      />
+    )
+  }
+
+  return (
+    <div className="space-y-5">
+      {/* Hero Branding Banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 p-5 sm:p-6 text-white shadow-xl border border-slate-800/80">
+        <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-cyan-500/10 blur-3xl" />
+        <div className="absolute -left-16 -bottom-16 h-48 w-48 rounded-full bg-blue-500/10 blur-3xl" />
+
+        <div className="relative z-10 flex flex-wrap items-center justify-between gap-5">
+          <div className="flex items-center gap-4 sm:gap-6">
+            <div className="flex items-center gap-3">
+              <img
+                src="/assets/img/logo only prisma.png"
+                alt="PRISMA AI Icon"
+                className="h-10 sm:h-12 w-auto object-contain filter drop-shadow-[0_0_15px_rgba(56,189,248,0.4)] transition-transform hover:scale-105"
+              />
+              <div className="flex items-center gap-2">
+                <span className="text-xl sm:text-2xl font-black tracking-wider text-white">
+                  PRISMA
+                </span>
+                <span className="text-lg sm:text-xl font-extrabold text-sky-400 bg-sky-500/20 border border-sky-400/30 px-2 py-0.5 rounded-lg shadow-inner">
+                  AI
+                </span>
+              </div>
+            </div>
+            <div className="hidden lg:block border-l border-slate-700/60 pl-5">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-sky-400">Industrial AI Decision Support</h2>
+              <p className="text-xs text-slate-300 font-medium mt-0.5">Pemantauan &amp; Prediksi Realtime Produksi ClO₂</p>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3.5">
+            <StatusPill
+              status={snapshot?.overall_status ?? 'no_data'}
+              label={`Kondisi: ${
+                snapshot?.overall_status === 'normal'
+                  ? 'Normal'
+                  : snapshot?.overall_status === 'warning'
+                    ? 'Peringatan'
+                    : snapshot?.overall_status === 'critical'
+                      ? 'Kritis'
+                      : 'Tidak ada data'
+              }`}
+              size="md"
+            />
+            <span className="text-xs font-mono text-slate-400 hidden xl:inline">
+              {formatDateTime(snapshot?.reading?.timestamp)}
+            </span>
+
+            {/* Export Actions */}
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() =>
+                  exportParametersToCSV(
+                    snapshot?.parameters ?? [],
+                    snapshot?.process.name,
+                    snapshot?.reading?.timestamp,
+                  )
+                }
+                title="Download Data CSV"
+                className="btn bg-white/10 text-white hover:bg-white/20 border border-white/20 shadow-sm backdrop-blur-sm px-2.5 py-1.5 text-xs font-medium inline-flex items-center gap-1.5"
+              >
+                <Download className="h-3.5 w-3.5 text-sky-300" />
+                <span className="hidden sm:inline">Export CSV</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() =>
+                  printProcessReport(
+                    snapshot?.process.name,
+                    snapshot?.reading?.timestamp,
+                    snapshot?.parameters ?? [],
+                    snapshot?.overall_status ?? 'normal',
+                  )
+                }
+                title="Cetak Laporan Formal (PDF)"
+                className="btn bg-white/10 text-white hover:bg-white/20 border border-white/20 shadow-sm backdrop-blur-sm px-2.5 py-1.5 text-xs font-medium inline-flex items-center gap-1.5"
+              >
+                <Printer className="h-3.5 w-3.5 text-emerald-300" />
+                <span className="hidden sm:inline">Cetak Laporan</span>
+              </button>
+            </div>
+
+            <button
+              type="button"
+              className="btn bg-sky-600/80 text-white hover:bg-sky-600 border border-sky-500/50 shadow-sm backdrop-blur-sm px-3 py-1.5 inline-flex items-center gap-1.5 font-semibold"
+              onClick={() => void refresh()}
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+              <span>Muat ulang</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <PipelineStrip stages={stages} />
+
+      {/* 2. Critical deviations first — never hidden behind navigation */}
+      <Panel
+        eyebrow="Deteksi penyimpangan"
+        title="Penyimpangan aktif"
+        action={
+          <span className="text-[11px] font-semibold text-slate-400">Evaluasi Telemetri DCS</span>
+        }
+      >
+        {deviations.loading && !deviations.data ? (
+          <LoadingState label="Mengevaluasi parameter…" />
+        ) : (
+          <DeviationPanel deviations={deviations.data ?? []} />
+        )}
+      </Panel>
+
+      {/* 3. Key values */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {primary && <KpiCard snapshot={primary} emphasis />}
+        {others.slice(0, 6).map((parameter) => (
+          <KpiCard key={parameter.parameter_name} snapshot={parameter} />
+        ))}
+      </div>
+
+      {/* 4. Trend */}
+      <Panel
+        eyebrow="Tren proses"
+        title={reference?.display_name ?? 'Konsentrasi ClO₂'}
+        action={<TimeRangeSelector value={range} onChange={setRange} />}
+        bodyClassName="p-2"
+      >
+        {history.loading && !history.data ? (
+          <LoadingState label="Memuat riwayat proses…" />
+        ) : history.error ? (
+          <ErrorState title="Riwayat tidak dapat dimuat" description={history.error} />
+        ) : (history.data?.points.length ?? 0) === 0 ? (
+          <EmptyState
+            title="Belum ada data pada rentang ini"
+            description="Pilih rentang waktu lain atau tunggu pembacaan berikutnya."
+          />
+        ) : (
+          <TrendChart
+            points={history.data!.points}
+            series={[
+              { parameter: PRIMARY_PARAMETER, label: reference?.display_name ?? 'ClO₂', color: '#1B4F91' },
+            ]}
+            reference={reference}
+          />
+        )}
+      </Panel>
+
+      {/* 5. Prediction, insight, recommendation */}
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+        <Panel
+          eyebrow="Prediksi"
+          title="Hasil model prediktif"
+          action={
+            <Link to="/predictions" className="text-xs font-medium text-brand hover:underline">
+              Detail
+            </Link>
+          }
+        >
+          {prediction.data ? (
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <p className="eyebrow">Aktual</p>
+                  <p className="tabular mt-1 font-mono text-2xl font-semibold text-ink">
+                    {formatNumber(prediction.data.actual_value, 2)}
+                  </p>
+                </div>
+                <div>
+                  <p className="eyebrow">Prediksi</p>
+                  <p className="tabular mt-1 font-mono text-2xl font-semibold text-[#7B4FBF]">
+                    {formatNumber(prediction.data.predicted_value, 2)}
+                  </p>
+                </div>
+              </div>
+              <p className="text-xs text-ink-muted">
+                Horizon {prediction.data.prediction_horizon} menit · {prediction.data.model_name}
+              </p>
+            </div>
+          ) : (
+            <EmptyState
+              title="Belum ada prediksi"
+              description="Jalankan prediksi dari halaman Prediksi untuk melihat perkiraan nilai berikutnya."
+              action={
+                <Link to="/predictions" className="btn-secondary">
+                  Buka halaman Prediksi
+                </Link>
+              }
+            />
+          )}
+        </Panel>
+
+        <Panel
+          eyebrow="Analisis AI"
+          title="Insight terbaru"
+          className="xl:col-span-2"
+          action={
+            <button type="button" className="btn-primary inline-flex items-center gap-1.5" onClick={() => void runAnalysis()} disabled={analyzing}>
+              <Sparkles className="h-3.5 w-3.5 text-sky-200" />
+              <span>{analyzing ? 'Menganalisis…' : 'Jalankan analisis AI'}</span>
+            </button>
+          }
+        >
+          {agentDown ? (
+            <AgentUnavailableState onRetry={() => void runAnalysis()} />
+          ) : analysisError ? (
+            <ErrorState title="Analisis gagal" description={analysisError} />
+          ) : latestInsight ? (
+            <InsightCard insight={latestInsight} />
+          ) : (
+            <EmptyState
+              title="Belum ada insight"
+              description="Jalankan analisis AI untuk menghasilkan penjelasan kondisi proses saat ini."
+            />
+          )}
+        </Panel>
+      </div>
+
+      <Panel
+        eyebrow="Decision support"
+        title="Rekomendasi menunggu verifikasi"
+        action={
+          <Link to="/recommendations" className="text-xs font-medium text-brand hover:underline">
+            Semua rekomendasi
+          </Link>
+        }
+        bodyClassName="p-4 space-y-4"
+      >
+        {pendingRecommendations.length === 0 ? (
+          <EmptyState
+            title="Tidak ada rekomendasi yang menunggu"
+            description="Rekomendasi muncul setelah analisis AI dijalankan pada kondisi yang menyimpang."
+          />
+        ) : (
+          pendingRecommendations.map((recommendation) => (
+            <RecommendationCard key={recommendation.id} recommendation={recommendation} onVerify={verify} />
+          ))
+        )}
+      </Panel>
+    </div>
+  )
+}
