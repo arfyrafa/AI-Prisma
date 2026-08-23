@@ -149,12 +149,12 @@ export function ParameterConfigPage() {
               <h1 className="text-xl font-bold text-slate-900 dark:text-white">Konfigurasi Batas Operasi Parameter</h1>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 ml-11">
-              Pengaturan 10 elemen kontrol proses industri produksi ClO₂. Perubahan rentang mempengaruhi batas evaluasi alert telemetri DCS.
+              Pengaturan 8 elemen kontrol proses industri produksi ClO₂. Perubahan rentang mempengaruhi batas evaluasi alert telemetri DCS.
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <span className="rounded-full bg-sky-50 dark:bg-sky-950/60 border border-sky-200/80 dark:border-sky-800 px-3.5 py-1 text-xs font-bold text-sky-700 dark:text-sky-300">
-              10 Parameter Terpantau
+            <span className="rounded-lg bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-900 px-3 py-1.5 text-xs font-bold text-sky-700 dark:text-sky-300">
+              8 Parameter Terpantau
             </span>
           </div>
         </div>

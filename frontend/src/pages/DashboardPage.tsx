@@ -98,7 +98,7 @@ export function DashboardPage() {
         key: 'validasi',
         label: 'Validasi',
         detail: hasReading
-          ? `${snapshot?.parameters.length ?? 0} parameter tervalidasi`
+          ? `${others.length || 8} parameter tervalidasi`
           : 'Belum ada pembacaan',
         state: hasReading ? 'done' : 'idle',
       },

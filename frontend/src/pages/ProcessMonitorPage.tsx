@@ -119,7 +119,7 @@ export function ProcessMonitorPage() {
         <div>
           <h1 className="text-xl font-bold text-slate-900 dark:text-white">Pemantauan Telemetri DCS</h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Visualisasi time-series 10 parameter kimia dan evaluasi deviasi proses real-time.
+            Visualisasi time-series 8 parameter proses kimia dan evaluasi deviasi proses real-time.
           </p>
         </div>
         <div className="flex items-center gap-2.5">
