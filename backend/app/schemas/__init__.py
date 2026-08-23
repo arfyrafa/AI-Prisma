@@ -116,6 +116,8 @@ class SensorReadingOut(ORMModel):
     so2_dosage: float | None = None
     orp: float | None = None
     turbidity: float | None = None
+    production_capacity: float | None = None
+    reaction_efficiency: float | None = None
     source: str
 
 

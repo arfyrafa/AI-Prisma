@@ -48,6 +48,8 @@ class SensorReading(Base):
     so2_dosage: Mapped[float | None] = mapped_column(Float)
     orp: Mapped[float | None] = mapped_column(Float)
     turbidity: Mapped[float | None] = mapped_column(Float)
+    production_capacity: Mapped[float | None] = mapped_column(Float)
+    reaction_efficiency: Mapped[float | None] = mapped_column(Float)
 
     source: Mapped[str] = mapped_column(String(32), default="simulation", nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
@@ -65,6 +67,8 @@ class SensorReading(Base):
         "so2_dosage",
         "orp",
         "turbidity",
+        "production_capacity",
+        "reaction_efficiency",
     )
 
     def as_parameter_map(self) -> dict[str, float | None]:
