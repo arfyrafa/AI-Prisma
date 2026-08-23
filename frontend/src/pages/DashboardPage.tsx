@@ -253,10 +253,10 @@ export function DashboardPage() {
         )}
       </Panel>
 
-      {/* 3. Key values */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {primary && <KpiCard snapshot={primary} emphasis />}
-        {others.slice(0, 6).map((parameter) => (
+      {/* 3. Key values (8 Model Elements + Primary Target) */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {primary && <KpiCard snapshot={primary} emphasis symbol="Y" />}
+        {others.map((parameter) => (
           <KpiCard key={parameter.parameter_name} snapshot={parameter} />
         ))}
       </div>

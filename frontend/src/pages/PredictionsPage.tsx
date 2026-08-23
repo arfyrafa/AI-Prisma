@@ -118,8 +118,8 @@ export function PredictionsPage() {
             type="button"
             onClick={() => setActiveTab('whatif')}
             className={`inline-flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-bold transition-all ${activeTab === 'whatif'
-                ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-xs'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+              ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-xs'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
               }`}
           >
             <Sliders className="h-3.5 w-3.5" />
@@ -129,8 +129,8 @@ export function PredictionsPage() {
             type="button"
             onClick={() => setActiveTab('historical')}
             className={`inline-flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-bold transition-all ${activeTab === 'historical'
-                ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-xs'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+              ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-xs'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
               }`}
           >
             <Gauge className="h-3.5 w-3.5" />
