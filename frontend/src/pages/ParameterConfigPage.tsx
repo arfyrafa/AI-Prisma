@@ -7,23 +7,74 @@ import { api } from '../services/api'
 import type { ParameterSnapshot } from '../types'
 import { decimalsFor, formatNumber } from '../utils/format'
 
-// AI Agent Suggested Setpoints map for intelligent optimization
+// AI Agent Suggested Setpoints map for intelligent optimization (8 ClO2 Model Variables + Product Target)
 const AI_SUGGESTIONS: Record<string, { target: number; min: number; max: number; reason: string }> = {
-  clo2_concentration: { target: 8.5, min: 5.0, max: 9.0, reason: 'Mempertahankan stabilitas yield pemutihan pulp.' },
-  temperature: { target: 15.0, min: 12.0, max: 18.0, reason: 'Menjaga kinetika reaksi eksotermik aman.' },
-  pressure: { target: 9.5, min: 8.5, max: 10.5, reason: 'Menghindari kavitasi pompa dan lonjakan tekanan.' },
-  ph: { target: 4.5, min: 4.0, max: 5.0, reason: 'Mengoptimalkan selektivitas pembentukan ClO₂.' },
-  flow_rate: { target: 28.0, min: 25.0, max: 30.0, reason: 'Menyeimbangkan waktu tinggal dalam reaktor.' },
-  so2_dosage: { target: 0.41, min: 0.35, max: 0.55, reason: 'Meminimalkan sisa SO₂ dan menghemat agen reduksi.' },
-  orp: { target: 180, min: 150, max: 220, reason: 'Indikasi keseimbangan konsentrasi larutan.' },
-  turbidity: { target: 0.8, min: 0.0, max: 1.5, reason: 'Menjaga kejernihan hasil reaksi tanpa endapan.' },
-  production_capacity: { target: 52.0, min: 40.0, max: 60.0, reason: 'Memaksimalkan throughput pabrik per hari.' },
-  reaction_efficiency: { target: 96.5, min: 90.0, max: 99.0, reason: 'Efisiensi konversi bahan baku maksimum.' },
+  clo2_concentration: { target: 9.60, min: 9.0, max: 11.0, reason: 'Target konsentrasi produk ClO₂ optimum spesifikasi pulp mill.' },
+  naclo3_feed: { target: 17.37, min: 14.0, max: 20.0, reason: 'Laju alir umpan klorat optimum untuk kestabilan reaksi generator.' },
+  naclo3_feed_m3h: { target: 17.37, min: 14.0, max: 20.0, reason: 'Laju alir umpan klorat optimum untuk kestabilan reaksi generator.' },
+  flow_rate: { target: 17.37, min: 14.0, max: 20.0, reason: 'Laju alir umpan klorat optimum untuk kestabilan reaksi generator.' },
+  naclo3_concentration: { target: 437.16, min: 380.0, max: 480.0, reason: 'Konsentrasi klorat baseline untuk konversi stoikiometri maksimal.' },
+  naclo3_concentration_gpl: { target: 437.16, min: 380.0, max: 480.0, reason: 'Konsentrasi klorat baseline untuk konversi stoikiometri maksimal.' },
+  nacl_concentration: { target: 95.5, min: 80.0, max: 120.0, reason: 'Kadar garam optimum katalisator reduksi klorat.' },
+  nacl_concentration_gpl: { target: 95.5, min: 80.0, max: 120.0, reason: 'Kadar garam optimum katalisator reduksi klorat.' },
+  hcl_feed: { target: 4.13, min: 3.0, max: 5.5, reason: 'Laju alir asam klorida optimum rasio stoikiometri.' },
+  hcl_feed_m3h: { target: 4.13, min: 3.0, max: 5.5, reason: 'Laju alir asam klorida optimum rasio stoikiometri.' },
+  so2_dosage: { target: 4.13, min: 3.0, max: 5.5, reason: 'Laju alir asam klorida optimum rasio stoikiometri.' },
+  hcl_concentration: { target: 31.55, min: 28.0, max: 35.0, reason: 'Kadar HCl 31.55% memiliki korelasi T-Stat tertinggi terhadap yield.' },
+  hcl_concentration_pct: { target: 31.55, min: 28.0, max: 35.0, reason: 'Kadar HCl 31.55% memiliki korelasi T-Stat tertinggi terhadap yield.' },
+  reaction_efficiency: { target: 31.55, min: 28.0, max: 35.0, reason: 'Kadar HCl 31.55% memiliki korelasi T-Stat tertinggi terhadap yield.' },
+  generator_temperature: { target: 46.7, min: 40.0, max: 55.0, reason: 'Suhu reaktor 46.7°C mencegah dekomposisi termal gas ClO₂.' },
+  generator_temperature_c: { target: 46.7, min: 40.0, max: 55.0, reason: 'Suhu reaktor 46.7°C mencegah dekomposisi termal gas ClO₂.' },
+  pressure: { target: 46.7, min: 40.0, max: 55.0, reason: 'Suhu reaktor 46.7°C mencegah dekomposisi termal gas ClO₂.' },
+  absorber_water_temperature: { target: 8.42, min: 4.0, max: 15.0, reason: 'Suhu air dingin 8.42°C meningkatkan efisiensi absorpsi gas ClO₂.' },
+  absorber_water_temperature_c: { target: 8.42, min: 4.0, max: 15.0, reason: 'Suhu air dingin 8.42°C meningkatkan efisiensi absorpsi gas ClO₂.' },
+  temperature: { target: 8.42, min: 4.0, max: 15.0, reason: 'Suhu air dingin 8.42°C meningkatkan efisiensi absorpsi gas ClO₂.' },
+  absorber_water_rate: { target: 104.78, min: 85.0, max: 120.0, reason: 'Laju air absorber seimbang untuk mencegah gas lolos ke scrubber.' },
+  absorber_water_rate_m3h: { target: 104.78, min: 85.0, max: 120.0, reason: 'Laju air absorber seimbang untuk mencegah gas lolos ke scrubber.' },
+  production_capacity: { target: 104.78, min: 85.0, max: 120.0, reason: 'Laju air absorber seimbang untuk mencegah gas lolos ke scrubber.' },
+}
+
+const PARAM_NAME_OVERRIDES: Record<string, { name: string; unit: string; order: number }> = {
+  clo2_concentration: { name: 'Konsentrasi ClO₂', unit: 'g/L', order: 0 },
+  naclo3_feed_m3h: { name: 'NaClO₃ Feed', unit: 'm³/h', order: 1 },
+  naclo3_feed: { name: 'NaClO₃ Feed', unit: 'm³/h', order: 1 },
+  flow_rate: { name: 'NaClO₃ Feed', unit: 'm³/h', order: 1 },
+  naclo3_concentration_gpl: { name: 'NaClO₃ Concentration', unit: 'g/L', order: 2 },
+  naclo3_concentration: { name: 'NaClO₃ Concentration', unit: 'g/L', order: 2 },
+  nacl_concentration_gpl: { name: 'NaCl Concentration', unit: 'g/L', order: 3 },
+  nacl_concentration: { name: 'NaCl Concentration', unit: 'g/L', order: 3 },
+  hcl_feed_m3h: { name: 'HCl Feed', unit: 'm³/h', order: 4 },
+  hcl_feed: { name: 'HCl Feed', unit: 'm³/h', order: 4 },
+  so2_dosage: { name: 'HCl Feed', unit: 'm³/h', order: 4 },
+  hcl_concentration_pct: { name: 'HCl Concentration', unit: '%', order: 5 },
+  hcl_concentration: { name: 'HCl Concentration', unit: '%', order: 5 },
+  reaction_efficiency: { name: 'HCl Concentration', unit: '%', order: 5 },
+  generator_temperature_c: { name: 'Generator Temperature', unit: '°C', order: 6 },
+  generator_temperature: { name: 'Generator Temperature', unit: '°C', order: 6 },
+  pressure: { name: 'Generator Temperature', unit: '°C', order: 6 },
+  absorber_water_temperature_c: { name: 'Absorber Water Temperature', unit: '°C', order: 7 },
+  absorber_water_temperature: { name: 'Absorber Water Temperature', unit: '°C', order: 7 },
+  temperature: { name: 'Absorber Water Temperature', unit: '°C', order: 7 },
+  absorber_water_rate_m3h: { name: 'Absorber Water Rate', unit: 'm³/h', order: 8 },
+  absorber_water_rate: { name: 'Absorber Water Rate', unit: 'm³/h', order: 8 },
+  production_capacity: { name: 'Absorber Water Rate', unit: 'm³/h', order: 8 },
 }
 
 export function ParameterConfigPage() {
   const { processId, snapshot, refresh } = useProcessContext()
-  const parameters = snapshot?.parameters ?? []
+  const rawParameters = snapshot?.parameters ?? []
+  const parameters = rawParameters
+    .filter((p) => PARAM_NAME_OVERRIDES[p.parameter_name] !== undefined)
+    .map((p) => {
+      const meta = PARAM_NAME_OVERRIDES[p.parameter_name]
+      return {
+        ...p,
+        display_name: meta.name,
+        unit: meta.unit,
+        _order: meta.order,
+      }
+    })
+    .sort((a, b) => a._order - b._order)
 
   // Local state for editing thresholds per parameter ID
   const [edits, setEdits] = useState<

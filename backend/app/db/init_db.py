@@ -30,16 +30,15 @@ PROCESS_SEED = {
 
 PARAMETER_SEED = [
     # (name, display, unit, target, min, max)
-    ("clo2_concentration", "Konsentrasi ClO₂", "mg/L", 8.5, 5.0, 9.0),
-    ("temperature", "Suhu", "°C", 15.0, 12.0, 18.0),
-    ("pressure", "Tekanan", "bar", 9.5, 8.5, 10.5),
-    ("ph", "pH", "", 4.5, 4.0, 5.0),
-    ("flow_rate", "Laju Alir", "m³/jam", 28.0, 25.0, 30.0),
-    ("so2_dosage", "Dosis SO₂", "kg/jam", 0.42, 0.35, 0.55),
-    ("orp", "ORP", "mV", 180.0, 150.0, 220.0),
-    ("turbidity", "Turbiditas", "NTU", 0.8, 0.0, 1.5),
-    ("production_capacity", "Kapasitas Produksi", "ton/hari", 50.0, 40.0, 60.0),
-    ("reaction_efficiency", "Efisiensi Reaksi", "%", 95.0, 90.0, 99.0),
+    ("clo2_concentration", "Konsentrasi ClO₂", "g/L", 9.60, 9.0, 11.0),
+    ("naclo3_feed_m3h", "NaClO₃ Feed", "m³/h", 17.37, 14.0, 20.0),
+    ("naclo3_concentration_gpl", "NaClO₃ Concentration", "g/L", 437.16, 380.0, 480.0),
+    ("nacl_concentration_gpl", "NaCl Concentration", "g/L", 95.5, 80.0, 120.0),
+    ("hcl_feed_m3h", "HCl Feed", "m³/h", 4.13, 3.0, 5.5),
+    ("hcl_concentration_pct", "HCl Concentration", "%", 31.55, 28.0, 35.0),
+    ("generator_temperature_c", "Generator Temperature", "°C", 46.7, 40.0, 55.0),
+    ("absorber_water_temperature_c", "Absorber Water Temperature", "°C", 8.42, 4.0, 15.0),
+    ("absorber_water_rate_m3h", "Absorber Water Rate", "m³/h", 104.78, 85.0, 120.0),
 ]
 
 KNOWLEDGE_SEED = [
