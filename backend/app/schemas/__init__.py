@@ -1,8 +1,6 @@
 """Typed API contracts (Pydantic v2)."""
-
 from datetime import datetime
 from typing import Any, Literal
-
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 Severity = Literal["INFO", "WARNING", "CRITICAL"]

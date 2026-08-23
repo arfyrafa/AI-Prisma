@@ -1,7 +1,6 @@
 import { Download, Printer, RefreshCw, Sparkles } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-
 import { DeviationPanel } from '../components/DeviationPanel'
 import { InsightCard } from '../components/InsightCard'
 import { KpiCard } from '../components/KpiCard'
@@ -43,7 +42,6 @@ export function DashboardPage() {
   const reference = parameters.data?.find((p) => p.parameter_name === PRIMARY_PARAMETER) ?? null
   const latestInsight = insights.data?.[0] ?? null
   const pendingRecommendations = (recommendations.data ?? []).filter((r) => r.status === 'pending')
-
   const stages: PipelineStage[] = useMemo(() => {
     const hasReading = Boolean(snapshot?.reading)
     const deviationCount = deviations.data?.length ?? 0
@@ -176,15 +174,14 @@ export function DashboardPage() {
           <div className="flex flex-wrap items-center gap-2.5 sm:gap-3.5">
             <StatusPill
               status={snapshot?.overall_status ?? 'no_data'}
-              label={`Kondisi: ${
-                snapshot?.overall_status === 'normal'
-                  ? 'Normal'
-                  : snapshot?.overall_status === 'warning'
-                    ? 'Peringatan'
-                    : snapshot?.overall_status === 'critical'
-                      ? 'Kritis'
-                      : 'Tidak ada data'
-              }`}
+              label={`Kondisi: ${snapshot?.overall_status === 'normal'
+                ? 'Normal'
+                : snapshot?.overall_status === 'warning'
+                  ? 'Peringatan'
+                  : snapshot?.overall_status === 'critical'
+                    ? 'Kritis'
+                    : 'Tidak ada data'
+                }`}
               size="md"
             />
             <span className="text-xs font-mono text-slate-400 hidden xl:inline">

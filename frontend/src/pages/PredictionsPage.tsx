@@ -64,12 +64,12 @@ export function PredictionsPage() {
   const predictedPoint =
     latest && history.data?.points.length
       ? {
-          timestamp: new Date(
-            new Date(history.data.points[history.data.points.length - 1].timestamp).getTime() +
-              latest.prediction_horizon * 60000,
-          ).toISOString(),
-          value: latest.predicted_value ?? 0,
-        }
+        timestamp: new Date(
+          new Date(history.data.points[history.data.points.length - 1].timestamp).getTime() +
+          latest.prediction_horizon * 60000,
+        ).toISOString(),
+        value: latest.predicted_value ?? 0,
+      }
       : null
 
   const run = async () => {
@@ -117,11 +117,10 @@ export function PredictionsPage() {
           <button
             type="button"
             onClick={() => setActiveTab('whatif')}
-            className={`inline-flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-bold transition-all ${
-              activeTab === 'whatif'
+            className={`inline-flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-bold transition-all ${activeTab === 'whatif'
                 ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
-            }`}
+              }`}
           >
             <Sliders className="h-3.5 w-3.5" />
             Simulasi What-If (Sandbox)
@@ -129,11 +128,10 @@ export function PredictionsPage() {
           <button
             type="button"
             onClick={() => setActiveTab('historical')}
-            className={`inline-flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-bold transition-all ${
-              activeTab === 'historical'
+            className={`inline-flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-bold transition-all ${activeTab === 'historical'
                 ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
-            }`}
+              }`}
           >
             <Gauge className="h-3.5 w-3.5" />
             Prediksi Historis DCS
@@ -225,7 +223,7 @@ export function PredictionsPage() {
               {/* X1 */}
               <div className="space-y-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 p-4 border border-slate-100 dark:border-slate-800">
                 <div className="flex justify-between items-baseline">
-                  <label className="text-xs font-bold text-slate-800 dark:text-slate-200">X₁ NaClO₃ Feed</label>
+                  <label className="text-xs font-bold text-slate-800 dark:text-slate-200">NaClO₃ Feed</label>
                   <span className="font-mono text-xs font-bold text-sky-600 dark:text-sky-400">{x1} m³/h</span>
                 </div>
                 <input
@@ -247,7 +245,7 @@ export function PredictionsPage() {
               {/* X2 */}
               <div className="space-y-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 p-4 border border-slate-100 dark:border-slate-800">
                 <div className="flex justify-between items-baseline">
-                  <label className="text-xs font-bold text-slate-800 dark:text-slate-200">X₂ NaClO₃ Conc.</label>
+                  <label className="text-xs font-bold text-slate-800 dark:text-slate-200">NaClO₃ Conc.</label>
                   <span className="font-mono text-xs font-bold text-sky-600 dark:text-sky-400">{x2} g/L</span>
                 </div>
                 <input
@@ -269,7 +267,7 @@ export function PredictionsPage() {
               {/* X3 */}
               <div className="space-y-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 p-4 border border-slate-100 dark:border-slate-800">
                 <div className="flex justify-between items-baseline">
-                  <label className="text-xs font-bold text-slate-800 dark:text-slate-200">X₃ NaCl Conc.</label>
+                  <label className="text-xs font-bold text-slate-800 dark:text-slate-200">NaCl Conc.</label>
                   <span className="font-mono text-xs font-bold text-sky-600 dark:text-sky-400">{x3} g/L</span>
                 </div>
                 <input
@@ -291,7 +289,7 @@ export function PredictionsPage() {
               {/* X4 */}
               <div className="space-y-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 p-4 border border-slate-100 dark:border-slate-800">
                 <div className="flex justify-between items-baseline">
-                  <label className="text-xs font-bold text-slate-800 dark:text-slate-200">X₄ HCl Feed</label>
+                  <label className="text-xs font-bold text-slate-800 dark:text-slate-200">HCl Feed</label>
                   <span className="font-mono text-xs font-bold text-sky-600 dark:text-sky-400">{x4} m³/h</span>
                 </div>
                 <input
@@ -313,7 +311,7 @@ export function PredictionsPage() {
               {/* X5 */}
               <div className="space-y-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 p-4 border border-slate-100 dark:border-slate-800">
                 <div className="flex justify-between items-baseline">
-                  <label className="text-xs font-bold text-slate-800 dark:text-slate-200">X₅ HCl Conc.</label>
+                  <label className="text-xs font-bold text-slate-800 dark:text-slate-200">HCl Conc.</label>
                   <span className="font-mono text-xs font-bold text-sky-600 dark:text-sky-400">{x5} %</span>
                 </div>
                 <input
@@ -335,7 +333,7 @@ export function PredictionsPage() {
               {/* X7 */}
               <div className="space-y-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 p-4 border border-slate-100 dark:border-slate-800">
                 <div className="flex justify-between items-baseline">
-                  <label className="text-xs font-bold text-slate-800 dark:text-slate-200">X₇ Generator Temp</label>
+                  <label className="text-xs font-bold text-slate-800 dark:text-slate-200">Generator Temp</label>
                   <span className="font-mono text-xs font-bold text-sky-600 dark:text-sky-400">{x7} °C</span>
                 </div>
                 <input
@@ -357,7 +355,7 @@ export function PredictionsPage() {
               {/* X9 */}
               <div className="space-y-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 p-4 border border-slate-100 dark:border-slate-800">
                 <div className="flex justify-between items-baseline">
-                  <label className="text-xs font-bold text-slate-800 dark:text-slate-200">X₉ Chilled H₂O Temp</label>
+                  <label className="text-xs font-bold text-slate-800 dark:text-slate-200">Chilled H₂O Temp</label>
                   <span className="font-mono text-xs font-bold text-sky-600 dark:text-sky-400">{x9} °C</span>
                 </div>
                 <input
@@ -379,7 +377,7 @@ export function PredictionsPage() {
               {/* X10 */}
               <div className="space-y-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 p-4 border border-slate-100 dark:border-slate-800">
                 <div className="flex justify-between items-baseline">
-                  <label className="text-xs font-bold text-slate-800 dark:text-slate-200">X₁₀ Absorber H₂O Rate</label>
+                  <label className="text-xs font-bold text-slate-800 dark:text-slate-200">Absorber H₂O Rate</label>
                   <span className="font-mono text-xs font-bold text-sky-600 dark:text-sky-400">{x10} m³/h</span>
                 </div>
                 <input
