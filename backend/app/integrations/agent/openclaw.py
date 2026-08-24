@@ -238,23 +238,31 @@ Analisis kondisi proses ini dan berikan output JSON dengan skema berikut:
             for p in context.parameters
             if isinstance(p, dict) and "parameter_name" in p
         }
-        clo2 = readings.get("clo2_concentration") or 8.4
-        ph = readings.get("ph") or 4.5
-        so2 = readings.get("so2_dosage") or 0.42
-        flow = readings.get("flow_rate") or 28.0
-        temp = readings.get("temperature") or 15.2
+        clo2 = readings.get("clo2_concentration") or 9.60
+        x1 = readings.get("naclo3_feed") or readings.get("flow_rate") or 17.37
+        x2 = readings.get("naclo3_concentration") or readings.get("reaction_efficiency") or 437.16
+        x3 = readings.get("nacl_concentration") or readings.get("orp") or 95.50
+        x4 = readings.get("hcl_feed") or readings.get("so2_dosage") or 4.13
+        x5 = readings.get("hcl_concentration") or readings.get("ph") or 31.55
+        x7 = readings.get("generator_temperature") or readings.get("pressure") or 46.70
+        x9 = readings.get("absorber_water_temperature") or readings.get("temperature") or 8.42
+        x10 = readings.get("absorber_water_rate") or readings.get("production_capacity") or 104.78
 
         # Try LLM if configured
         if self.base_url and self.api_key:
             try:
                 system_ctx = (
                     f"{OPENCLAW_SYSTEM_PROMPT}\n\n"
-                    f"Telemetri Proses Terkini:\n"
-                    f"- Konsentrasi ClO₂: {clo2:.2f} mg/L\n"
-                    f"- pH: {ph:.2f}\n"
-                    f"- Dosis SO₂: {so2:.3f} kg/jam\n"
-                    f"- Laju Alir: {flow:.1f} m³/jam\n"
-                    f"- Suhu: {temp:.1f} °C\n"
+                    f"Telemetri Proses Terkini (8 Parameter Kimia):\n"
+                    f"- Konsentrasi ClO₂ (Y): {clo2:.2f} g/L\n"
+                    f"- NaClO₃ Feed (X1): {x1:.2f} m³/h\n"
+                    f"- NaClO₃ Concentration (X2): {x2:.1f} g/L\n"
+                    f"- NaCl Concentration (X3): {x3:.1f} g/L\n"
+                    f"- HCl Feed (X4): {x4:.2f} m³/h\n"
+                    f"- HCl Concentration (X5): {x5:.1f} %\n"
+                    f"- Suhu Generator (X7): {x7:.1f} °C\n"
+                    f"- Suhu Air Absorber (X9): {x9:.1f} °C\n"
+                    f"- Laju Air Absorber (X10): {x10:.1f} m³/h\n"
                     f"- Deviasi Aktif: {len(context.deviations)} parameter"
                 )
                 messages_payload = [{"role": "system", "content": system_ctx}]
@@ -277,7 +285,7 @@ Analisis kondisi proses ini dan berikan output JSON dengan skema berikut:
                     return AgentChatReply(
                         reply=reply_text,
                         source="openclaw-llm",
-                        related_parameters=["clo2_concentration", "ph", "so2_dosage"],
+                        related_parameters=["clo2_concentration", "flow_rate", "so2_dosage"],
                     )
             except Exception as exc:  # noqa: BLE001
                 logger.warning("LLM chat failed, using local OpenClaw response engine: %s", exc)
@@ -315,54 +323,58 @@ Analisis kondisi proses ini dan berikan output JSON dengan skema berikut:
 
             y_pred = ml_result.predicted_value
             status_proc = {
-                "LOW": "ClO\u2082 Rendah (<9.7 g/L)",
-                "NORMAL": "ClO\u2082 Normal (9.7\u201311.0 g/L)",
-                "HIGH": "ClO\u2082 Tinggi (>11.0 g/L)",
+                "LOW": "ClO₂ Rendah (<9.70 g/L)",
+                "NORMAL": "ClO₂ Normal (9.70–9.80 g/L)",
+                "HIGH": "ClO₂ Tinggi (>9.80 g/L Kritis)",
             }[ml_result.process_condition]
 
             error_text = ""
             if ml_result.error_pct is not None:
                 error_text = (
-                    f"\n\u2022 **Aktual Lab:** {ml_result.actual_value:.3f} g/L\n"
-                    f"> \u2022 **Error Absolut:** {ml_result.error_abs:.3f} g/L\n"
-                    f"\u2022 **Error Persen:** {ml_result.error_pct:.2f}%\n"
-                    f"\u2022 **Status Toleransi:** {ml_result.accuracy_status}\n"
+                    f"\n• **Aktual Lab:** {ml_result.actual_value:.3f} g/L\n"
+                    f"• **Error Absolut:** {ml_result.error_abs:.3f} g/L\n"
+                    f"• **Error Persen:** {ml_result.error_pct:.2f}%\n"
+                    f"• **Status Toleransi:** {ml_result.accuracy_status}\n"
                 )
 
             warning_text = ""
             if ml_result.warnings:
-                warning_text = "\n\u26a0\ufe0f **Peringatan Rentang Input:**\n" + "\n".join(
-                    f"\u2022 {w}" for w in ml_result.warnings
+                warning_text = "\n⚠️ **Peringatan Rentang Input:**\n" + "\n".join(
+                    f"• {w}" for w in ml_result.warnings
                 ) + "\n"
 
             reply = (
-                f"Hasil kalkulasi Model Regresi Linier Berganda (MLR) ClO\u2082 untuk Bapak:\n\n"
-                f"\U0001f4ca **Ringkasan Prediksi:**\n"
-                f"\u2022 **Prediksi ClO\u2082 (Y):** **{y_pred:.3f} g/L**\n"
-                f"\u2022 **Status Proses:** **{status_proc}**\n"
-                f"\u2022 **Confidence:** {ml_result.confidence}"
+                f"Hasil kalkulasi Model Regresi Linier Berganda (MLR) ClO₂ untuk Bapak:\n\n"
+                f"📊 **Ringkasan Prediksi:**\n"
+                f"• **Prediksi ClO₂ (Y):** **{y_pred:.3f} g/L**\n"
+                f"• **Status Proses:** **{status_proc}**\n"
+                f"• **Confidence:** {ml_result.confidence}"
                 f"{error_text}{warning_text}\n"
-                f"\U0001f4cb **Rekomendasi Penyesuaian Lapangan:**\n"
+                f"📋 **Rekomendasi Penyesuaian Lapangan:**\n"
                 f"{ml_result.recommendation_summary}\n"
-                f"\n*Catatan:* Keputusan akhir tetap mengacu pada SOP pabrik dan verifikasi lab titrasi \U0001f64f\U0001f3fc."
+                f"\n*Catatan:* Keputusan akhir tetap mengacu pada SOP pabrik dan verifikasi lab titrasi 🙏🏼."
             )
         elif msg_lower in ["tes", "test", "ping", "cek", "halo tes"]:
             reply = (
                 "Halo Bapak, koneksi sistem AI Agent **OpenClaw** aktif dan siap melayani 🙏🏼.\n\n"
-                f"📡 **Status Telemetri Live:**\n"
-                f"• Konsentrasi ClO₂: **{clo2:.2f} mg/L**\n"
-                f"• pH Reaktor: **{ph:.2f}**\n"
-                f"• Dosis SO₂: **{so2:.3f} kg/jam**\n"
-                f"• Laju Alir Umpan: **{flow:.1f} m³/jam**\n"
-                f"• Suhu Reaktor: **{temp:.1f} °C**\n\n"
+                "📡 **Status Telemetri Live (8 Parameter Proses):**\n"
+                f"• Konsentrasi ClO₂ (Produk Y): **{clo2:.2f} g/L**\n"
+                f"• NaClO₃ Feed (X1): **{x1:.2f} m³/h**\n"
+                f"• NaClO₃ Concentration (X2): **{x2:.1f} g/L**\n"
+                f"• NaCl Concentration (X3): **{x3:.1f} g/L**\n"
+                f"• HCl Feed (X4): **{x4:.2f} m³/h**\n"
+                f"• HCl Concentration (X5): **{x5:.1f} %**\n"
+                f"• Suhu Generator (X7): **{x7:.1f} °C**\n"
+                f"• Suhu Air Absorber (X9): **{x9:.1f} °C**\n"
+                f"• Laju Air Absorber (X10): **{x10:.1f} m³/h**\n\n"
                 "Semua modul analytics, model MLR, dan diagnosis deviasi beroperasi normal. Ada parameter yang ingin Bapak evaluasi?"
             )
         elif "halo" in msg_lower or "hai" in msg_lower or "selamat" in msg_lower:
             reply = (
                 "Halo Bapak, selamat datang kembali. Saya asisten AI OpenClaw yang siap membantu analisis, "
                 "prediksi, dan evaluasi proses produksi ClO₂ Anda hari ini 🙏🏼.\n\n"
-                f"Kondisi telemetri saat ini: Konsentrasi ClO₂ tercatat **{clo2:.2f} mg/L**, pH **{ph:.2f}**, "
-                f"dan Dosis SO₂ **{so2:.3f} kg/jam**. Ada yang ingin Bapak diskusikan mengenai parameter operasi?"
+                f"Kondisi telemetri saat ini: Konsentrasi ClO₂ tercatat **{clo2:.2f} g/L**, NaClO₃ Feed **{x1:.2f} m³/h**, "
+                f"dan HCl Feed **{x4:.2f} m³/h**. Ada yang ingin Bapak diskusikan mengenai parameter operasi?"
             )
         elif "kemampuan" in msg_lower or "bisa apa" in msg_lower or "fitur" in msg_lower:
             reply = (
@@ -370,32 +382,42 @@ Analisis kondisi proses ini dan berikan output JSON dengan skema berikut:
                 "1. **Prediksi konsentrasi ClO₂** berdasarkan model regresi linier berganda (MLR).\n"
                 "2. **Diagnosis deviasi proses** dan identifikasi akar penyebab (Root Cause Analysis).\n"
                 "3. **Rekomendasi adjustment lapangan 4-tingkat** (Absorber, Generator, Kualitas Reaktan, Validasi Lab) yang aman dan bertahap.\n"
-                "4. **Penjelasan dampak parameter** seperti rasio NaClO₃ Feed, HCl/SO₂ dosage, laju alir absorber, dan temperatur terhadap yield ClO₂ 🙏🏼."
+                "4. **Penjelasan dampak parameter** seperti rasio NaClO₃ Feed, HCl Feed, laju alir absorber, dan temperatur terhadap yield ClO₂ 🙏🏼."
             )
         elif "rekomendasi" in msg_lower or "saran" in msg_lower or "tindakan" in msg_lower:
-            if clo2 > 9.0:
+            if clo2 > 9.80:
                 reply = (
-                    f"Berdasarkan pembacaan ClO₂ saat ini ({clo2:.2f} mg/L yang cenderung tinggi), "
-                    "rekomendasi bertahap OpenClaw adalah:\n"
-                    "1. **Prioritas 1 (Absorber):** Pertimbangkan menaikkan laju air absorber secara bertahap untuk menjaga penyerapan gas dan pengenceran aman.\n"
-                    "2. **Prioritas 2 (Generator):** Pertimbangkan menurunkan dosis SO₂ bertahap (2–5%) menuju target 0.410 kg/jam.\n"
-                    "3. **Prioritas 4 (Lab):** Verifikasi sampel dengan titrasi laboratorium sebelum melakukan perubahan drastis 🙏🏼."
+                    f"Berdasarkan pembacaan ClO₂ saat ini ({clo2:.2f} g/L yang melewati batas kritis > 9.80 g/L), "
+                    "rekomendasi darurat bertahap OpenClaw adalah:\n"
+                    "1. **Prioritas 1 (Absorber):** Segera naikkan laju air absorber (X10) secara bertahap 3–5% untuk meningkatkan pengenceran dan mencegah gas loss.\n"
+                    "2. **Prioritas 2 (Generator):** Turunkan laju HCl Feed (X4) sebesar 5% guna meredam laju pembentukan gas berlebih.\n"
+                    "3. **Prioritas 4 (Lab):** Ambil sampel produk di titik SP-02 untuk validasi titrasi iodometri 🙏🏼."
+                )
+            elif clo2 < 9.70:
+                reply = (
+                    f"Konsentrasi ClO₂ saat ini ({clo2:.2f} g/L) berada di bawah batas optimum 9.70 g/L.\n"
+                    "Rekomendasi OpenClaw:\n"
+                    "1. Periksa kualitas konsentrasi HCl (X5) dan NaClO₃ (X2).\n"
+                    "2. Naikkan umpan HCl Feed (X4) secara bertahap 2–3% untuk memacu kinetika pembentukan ClO₂."
                 )
             else:
                 reply = (
-                    f"Konsentrasi ClO₂ saat ini ({clo2:.2f} mg/L) berada dalam rentang operasi nominal. "
-                    "Rekomendasi OpenClaw adalah mempertahankan kestabilan rasio umpan dan laju alir pendingin absorber 🙏🏼."
+                    f"Konsentrasi ClO₂ saat ini ({clo2:.2f} g/L) berada dalam rentang operasi ideal (9.70 – 9.80 g/L).\n"
+                    "Pertahankan kestabilan rasio umpan dan laju alir pendingin absorber 🙏🏼."
                 )
         elif "rumus" in msg_lower or "formula" in msg_lower or "mlr" in msg_lower or "model" in msg_lower:
             reply = (
                 "Persamaan Regresi Linier Berganda (MLR) ClO₂ yang digunakan dalam sistem OpenClaw adalah:\n\n"
                 "**Y = 3.11 - 0.1407·X₁ + 0.003192·X₂ + 0.00613·X₃ + 0.799·X₄ + 0.2343·X₅ - 0.0220·X₇ - 0.0607·X₉ - 0.02148·X₁₀**\n\n"
-                "Keterangan variabel dominan:\n"
+                "Keterangan 8 Variabel Proses:\n"
                 "• **X₁:** NaClO₃ Feed (m³/h)\n"
                 "• **X₂:** NaClO₃ Concentration (g/L)\n"
-                "• **X₄:** HCl / SO₂ Feed Ratio\n"
-                "• **X₉:** Suhu Chilled Water (°C)\n"
-                "• **X₁₀:** Absorber H₂O Rate (m³/h)\n"
+                "• **X₃:** NaCl Concentration (g/L)\n"
+                "• **X₄:** HCl Feed (m³/h)\n"
+                "• **X₅:** HCl Concentration (%)\n"
+                "• **X₇:** Generator ClO₂ Output Temp (°C)\n"
+                "• **X₉:** Absorber Chilled Water Temp (°C)\n"
+                "• **X₁₀:** Absorber Water Rate (m³/h)\n"
                 "Dominansi pengaruh terbesar ditentukan oleh nilai |T-Value| statistik model 🙏🏼."
             )
         else:
