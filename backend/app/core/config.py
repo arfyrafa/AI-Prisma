@@ -20,12 +20,12 @@ class Settings(BaseSettings):
     # Comma separated list, e.g. "http://localhost:5173,http://localhost:8080"
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:8080,http://localhost:3000"
 
-    # --- External AI Agent (OpenClaw or any other framework) ---------------
+    # --- External AI Agent (OpenClaw or 9router) -------------------------
     # AGENT_PROVIDER: "mock" | "openclaw"
     AGENT_PROVIDER: str = "openclaw"
-    AGENT_API_URL: str = ""
-    AGENT_API_KEY: str = ""
-    AGENT_TIMEOUT_SECONDS: float = 20.0
+    AGENT_API_URL: str = "http://host.docker.internal:2026/v1"
+    AGENT_API_KEY: str = "sk-b3f1a5e1ce5843aa-w9huiy-f9654c92"
+    AGENT_TIMEOUT_SECONDS: float = 30.0
     OPENCLAW_MODEL: str = "gpt-4o-mini"
 
     # --- Predictive model --------------------------------------------------
