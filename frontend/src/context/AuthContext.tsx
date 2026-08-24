@@ -9,8 +9,8 @@ export interface UserProfile {
   email: string
   password?: string
   role: UserRole
-  department: string
-  engineerId: string
+  department?: string
+  engineerId?: string
   isActive: boolean
   avatarUrl?: string
   createdAt?: string
@@ -33,36 +33,12 @@ interface AuthContextType {
 const DEFAULT_USERS_SEED: UserProfile[] = [
   {
     id: '1',
-    name: 'Alex Rivera',
+    name: 'Administrator',
     email: 'admin@prisma.ai',
     password: 'admin123',
     role: 'Admin',
-    department: 'Kepala Operasi & Chemical Plant',
-    engineerId: 'ENG-ADM-001',
     isActive: true,
-    createdAt: '2026-01-15T08:00:00Z',
-  },
-  {
-    id: '2',
-    name: 'Budi Santoso',
-    email: 'operator@prisma.ai',
-    password: 'operator123',
-    role: 'Operator',
-    department: 'Operator Shift A - ClO₂ Unit',
-    engineerId: 'OPR-2026-102',
-    isActive: true,
-    createdAt: '2026-02-10T09:30:00Z',
-  },
-  {
-    id: '3',
-    name: 'Luqman Hakim',
-    email: 'luqman@prisma.ai',
-    password: 'luqman123',
-    role: 'Operator',
-    department: 'Process Engineering Specialist',
-    engineerId: 'ENG-CLO2-77',
-    isActive: true,
-    createdAt: '2026-03-01T10:15:00Z',
+    createdAt: '2026-01-01T00:00:00Z',
   },
 ]
 

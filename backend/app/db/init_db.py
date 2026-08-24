@@ -5,10 +5,8 @@ migrations when the schema starts evolving in production.
 """
 
 import logging
-
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-
 from app.core.config import settings
 from app.db.base import Base
 from app.db.session import SessionLocal, engine
@@ -268,30 +266,10 @@ from app.models.user import User
 
 USER_SEED = [
     {
-        "name": "Alex Rivera",
+        "name": "Administrator",
         "email": "admin@prisma.ai",
         "password_hash": hashlib.sha256(b"admin123").hexdigest(),
         "role": "Admin",
-        "department": "Kepala Operasi & Chemical Plant",
-        "engineer_id": "ENG-ADM-001",
-        "is_active": True,
-    },
-    {
-        "name": "Budi Santoso",
-        "email": "operator@prisma.ai",
-        "password_hash": hashlib.sha256(b"operator123").hexdigest(),
-        "role": "Operator",
-        "department": "Operator Shift A - ClO₂ Unit",
-        "engineer_id": "OPR-2026-102",
-        "is_active": True,
-    },
-    {
-        "name": "Luqman Hakim",
-        "email": "luqman@prisma.ai",
-        "password_hash": hashlib.sha256(b"luqman123").hexdigest(),
-        "role": "Operator",
-        "department": "Process Engineering Specialist",
-        "engineer_id": "ENG-CLO2-77",
         "is_active": True,
     },
 ]
