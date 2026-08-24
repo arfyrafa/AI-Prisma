@@ -28,7 +28,7 @@ def build_latest_snapshot(db: Session, process: Process) -> LatestSnapshot:
         process=ProcessOut.model_validate(process),
         reading=SensorReadingOut.model_validate(reading) if reading else None,
         parameters=snapshots,
-        overall_status=deviation_service.overall_status(snapshots),  # type: ignore[arg-type]
+        overall_status=deviation_service.overall_status(snapshots),
         active_alert_count=alert_repo.count_active_alerts(db, process.id),
         data_source=process.data_source,
         server_time=datetime.now(timezone.utc),

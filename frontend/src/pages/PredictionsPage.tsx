@@ -42,11 +42,11 @@ export function PredictionsPage() {
     0.02148 * x10
 
   const whatIfStatus =
-    whatIfPredicted < 9.7
-      ? { label: 'ClO₂ Rendah', color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900', desc: 'Konsentrasi di bawah batas optimum 9.7 g/L. Kurang efektif untuk bleaching pulp.' }
-      : whatIfPredicted > 11.0
-        ? { label: 'ClO₂ Tinggi', color: 'text-rose-500', bg: 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-900', desc: 'Konsentrasi di atas batas 11.0 g/L. Risiko gas loss dan pemborosan reagen.' }
-        : { label: 'ClO₂ Normal (Optimal)', color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900', desc: 'Berada pada rentang spesifikasi terbaik (9.7 – 11.0 g/L).' }
+    whatIfPredicted > 9.8
+      ? { label: 'ClO₂ Tinggi (Kritis)', color: 'text-rose-500', bg: 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-900', desc: 'Konsentrasi di atas batas aman 9.80 g/L! Risiko gas loss, pemborosan reagen & dekomposisi ClO₂.' }
+      : whatIfPredicted < 9.7
+        ? { label: 'ClO₂ Rendah', color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900', desc: 'Konsentrasi di bawah batas optimum 9.70 g/L. Kurang efektif untuk pemutihan pulp.' }
+        : { label: 'ClO₂ Normal (Optimal)', color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900', desc: 'Berada pada rentang aman dan ideal (9.70 – 9.80 g/L).' }
 
   const actualNum = actualLab !== '' ? Number(actualLab) : null
   const errorAbs = actualNum ? Math.abs(actualNum - whatIfPredicted) : null
