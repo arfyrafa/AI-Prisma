@@ -4,15 +4,13 @@ import {
   LayoutDashboard,
   Lightbulb,
   LogOut,
-  Moon,
   Sliders,
   Sparkles,
-  Sun,
   TrendingUp,
   User,
   UserCog,
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 
 import { FloatingAssistantWidget } from '../components/FloatingAssistantWidget'
@@ -44,25 +42,12 @@ export function AppLayout() {
   const { user, logout } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
-  const [darkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem('theme') === 'dark' || document.documentElement.classList.contains('dark')
-  })
-
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark')
-      localStorage.setItem('theme', 'dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-      localStorage.setItem('theme', 'light')
-    }
-  }, [darkMode])
 
   const simulation = health !== null && health !== undefined ? health.simulation_mode : snapshot?.data_source === 'simulation'
   const online = mode !== 'offline' && !error
 
   return (
-    <div className="flex min-h-screen bg-canvas dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
+    <div className="flex min-h-screen bg-canvas text-slate-900 transition-colors">
       {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-40 w-64 shrink-0 bg-slate-950 text-white transition-transform duration-300 ease-in-out border-r border-slate-800/80 lg:static lg:translate-x-0 ${
@@ -129,12 +114,12 @@ export function AppLayout() {
 
       {/* Main column */}
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-20 border-b border-slate-200/80 dark:border-slate-800 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md shadow-xs transition-colors">
+        <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/85 backdrop-blur-md shadow-xs transition-colors">
           <div className="flex h-16 items-center justify-between gap-4 px-4 lg:px-6">
             <div className="flex items-center gap-3">
               <button
                 type="button"
-                className="btn-ghost px-2 lg:hidden text-slate-700 dark:text-slate-200"
+                className="btn-ghost px-2 lg:hidden text-slate-700"
                 onClick={() => setMenuOpen(true)}
                 aria-label="Buka menu"
               >
@@ -146,8 +131,8 @@ export function AppLayout() {
                 className="h-8 w-8 object-contain hidden sm:block drop-shadow-sm"
               />
               <div>
-                <p className="eyebrow dark:text-slate-400">Proses aktif</p>
-                <h1 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white tracking-tight">
+                <p className="eyebrow">Proses aktif</p>
+                <h1 className="text-xs sm:text-sm font-bold text-slate-900 tracking-tight">
                   {snapshot?.process.name ?? 'Proses Produksi ClO₂'}
                 </h1>
               </div>
@@ -155,8 +140,8 @@ export function AppLayout() {
 
             <div className="flex items-center gap-2.5 sm:gap-3.5">
               <div className="hidden text-right xl:block">
-                <p className="eyebrow dark:text-slate-400">Pembaruan terakhir</p>
-                <p className="text-xs font-medium text-slate-600 dark:text-slate-300">
+                <p className="eyebrow">Pembaruan terakhir</p>
+                <p className="text-xs font-medium text-slate-600">
                   {formatRelative(snapshot?.reading?.timestamp ?? lastEventAt)}
                 </p>
               </div>
@@ -165,8 +150,8 @@ export function AppLayout() {
               <div
                 className={`hidden sm:flex items-center gap-2 rounded-full border px-3 py-1 ${
                   online
-                    ? 'border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/80 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300'
-                    : 'border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300'
+                    ? 'border-emerald-200 bg-emerald-50/80 text-emerald-800'
+                    : 'border-rose-200 bg-rose-50 text-rose-800'
                 }`}
               >
                 <span
@@ -181,46 +166,35 @@ export function AppLayout() {
                 </span>
               </div>
 
-              {/* Dark Mode Toggle Switch */}
-              <button
-                type="button"
-                onClick={() => setDarkMode(!darkMode)}
-                className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shadow-xs"
-                title={darkMode ? 'Beralih ke Light Mode' : 'Beralih ke Dark Mode'}
-                aria-label="Toggle Dark Mode"
-              >
-                {darkMode ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-slate-600" />}
-              </button>
-
               {/* Notification Popover */}
               <NotificationPopover />
 
               {/* User Profile Dropdown Menu */}
-              <div className="relative border-l border-slate-200 dark:border-slate-800 pl-2.5">
+              <div className="relative border-l border-slate-200 pl-2.5">
                 <button
                   type="button"
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center gap-2 rounded-xl p-1 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  className="flex items-center gap-2 rounded-xl p-1 hover:bg-slate-100 transition-colors"
                 >
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-sky-500 to-blue-600 text-xs font-black text-white shadow-sm">
                     {user?.name ? user.name.substring(0, 2).toUpperCase() : 'EG'}
                   </div>
                   <div className="hidden text-left md:block leading-tight pr-1">
-                    <p className="text-xs font-bold text-slate-800 dark:text-slate-200">{user?.name ?? 'Engineer'}</p>
-                    <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold">{user?.role ?? 'Process Engineer'}</p>
+                    <p className="text-xs font-bold text-slate-800">{user?.name ?? 'Engineer'}</p>
+                    <p className="text-[10px] text-slate-400 font-semibold">{user?.role ?? 'Process Engineer'}</p>
                   </div>
                 </button>
 
                 {userMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-52 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-1.5 shadow-2xl z-50 animate-in fade-in slide-in-from-top-1 duration-150">
-                    <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800 mb-1">
-                      <p className="text-xs font-bold text-slate-900 dark:text-slate-100">{user?.name}</p>
-                      <p className="text-[11px] text-slate-400 dark:text-slate-500 font-mono truncate">{user?.email}</p>
+                  <div className="absolute right-0 mt-2 w-52 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-2xl z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+                    <div className="px-3 py-2 border-b border-slate-100 mb-1">
+                      <p className="text-xs font-bold text-slate-900">{user?.name}</p>
+                      <p className="text-[11px] text-slate-400 font-mono truncate">{user?.email}</p>
                     </div>
                     <NavLink
                       to="/settings"
                       onClick={() => setUserMenuOpen(false)}
-                      className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                      className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors"
                     >
                       <User className="h-3.5 w-3.5 text-slate-500" />
                       Profil &amp; Pengaturan
@@ -231,7 +205,7 @@ export function AppLayout() {
                         setUserMenuOpen(false)
                         logout()
                       }}
-                      className="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-left transition-colors"
+                      className="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 text-left transition-colors"
                     >
                       <LogOut className="h-3.5 w-3.5 text-rose-500" />
                       Keluar (Logout)
@@ -243,9 +217,9 @@ export function AppLayout() {
           </div>
 
           {simulation && (
-            <div className="flex flex-wrap items-center gap-2 border-t border-amber-200/60 dark:border-amber-900/40 bg-amber-50/80 dark:bg-amber-950/30 px-4 py-1.5 lg:px-6">
+            <div className="flex flex-wrap items-center gap-2 border-t border-amber-200/60 bg-amber-50/80 px-4 py-1.5 lg:px-6">
               <StatusPill status="warning" label="Simulation Mode" />
-              <p className="text-xs font-medium text-amber-900 dark:text-amber-300">
+              <p className="text-xs font-medium text-amber-900">
                 Data proses dihasilkan simulator untuk keperluan demo — bukan data produksi nyata.
               </p>
             </div>
