@@ -1,7 +1,6 @@
 import {
   Activity,
   BookOpen,
-  Bot,
   LayoutDashboard,
   Lightbulb,
   LogOut,
@@ -16,6 +15,7 @@ import {
 import { useEffect, useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 
+import { FloatingAssistantWidget } from '../components/FloatingAssistantWidget'
 import { NotificationPopover } from '../components/NotificationPopover'
 import { StatusPill } from '../components/StatusPill'
 import { useAuth } from '../context/AuthContext'
@@ -30,7 +30,6 @@ const NAV_ITEMS = [
   { to: '/insights', label: 'Insight AI', icon: Sparkles },
   { to: '/recommendations', label: 'Rekomendasi', icon: Lightbulb },
   { to: '/knowledge-base', label: 'Knowledge Base', icon: BookOpen },
-  { to: '/assistant', label: 'AI Assistant', icon: Bot },
   { to: '/settings', label: 'Profil & Akun', icon: UserCog },
 ]
 
@@ -256,6 +255,9 @@ export function AppLayout() {
         <main className="flex-1 px-4 py-6 lg:px-8">
           <Outlet />
         </main>
+
+        {/* Global Floating AI Assistant Widget */}
+        <FloatingAssistantWidget />
       </div>
     </div>
   )
