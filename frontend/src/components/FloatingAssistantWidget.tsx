@@ -17,7 +17,7 @@ import type { ChatMessage } from '../types'
 import { formatClock } from '../utils/format'
 
 const QUICK_SUGGESTIONS = [
-  'Bagaimana status konsentrasi ClO₂ saat ini?',
+  'Bagaimana kondisi ClO₂ saat ini?',
   'Apa rekomendasi jika ClO₂ > 9.80 g/L?',
   'Jelaskan pengaruh HCl Feed (X4) ke produk',
   'Apa SOP saat suhu generator naik > 47°C?',
@@ -26,6 +26,41 @@ const QUICK_SUGGESTIONS = [
 interface Bubble extends ChatMessage {
   at: Date
   source?: string
+}
+
+function FormattedMessage({ content, isUser }: { content: string; isUser: boolean }) {
+  const lines = content.split('\n')
+
+  return (
+    <div className="space-y-1 leading-relaxed">
+      {lines.map((line, lineIdx) => {
+        if (!line.trim()) {
+          return <div key={lineIdx} className="h-1.5" />
+        }
+
+        const parts = line.split(/(\*\*[^*]+\*\*)/g)
+
+        return (
+          <p key={lineIdx} className={`${line.startsWith('•') || line.startsWith('-') ? 'pl-1.5' : ''}`}>
+            {parts.map((part, partIdx) => {
+              if (part.startsWith('**') && part.endsWith('**')) {
+                const boldText = part.slice(2, -2)
+                return (
+                  <strong
+                    key={partIdx}
+                    className={`font-semibold ${isUser ? 'text-white' : 'text-slate-900 dark:text-sky-300'}`}
+                  >
+                    {boldText}
+                  </strong>
+                )
+              }
+              return <span key={partIdx}>{part}</span>
+            })}
+          </p>
+        )
+      })}
+    </div>
+  )
 }
 
 export function FloatingAssistantWidget() {
@@ -193,13 +228,13 @@ export function FloatingAssistantWidget() {
                 )}
 
                 <div
-                  className={`group relative max-w-[82%] rounded-2xl px-4 py-3 shadow-xs ${
+                  className={`group relative max-w-[84%] rounded-2xl px-4 py-3 shadow-xs ${
                     msg.role === 'user'
                       ? 'bg-sky-600 text-white rounded-br-xs'
                       : 'border border-slate-200/80 dark:border-slate-800 bg-slate-50/90 dark:bg-slate-800/80 text-slate-800 dark:text-slate-200 rounded-bl-xs leading-relaxed'
                   }`}
                 >
-                  <p className="whitespace-pre-wrap">{msg.content}</p>
+                  <FormattedMessage content={msg.content} isUser={msg.role === 'user'} />
 
                   <div className="mt-1.5 flex items-center justify-between gap-2 text-[9px] opacity-70">
                     <span>{formatClock(msg.at)}</span>
@@ -314,7 +349,7 @@ export function FloatingAssistantWidget() {
             </div>
             {/* Tooltip on hover */}
             <span className="absolute right-16 whitespace-nowrap rounded-xl bg-slate-900/90 backdrop-blur-sm px-3 py-1.5 text-xs font-semibold text-white shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 border border-slate-700">
-              💬 Tanya OpenClaw AI
+              Tanya OpenClaw AI
             </span>
           </>
         )}
