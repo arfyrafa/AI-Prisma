@@ -1,4 +1,3 @@
-import { ShieldCheck, UserCog } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
@@ -6,8 +5,8 @@ import { useAuth } from '../context/AuthContext'
 export function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
-  const [email, setEmail] = useState('admin@prisma.ai')
-  const [password, setPassword] = useState('admin123')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const sessionExpired = localStorage.getItem('prisma_session_expired_notice') === 'true'
@@ -34,20 +33,6 @@ export function LoginPage() {
     } finally {
       setLoading(false)
     }
-  }
-
-  const handleQuickLogin = async (targetEmail: string, targetPass: string) => {
-    setEmail(targetEmail)
-    setPassword(targetPass)
-    setLoading(true)
-    setError(null)
-    const res = await login(targetEmail, targetPass)
-    if (res.success) {
-      navigate('/', { replace: true })
-    } else {
-      setError(res.message || 'Gagal login.')
-    }
-    setLoading(false)
   }
 
   return (
@@ -109,7 +94,7 @@ export function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="nama@prisma.ai"
-                className="w-full rounded-xl border border-slate-700 bg-slate-800/80 px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/20 transition-all"
+                className="w-full rounded-xl border border-slate-700 bg-slate-800/80 px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:border-sky-400 focus:outline-hidden focus:ring-2 focus:ring-sky-400/20 transition-all"
               />
             </div>
 
@@ -129,7 +114,7 @@ export function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full rounded-xl border border-slate-700 bg-slate-800/80 px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/20 transition-all"
+                className="w-full rounded-xl border border-slate-700 bg-slate-800/80 px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:border-sky-400 focus:outline-hidden focus:ring-2 focus:ring-sky-400/20 transition-all"
               />
             </div>
 
@@ -152,33 +137,11 @@ export function LoginPage() {
               {loading ? 'Memverifikasi Kredensial…' : 'Masuk ke Dashboard'}
             </button>
           </form>
-
-          {/* Quick Demo Access divider for Admin & Operator */}
-          <div className="mt-6 pt-5 border-t border-slate-800 text-center space-y-2">
-            <p className="text-[11px] text-slate-400 mb-2">Pilih Akses Cepat untuk Pengujian:</p>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('admin@prisma.ai', 'admin123')}
-                className="rounded-xl border border-purple-500/40 bg-purple-950/30 px-3 py-2 text-xs font-semibold text-purple-300 hover:bg-purple-900/50 transition-all flex items-center justify-center gap-1.5"
-              >
-                <ShieldCheck className="h-3.5 w-3.5 text-purple-400" /> Masuk Admin
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('operator@prisma.ai', 'operator123')}
-                className="rounded-xl border border-sky-500/40 bg-sky-950/30 px-3 py-2 text-xs font-semibold text-sky-300 hover:bg-sky-900/50 transition-all flex items-center justify-center gap-1.5"
-              >
-                <UserCog className="h-3.5 w-3.5 text-sky-400" /> Masuk Operator
-              </button>
-            </div>
-          </div>
         </div>
 
         {/* Footer info */}
         <div className="text-center text-[11px] text-slate-500 space-y-1">
-          <p>PRISMA AI v1.0.0 · Role-Based Access Control</p>
-          <p>Admin memiliki akses Manajemen Akun &amp; Pengguna di menu Pengaturan.</p>
+          <p>PRISMA AI v1.0.0 · Secure Industrial Access</p>
         </div>
       </div>
     </div>

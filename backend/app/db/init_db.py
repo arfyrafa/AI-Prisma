@@ -184,6 +184,35 @@ KNOWLEDGE_SEED = [
             "konsentrasi ClO₂ menyimpang."
         ),
     },
+    {
+        "title": "SOP Mitigasi Kritis Dekomposisi Gas ClO₂ & Suhu Tinggi Generator",
+        "doc_type": "SOP Safety",
+        "reference_code": "SOP-CLO2-DEC01",
+        "version": "2.1",
+        "summary": "Protokol darurat saat konsentrasi ClO₂ melebihi 9.80 g/L atau suhu generator melebihi 47°C.",
+        "tags": ["clo2_concentration", "pressure", "temperature", "flow_rate"],
+        "content": (
+            "Prosedur Tindakan Cepat:\n"
+            "1. Jika konsentrasi ClO₂ terprediksi/terukur > 9.80 g/L, segera naikkan laju air absorber (X10) secara bertahap 3-5%.\n"
+            "2. Turunkan umpan HCl Feed (X4) sebesar 5% untuk meredam laju pembentukan gas berlebih.\n"
+            "3. Pastikan aliran gas purge inert (N₂/udara pengencer) mengalir stabil untuk menjaga konsentrasi gas ClO₂ di fasa uap < 10% vol (batas aman ledakan).\n"
+            "4. Verifikasi tekanan vakum generator (8.5 - 10.5 kPa)."
+        ),
+    },
+    {
+        "title": "SOP Pengendalian Suhu Chilled Water Absorber Column",
+        "doc_type": "SOP Operasi",
+        "reference_code": "SOP-CHW-ABS02",
+        "version": "1.8",
+        "summary": "Panduan menjaga temperatur air dingin absorber pada 6°C - 10°C untuk efisiensi penyerapan gas.",
+        "tags": ["absorber_water_temperature", "absorber_water_rate", "temperature"],
+        "content": (
+            "Pengendalian Suhu Absorpsi ClO₂:\n"
+            "• Suhu air pendingin absorber (X9) harus dijaga di bawah 9.0°C (optimum 7.0 - 8.5°C).\n"
+            "• Setiap kenaikan 1°C pada air pendingin akan menurunkan kelarutan gas ClO₂ dan memicu gas loss ke scrubber.\n"
+            "• Periksa kinerja chiller unit dan bersihkan strainer chilled water jika suhu terbaca > 10°C."
+        ),
+    },
 ]
 
 
