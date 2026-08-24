@@ -42,9 +42,9 @@ export function PredictionsPage() {
     0.02148 * x10
 
   const whatIfStatus =
-    whatIfPredicted > 9.8
-      ? { label: 'ClO₂ Tinggi (Kritis)', color: 'text-rose-500', bg: 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-900', desc: 'Konsentrasi di atas batas aman 9.80 g/L! Risiko gas loss, pemborosan reagen & dekomposisi ClO₂.' }
-      : whatIfPredicted < 9.7
+    whatIfPredicted >= 9.80
+      ? { label: 'ClO₂ Tinggi (Kritis)', color: 'text-rose-500', bg: 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-900', desc: 'Konsentrasi mencapai/melebihi batas aman 9.80 g/L! Risiko dekomposisi gas & pemborosan reagen.' }
+      : whatIfPredicted < 9.70
         ? { label: 'ClO₂ Rendah', color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900', desc: 'Konsentrasi di bawah batas optimum 9.70 g/L. Kurang efektif untuk pemutihan pulp.' }
         : { label: 'ClO₂ Normal (Optimal)', color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900', desc: 'Berada pada rentang aman dan ideal (9.70 – 9.80 g/L).' }
 
