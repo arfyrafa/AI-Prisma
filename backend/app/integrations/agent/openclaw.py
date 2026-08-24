@@ -55,10 +55,10 @@ Persona & Gaya Kerja:
 class OpenClawAgentProvider(AgentProvider):
     name = "openclaw"
 
-    def __init__(self, base_url: str = "", api_key: str = "", timeout: float = 20.0) -> None:
+    def __init__(self, base_url: str = "", api_key: str = "", timeout: float = 6.0) -> None:
         self.base_url = base_url.rstrip("/") if base_url else ""
         self.api_key = api_key
-        self.timeout = timeout
+        self.timeout = min(timeout, 8.0)
 
     def _headers(self) -> dict[str, str]:
         headers = {"Content-Type": "application/json"}
@@ -420,16 +420,43 @@ Analisis kondisi proses ini dan berikan output JSON dengan skema berikut:
                 "• **X₁₀:** Absorber Water Rate (m³/h)\n"
                 "Dominansi pengaruh terbesar ditentukan oleh nilai |T-Value| statistik model 🙏🏼."
             )
+        elif "kondisi" in msg_lower or "status" in msg_lower or "bagaimana" in msg_lower or "saat ini" in msg_lower:
+            status_text = (
+                "⚠️ **Tinggi (Kritis > 9.80 g/L)**"
+                if clo2 > 9.80
+                else "⚠️ **Rendah (< 9.70 g/L)**"
+                if clo2 < 9.70
+                else "✅ **Normal & Optimal (9.70 – 9.80 g/L)**"
+            )
+            reply = (
+                f"Laporan Analisis Kondisi Proses ClO₂ untuk Bapak:\n\n"
+                f"📊 **Status Produk ClO₂:**\n"
+                f"• Konsentrasi ClO₂ (Y): **{clo2:.2f} g/L** — {status_text}\n"
+                f"• Deviasi Terdeteksi: **{len(context.deviations)} parameter**\n\n"
+                f"⚙️ **Variabel Utama Generator & Absorber:**\n"
+                f"• Umpan NaClO₃ (X1): **{x1:.2f} m³/h** | Konsentrasi (X2): **{x2:.1f} g/L**\n"
+                f"• Umpan HCl (X4): **{x4:.2f} m³/h** | Konsentrasi (X5): **{x5:.1f} %**\n"
+                f"• Suhu Generator (X7): **{x7:.1f} °C**\n"
+                f"• Chilled Water (X9): **{x9:.1f} °C** | Laju Air Absorber (X10): **{x10:.1f} m³/h**\n\n"
+                f"💡 **Rekomendasi Operasional:**\n"
+                + (
+                    "Konsentrasi ClO₂ di bawah batas optimal 9.70 g/L. Pertimbangkan menaikkan umpan HCl (X4) bertahap 2–3% atau periksa kualitas konsentrasi klorat."
+                    if clo2 < 9.70
+                    else "Konsentrasi ClO₂ melebihi batas 9.80 g/L! Segera naikkan laju air absorber (X10) dan turunkan umpan HCl (X4) 5% untuk meredam dekomposisi."
+                    if clo2 > 9.80
+                    else "Seluruh parameter berada pada titik keseimbangan kinetika terbaik. Pertahankan setpoint saat ini 🙏🏼."
+                )
+            )
         else:
             reply = (
-                f"Baik Bapak, terkait pertanyaan mengenai '{message}':\n\n"
-                f"Pada kondisi pabrik saat ini (ClO₂: **{clo2:.2f} mg/L**, pH: **{ph:.2f}**, Suhu: **{temp:.1f}°C**), "
-                "keseimbangan reaksi pembentukan klorin dioksida sangat dipengaruhi oleh rasio bahan baku dan kontrol suhu absorber.\n\n"
-                "Jika Bapak ingin mengevaluasi parameter spesifik atau menguji simulasi setpoint tertentu, silakan sebutkan nilai variabel yang ingin disesuaikan 🙏🏼."
+                f"Baik Bapak, terkait pertanyaan mengenai *'{message}'*:\n\n"
+                f"Pada telemetri terkini pabrik (Konsentrasi ClO₂: **{clo2:.2f} g/L**, NaClO₃ Feed: **{x1:.2f} m³/h**, HCl Feed: **{x4:.2f} m³/h**, Suhu Chilled Water: **{x9:.1f} °C**), "
+                "reaksi pembentukan klorin dioksida dikendalikan oleh model regresi linier berganda (MLR) berbasis 8 variabel proses.\n\n"
+                "Silakan tanyakan mengenai rekomendasi penyesuaian reagen, SOP mitigasi keselamatan, atau simulasi angka parameter yang ingin dievaluasi bersama 🙏🏼."
             )
 
         return AgentChatReply(
             reply=reply,
             source="openclaw",
-            related_parameters=["clo2_concentration", "ph", "so2_dosage", "temperature"],
+            related_parameters=["clo2_concentration", "flow_rate", "so2_dosage", "temperature"],
         )
