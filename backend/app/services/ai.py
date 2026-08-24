@@ -28,11 +28,14 @@ def build_context(db: Session, process_id: int) -> ProcessContext:
 
     recent = reading_repo.get_recent_readings(db, process_id, limit=TREND_WINDOW)
     trend: dict[str, list[float]] = {}
+    from app.services.monitoring import COLUMN_ALIASES
+
     for parameter in parameters:
+        col_name = COLUMN_ALIASES.get(parameter.parameter_name, parameter.parameter_name)
         series = [
-            getattr(row, parameter.parameter_name)
+            getattr(row, col_name)
             for row in recent
-            if getattr(row, parameter.parameter_name, None) is not None
+            if getattr(row, col_name, None) is not None
         ]
         if series:
             trend[parameter.parameter_name] = [float(value) for value in series]
