@@ -35,23 +35,45 @@ def build_latest_snapshot(db: Session, process: Process) -> LatestSnapshot:
     )
 
 
+COLUMN_ALIASES: dict[str, str] = {
+    "naclo3_feed": "flow_rate",
+    "naclo3_feed_m3h": "flow_rate",
+    "naclo3_concentration": "reaction_efficiency",
+    "naclo3_concentration_gpl": "reaction_efficiency",
+    "nacl_concentration": "orp",
+    "nacl_concentration_gpl": "orp",
+    "hcl_feed": "so2_dosage",
+    "hcl_feed_m3h": "so2_dosage",
+    "hcl_concentration": "ph",
+    "hcl_concentration_pct": "ph",
+    "generator_temperature": "pressure",
+    "generator_temperature_c": "pressure",
+    "absorber_water_temperature": "temperature",
+    "absorber_water_temperature_c": "temperature",
+    "absorber_water_rate": "production_capacity",
+    "absorber_water_rate_m3h": "production_capacity",
+}
+
+
 def build_history(
     db: Session, process_id: int, range_key: str, parameters: list[str] | None = None
 ) -> HistoryResponse:
     since = reading_repo.resolve_range(range_key)
     rows = reading_repo.get_readings_since(db, process_id, since)
-    selected = parameters or list(SensorReading.PARAMETER_COLUMNS)
-    selected = [name for name in selected if name in SensorReading.PARAMETER_COLUMNS]
+    req_params = parameters or list(SensorReading.PARAMETER_COLUMNS)
 
-    points = [
-        HistoryPoint(
-            timestamp=row.timestamp,
-            values={name: getattr(row, name) for name in selected},
-        )
-        for row in rows
-    ]
+    points = []
+    for row in rows:
+        val_map: dict[str, float | None] = {}
+        for p in req_params:
+            col_name = COLUMN_ALIASES.get(p, p)
+            val = getattr(row, col_name, None) if hasattr(row, col_name) else None
+            val_map[p] = val
+            val_map[col_name] = val
+        points.append(HistoryPoint(timestamp=row.timestamp, values=val_map))
+
     return HistoryResponse(
-        process_id=process_id, range=range_key, parameters=selected, points=points
+        process_id=process_id, range=range_key, parameters=req_params, points=points
     )
 
 
