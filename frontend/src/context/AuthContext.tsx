@@ -66,23 +66,55 @@ const DEFAULT_USERS_SEED: UserProfile[] = [
   },
 ]
 
+// 1 Hour Session Lifespan in milliseconds (60 minutes * 60 seconds * 1000 ms)
+export const SESSION_TIMEOUT_MS = 60 * 60 * 1000
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [users, setUsers] = useState<UserProfile[]>(DEFAULT_USERS_SEED)
 
-  // Current logged in session (null by default so it redirects to /login)
+  // Current logged in session with 1-hour expiry check
   const [user, setUser] = useState<UserProfile | null>(() => {
     const saved = localStorage.getItem('prisma_user_session')
-    if (saved) {
-      try {
-        return JSON.parse(saved) as UserProfile
-      } catch {
+    const expiry = localStorage.getItem('prisma_session_expiry')
+
+    if (saved && expiry) {
+      const expiryTimestamp = Number(expiry)
+      if (Date.now() < expiryTimestamp) {
+        try {
+          return JSON.parse(saved) as UserProfile
+        } catch {
+          return null
+        }
+      } else {
+        // Session expired (older than 1 hour)
+        localStorage.removeItem('prisma_user_session')
+        localStorage.removeItem('prisma_session_expiry')
+        localStorage.setItem('prisma_session_expired_notice', 'true')
         return null
       }
     }
     return null
   })
+
+  // Periodic background check for 1-hour session timeout
+  useEffect(() => {
+    if (!user) return
+
+    const interval = setInterval(() => {
+      const expiry = localStorage.getItem('prisma_session_expiry')
+      if (expiry && Date.now() >= Number(expiry)) {
+        // Force session timeout
+        setUser(null)
+        localStorage.removeItem('prisma_user_session')
+        localStorage.removeItem('prisma_session_expiry')
+        localStorage.setItem('prisma_session_expired_notice', 'true')
+      }
+    }, 15000) // Check every 15 seconds
+
+    return () => clearInterval(interval)
+  }, [user])
 
   // Sync users from backend DB
   const loadDbUsers = async () => {
@@ -110,12 +142,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loadDbUsers()
   }, [])
 
-  // Persist active session
+  // Persist active session and expiry
   useEffect(() => {
     if (user) {
       localStorage.setItem('prisma_user_session', JSON.stringify(user))
+      if (!localStorage.getItem('prisma_session_expiry')) {
+        localStorage.setItem('prisma_session_expiry', String(Date.now() + SESSION_TIMEOUT_MS))
+      }
     } else {
       localStorage.removeItem('prisma_user_session')
+      localStorage.removeItem('prisma_session_expiry')
     }
   }, [user])
 
@@ -136,6 +172,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           createdAt: res.user.created_at,
         }
         setUser(loggedUser)
+        localStorage.setItem('prisma_session_expiry', String(Date.now() + SESSION_TIMEOUT_MS))
+        localStorage.removeItem('prisma_session_expired_notice')
         return { success: true }
       }
     } catch (err: any) {
@@ -158,12 +196,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     setUser(foundUser)
+    localStorage.setItem('prisma_session_expiry', String(Date.now() + SESSION_TIMEOUT_MS))
+    localStorage.removeItem('prisma_session_expired_notice')
     return { success: true }
   }
 
   const logout = () => {
     setUser(null)
     localStorage.removeItem('prisma_user_session')
+    localStorage.removeItem('prisma_session_expiry')
+    localStorage.removeItem('prisma_session_expired_notice')
   }
 
   const updateProfile = (updated: Partial<UserProfile>) => {

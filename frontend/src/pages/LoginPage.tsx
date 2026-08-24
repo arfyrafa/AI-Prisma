@@ -10,6 +10,7 @@ export function LoginPage() {
   const [password, setPassword] = useState('admin123')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const sessionExpired = localStorage.getItem('prisma_session_expired_notice') === 'true'
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -84,6 +85,13 @@ export function LoginPage() {
         {/* Login Card */}
         <div className="rounded-2xl border border-slate-800/80 bg-slate-900/90 p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
           <form onSubmit={handleSubmit} className="space-y-5">
+            {sessionExpired && (
+              <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-3.5 text-xs text-amber-300 font-medium leading-relaxed flex items-center gap-2.5">
+                <span className="flex h-2 w-2 rounded-full bg-amber-400 animate-ping" />
+                <span>Sesi Anda telah berakhir setelah 1 jam demi keamanan sistem. Silakan masuk kembali.</span>
+              </div>
+            )}
+
             {error && (
               <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-3.5 text-xs text-rose-300 font-medium leading-relaxed">
                 {error}
