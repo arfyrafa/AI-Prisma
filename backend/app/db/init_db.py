@@ -326,10 +326,12 @@ def init_db() -> None:
             actual_count = db.scalar(select(func.count(SensorReading.id)).where(SensorReading.process_id == process.id, SensorReading.source == "actual_plant")) or 0
             if actual_count != len(REAL_PLANT_READINGS):
                 logger.info("Membersihkan data lama dan memasukkan %d data riil pabrik baru...", len(REAL_PLANT_READINGS))
-                db.query(SensorReading).filter(SensorReading.process_id == process.id).delete()
+                # Delete in FK-safe order: children first, parents last
                 db.query(Recommendation).filter(Recommendation.process_id == process.id).delete()
                 db.query(AIInsight).filter(AIInsight.process_id == process.id).delete()
                 db.query(Alert).filter(Alert.process_id == process.id).delete()
+                db.query(SensorReading).filter(SensorReading.process_id == process.id).delete()
+                db.commit()
                 
                 real_objs = []
                 for r in REAL_PLANT_READINGS:
