@@ -116,7 +116,7 @@ class OpenClawAgentProvider(AgentProvider):
         )
 
     def _post_chat_completion(self, messages_payload: list[dict[str, Any]], temperature: float = 0.4) -> str:
-        """Sends chat completion to 9Router / OpenClaw LLM with automatic multi-endpoint discovery."""
+        """Sends chat completion to 9Router / OpenClaw LLM with automatic multi-endpoint & model discovery."""
         candidate_urls = []
         if self.base_url:
             candidate_urls.append(self.base_url)
@@ -143,13 +143,39 @@ class OpenClawAgentProvider(AgentProvider):
         errors_summary = []
         for target_url in urls:
             endpoint = f"{target_url}/chat/completions"
+            model_candidates = [
+                getattr(settings, "OPENCLAW_MODEL", "gpt-4o-mini"),
+                "cx/gpt-5.4-mini",
+                "cx/gpt-5.4",
+                "cx/gpt-5.5",
+                "cx/gpt-5.6-sol",
+                "cx/gpt-5.3-codex-spark",
+                "gpt-4o-mini",
+                "gpt-4o",
+            ]
+
             try:
-                with httpx.Client(timeout=min(self.timeout, 12.0)) as client:
+                with httpx.Client(timeout=min(self.timeout, 15.0)) as client:
+                    # Try querying /models to get active model list from 9router
+                    try:
+                        m_resp = client.get(f"{target_url}/models", headers=self._headers(), timeout=4.0)
+                        if m_resp.status_code == 200:
+                            m_data = m_resp.json()
+                            m_list = m_data.get("data", [])
+                            if m_list and isinstance(m_list, list):
+                                found_ids = [m["id"] for m in m_list if isinstance(m, dict) and "id" in m]
+                                if found_ids:
+                                    model_candidates = found_ids + model_candidates
+                    except Exception:
+                        pass
+
+                    # Try selected model
+                    chosen_model = model_candidates[0]
                     resp = client.post(
                         endpoint,
                         headers=self._headers(),
                         json={
-                            "model": getattr(settings, "OPENCLAW_MODEL", "gpt-4o-mini"),
+                            "model": chosen_model,
                             "messages": messages_payload,
                             "temperature": temperature,
                         },
