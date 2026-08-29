@@ -23,10 +23,10 @@ class Settings(BaseSettings):
     # --- External AI Agent (OpenClaw or 9router) -------------------------
     # AGENT_PROVIDER: "mock" | "openclaw"
     AGENT_PROVIDER: str = "openclaw"
-    AGENT_API_URL: str = "http://host.docker.internal:2026/v1"
+    AGENT_API_URL: str = "http://172.17.0.1:20128/v1"
     AGENT_API_KEY: str = "sk-b3f1a5e1ce5843aa-w9huiy-f9654c92"
     AGENT_TIMEOUT_SECONDS: float = 30.0
-    OPENCLAW_MODEL: str = "gpt-4o-mini"
+    OPENCLAW_MODEL: str = "cx/gpt-5.4-mini"
 
     # --- Predictive model --------------------------------------------------
     # PREDICTIVE_PROVIDER: "regression" | "mock" | "remote"

@@ -28,9 +28,9 @@ services:
       DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-prisma}:${POSTGRES_PASSWORD:-prisma}@postgres:5432/${POSTGRES_DB:-prisma_ai}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8080,http://localhost:5173,https://aiprisma.tech}
       AGENT_PROVIDER: ${AGENT_PROVIDER:-openclaw}
-      AGENT_API_URL: ${AGENT_API_URL:-http://host.docker.internal:2026/v1}
+      AGENT_API_URL: ${AGENT_API_URL:-http://172.17.0.1:20128/v1}
       AGENT_API_KEY: ${AGENT_API_KEY:-sk-b3f1a5e1ce5843aa-w9huiy-f9654c92}
-      OPENCLAW_MODEL: ${OPENCLAW_MODEL:-gpt-4o-mini}
+      OPENCLAW_MODEL: ${OPENCLAW_MODEL:-cx/gpt-5.4-mini}
       PREDICTIVE_PROVIDER: ${PREDICTIVE_PROVIDER:-regression}
       MODEL_API_URL: ${MODEL_API_URL:-}
       MODEL_API_KEY: ${MODEL_API_KEY:-}
