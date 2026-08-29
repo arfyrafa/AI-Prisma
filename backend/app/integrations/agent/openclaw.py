@@ -183,8 +183,14 @@ class OpenClawAgentProvider(AgentProvider):
                     resp.raise_for_status()
                     data = resp.json()
                     choices = data.get("choices", [])
-                    if choices and "message" in choices[0]:
-                        return choices[0]["message"].get("content", "")
+                    if choices and isinstance(choices[0], dict):
+                        msg = choices[0].get("message", {})
+                        if isinstance(msg, dict):
+                            raw_content = msg.get("content") or msg.get("reasoning_content") or msg.get("text") or ""
+                            if raw_content:
+                                return str(raw_content)
+                        elif isinstance(msg, str) and msg.strip():
+                            return msg.strip()
             except Exception as exc:
                 last_error = exc
                 errors_summary.append(f"{target_url} -> {exc}")
