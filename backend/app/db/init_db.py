@@ -307,5 +307,34 @@ def init_db() -> None:
         seed_knowledge(db)
         if settings.SIMULATION_MODE:
             seed_history(db, process.id, settings.SIMULATION_SEED_HOURS, SEED_INTERVAL_SECONDS)
+        else:
+            # In Production Mode: If no readings exist yet, seed initial baseline reading so dashboard is alive
+            from app.models import SensorReading, AIInsight
+            from app.services.monitoring import record_reading
+            from app.services.ai import generate_insight
+            
+            has_reading = db.scalars(select(SensorReading).where(SensorReading.process_id == process.id).limit(1)).first()
+            if not has_reading:
+                baseline_values = {
+                    "clo2_concentration": 9.72,
+                    "flow_rate": 17.37,
+                    "reaction_efficiency": 437.16,
+                    "orp": 95.5,
+                    "so2_dosage": 4.13,
+                    "ph": 31.55,
+                    "pressure": 46.7,
+                    "temperature": 8.42,
+                    "production_capacity": 104.78,
+                }
+                reading, _, _ = record_reading(db, process.id, baseline_values, source="manual")
+                logger.info("Seed 1 baseline reading produksi untuk inisialisasi awal")
+
+            has_insight = db.scalars(select(AIInsight).where(AIInsight.process_id == process.id).limit(1)).first()
+            if not has_insight:
+                try:
+                    generate_insight(db, process.id)
+                    logger.info("Seed AI insight & rekomendasi awal")
+                except Exception as e:
+                    logger.warning("Gagal generate insight awal: %s", e)
     finally:
         db.close()
