@@ -312,55 +312,94 @@ def init_db() -> None:
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     try:
-        seed_users(db)
-        process = seed_process(db)
-        seed_knowledge(db)
-        if settings.SIMULATION_MODE:
-            seed_history(db, process.id, settings.SIMULATION_SEED_HOURS, SEED_INTERVAL_SECONDS)
-        else:
-            # In Production Mode: Wipe old mock data and ensure exactly the 297 real plant dataset records exist
-            from datetime import datetime
-            from app.models import SensorReading, AIInsight, Alert, Recommendation
-            from app.db.real_data import REAL_PLANT_READINGS
-            
-            actual_count = db.scalar(select(func.count(SensorReading.id)).where(SensorReading.process_id == process.id, SensorReading.source == "actual_plant")) or 0
-            if actual_count != len(REAL_PLANT_READINGS):
-                logger.info("Membersihkan data lama dan memasukkan %d data riil pabrik baru...", len(REAL_PLANT_READINGS))
-                # Delete in FK-safe order: children first, parents last
-                db.query(Recommendation).filter(Recommendation.process_id == process.id).delete()
-                db.query(AIInsight).filter(AIInsight.process_id == process.id).delete()
-                db.query(Alert).filter(Alert.process_id == process.id).delete()
-                db.query(SensorReading).filter(SensorReading.process_id == process.id).delete()
-                db.commit()
-                
-                real_objs = []
-                for r in REAL_PLANT_READINGS:
-                    dt = datetime.fromisoformat(r["timestamp"].replace("Z", "+00:00"))
-                    real_objs.append(SensorReading(
-                        process_id=process.id,
-                        timestamp=dt,
-                        clo2_concentration=r["clo2_concentration"],
-                        flow_rate=r["flow_rate"],
-                        reaction_efficiency=r["reaction_efficiency"],
-                        orp=r["orp"],
-                        so2_dosage=r["so2_dosage"],
-                        ph=r["ph"],
-                        pressure=r["pressure"],
-                        temperature=r["temperature"],
-                        production_capacity=r["production_capacity"],
-                        source="actual_plant"
-                    ))
-                db.add_all(real_objs)
-                db.commit()
-                logger.info("Berhasil membersihkan data lama dan menyimpan %d data riil pabrik ke database!", len(real_objs))
+        # Step 1: Users (always safe)
+        try:
+            seed_users(db)
+        except Exception as e:
+            db.rollback()
+            logger.warning("seed_users gagal: %s", e)
 
-            has_insight = db.scalars(select(AIInsight).where(AIInsight.process_id == process.id).limit(1)).first()
-            if not has_insight:
-                try:
+        # Step 2: Process + Parameters
+        try:
+            process = seed_process(db)
+        except Exception as e:
+            db.rollback()
+            logger.warning("seed_process gagal: %s", e)
+            return  # Can't continue without process
+
+        # Step 3: Knowledge Base
+        try:
+            seed_knowledge(db)
+        except Exception as e:
+            db.rollback()
+            logger.warning("seed_knowledge gagal: %s", e)
+
+        # Step 4: Data seeding
+        if settings.SIMULATION_MODE:
+            try:
+                seed_history(db, process.id, settings.SIMULATION_SEED_HOURS, SEED_INTERVAL_SECONDS)
+            except Exception as e:
+                db.rollback()
+                logger.warning("seed_history gagal: %s", e)
+        else:
+            try:
+                from datetime import datetime
+                from app.models import SensorReading, AIInsight, Alert, Recommendation
+                from app.db.real_data import REAL_PLANT_READINGS
+
+                actual_count = db.scalar(
+                    select(func.count(SensorReading.id)).where(
+                        SensorReading.process_id == process.id,
+                        SensorReading.source == "actual_plant",
+                    )
+                ) or 0
+
+                if actual_count != len(REAL_PLANT_READINGS):
+                    logger.info("Membersihkan data lama dan memasukkan %d data riil pabrik baru...", len(REAL_PLANT_READINGS))
+                    db.query(Recommendation).filter(Recommendation.process_id == process.id).delete()
+                    db.query(AIInsight).filter(AIInsight.process_id == process.id).delete()
+                    db.query(Alert).filter(Alert.process_id == process.id).delete()
+                    db.query(SensorReading).filter(SensorReading.process_id == process.id).delete()
+                    db.commit()
+
+                    real_objs = []
+                    for r in REAL_PLANT_READINGS:
+                        dt = datetime.fromisoformat(r["timestamp"].replace("Z", "+00:00"))
+                        real_objs.append(SensorReading(
+                            process_id=process.id,
+                            timestamp=dt,
+                            clo2_concentration=r["clo2_concentration"],
+                            flow_rate=r["flow_rate"],
+                            reaction_efficiency=r["reaction_efficiency"],
+                            orp=r["orp"],
+                            so2_dosage=r["so2_dosage"],
+                            ph=r["ph"],
+                            pressure=r["pressure"],
+                            temperature=r["temperature"],
+                            production_capacity=r["production_capacity"],
+                            source="actual_plant",
+                        ))
+                    db.add_all(real_objs)
+                    db.commit()
+                    logger.info("Berhasil menyimpan %d data riil pabrik ke database!", len(real_objs))
+                else:
+                    logger.info("Data riil pabrik (%d records) sudah lengkap, skip seeding.", actual_count)
+            except Exception as e:
+                db.rollback()
+                logger.warning("Seeding data riil gagal (backend tetap jalan): %s", e)
+
+            # Step 5: AI Insight (optional)
+            try:
+                from app.models import AIInsight
+                has_insight = db.scalars(select(AIInsight).where(AIInsight.process_id == process.id).limit(1)).first()
+                if not has_insight:
                     from app.services.ai import run_analysis
                     run_analysis(db, process.id)
                     logger.info("Seed AI insight & rekomendasi awal")
-                except Exception as e:
-                    logger.warning("Lewati analisis awal saat startup: %s", e)
+            except Exception as e:
+                db.rollback()
+                logger.warning("Lewati analisis AI awal: %s", e)
+
+        logger.info("=== PRISMA AI backend siap melayani request ===")
     finally:
         db.close()
