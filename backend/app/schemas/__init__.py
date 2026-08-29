@@ -293,6 +293,7 @@ class ChatResponse(BaseModel):
     source: str
     related_parameters: list[str] | None = None
     timestamp: datetime
+    latency_ms: int | None = None
 
 
 # --------------------------------------------------------------------------

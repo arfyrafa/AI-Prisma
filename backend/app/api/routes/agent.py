@@ -1,6 +1,4 @@
-"""AI assistant chat endpoint."""
-
-from datetime import datetime, timezone
+import time
 
 from fastapi import APIRouter, HTTPException, status
 
@@ -14,6 +12,7 @@ router = APIRouter(prefix="/agent", tags=["agent"])
 
 @router.post("/chat", response_model=ChatResponse)
 def chat(payload: ChatRequest, db: DbSession) -> ChatResponse:
+    t0 = time.perf_counter()
     try:
         reply, source, related = ai_service.chat(
             db,
@@ -30,9 +29,12 @@ def chat(payload: ChatRequest, db: DbSession) -> ChatResponse:
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
 
+    latency_ms = int((time.perf_counter() - t0) * 1000)
+
     return ChatResponse(
         reply=reply,
         source=source,
         related_parameters=related or None,
         timestamp=datetime.now(timezone.utc),
+        latency_ms=latency_ms,
     )

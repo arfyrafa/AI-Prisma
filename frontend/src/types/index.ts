@@ -180,6 +180,7 @@ export interface ChatResponse {
   source: string
   related_parameters: string[] | null
   timestamp: string
+  latency_ms?: number
 }
 
 export interface KnowledgeDocument {

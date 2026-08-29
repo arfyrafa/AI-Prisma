@@ -26,6 +26,7 @@ const QUICK_SUGGESTIONS = [
 interface Bubble extends ChatMessage {
  at: Date
  source?: string
+ latencyMs?: number
 }
 
 function FormattedMessage({ content, isUser }: { content: string; isUser: boolean }) {
@@ -106,6 +107,7 @@ export function FloatingAssistantWidget() {
  content: response.reply,
  at: new Date(response.timestamp),
  source: response.source,
+ latencyMs: response.latency_ms,
  },
  ])
  } catch (err) {
@@ -237,7 +239,14 @@ export function FloatingAssistantWidget() {
  <FormattedMessage content={msg.content} isUser={msg.role === 'user'} />
 
  <div className="mt-1.5 flex items-center justify-between gap-2 text-[9px] opacity-70">
+ <div className="flex items-center gap-1.5 font-mono">
  <span>{formatClock(msg.at)}</span>
+ {msg.role === 'assistant' && msg.latencyMs !== undefined && (
+ <span className="inline-flex items-center gap-0.5 rounded bg-sky-100/90 text-sky-800 border border-sky-200 px-1 py-0.2 font-semibold">
+ ⚡ {msg.latencyMs < 1000 ? `${msg.latencyMs}ms` : `${(msg.latencyMs / 1000).toFixed(2)}s`}
+ </span>
+ )}
+ </div>
  {msg.role === 'assistant' && (
  <button
  type="button"
