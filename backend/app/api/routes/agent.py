@@ -20,14 +20,15 @@ def chat(payload: ChatRequest, db: DbSession) -> ChatResponse:
             payload.message,
             [message.model_dump() for message in payload.history[-10:]],
         )
-    except AgentUnavailableError as exc:
-        # No silent fabrication: the UI shows an explicit unavailable state.
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="AI Agent sedang tidak tersedia. Pemantauan tetap berjalan normal.",
-        ) from exc
-    except ValueError as exc:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    except Exception as exc:
+        latency_ms = int((time.perf_counter() - t0) * 1000)
+        return ChatResponse(
+            reply=f"**[Pemberitahuan Sistem AI Agent]**\n\nTerjadi kendala koneksi ke model LLM:\n`{exc}`\n\nSilakan periksa apakah service 9Router/OpenClaw aktif di VPS (port 2026).",
+            source="system-diagnostic",
+            related_parameters=None,
+            timestamp=datetime.now(timezone.utc),
+            latency_ms=latency_ms,
+        )
 
     latency_ms = int((time.perf_counter() - t0) * 1000)
 

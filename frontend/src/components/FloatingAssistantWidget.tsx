@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useProcessContext } from '../hooks/useProcessContext'
-import { api, isAgentUnavailable } from '../services/api'
+import { api } from '../services/api'
 import type { ChatMessage } from '../types'
 import { formatClock } from '../utils/format'
 
@@ -111,26 +111,16 @@ export function FloatingAssistantWidget() {
  },
  ])
  } catch (err) {
- if (isAgentUnavailable(err)) {
- setMessages((prev) => [
- ...prev,
- {
- role: 'assistant',
- content: 'AI Agent sedang offline atau tidak dapat dijangkau saat ini.',
- at: new Date(),
- },
- ])
- } else {
- setMessages((prev) => [
- ...prev,
- {
- role: 'assistant',
- content: 'Mohon maaf Bapak, terjadi kendala saat menghubungkan ke sistem analisis. Silakan coba kembali sesaat lagi.',
- at: new Date(),
- },
- ])
- }
- } finally {
+      const errMsg = err instanceof Error ? err.message : 'Terjadi kendala koneksi ke server.'
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: `**[Kendala Koneksi Chat]**\n\n${errMsg}\n\nSilakan periksa koneksi backend atau coba beberapa saat lagi.`,
+          at: new Date(),
+        },
+      ])
+    } finally {
  setSending(false)
  }
  }
