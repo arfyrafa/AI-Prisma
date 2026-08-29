@@ -22,14 +22,15 @@ def to_float(val):
     except:
         return None
 
-now = datetime.now(timezone.utc)
+# Spread 297 records over last 2 weeks ending yesterday
+end_time = datetime.now(timezone.utc).replace(hour=23, minute=0, second=0, microsecond=0) - timedelta(days=1)
+start_time = end_time - timedelta(days=14)
 total_rows = len(df)
-records = []
+interval_seconds = (end_time - start_time).total_seconds() / (total_rows - 1)
 
+records = []
 for idx, (_, row) in enumerate(df.iterrows()):
-    # 8 hours per shift
-    hours_ago = (total_rows - 1 - idx) * 8
-    ts = now - timedelta(hours=hours_ago)
+    ts = start_time + timedelta(seconds=interval_seconds * idx)
     
     rec = {
         'timestamp': ts.strftime('%Y-%m-%dT%H:%M:%SZ'),
@@ -47,32 +48,14 @@ for idx, (_, row) in enumerate(df.iterrows()):
     records.append(rec)
 
 print(f'Processed {len(records)} records.')
-print('First record:', records[0])
-print('Last record:', records[-1])
+print(f'Date range: {records[0]["timestamp"]} to {records[-1]["timestamp"]}')
+print(f'Interval: ~{interval_seconds/60:.0f} minutes between readings')
+print('First:', records[0])
+print('Last:', records[-1])
 
-# Save to real_data.py
 with open(r'c:\MyFiles\MyProject\prisma-ai\backend\app\db\real_data.py', 'w', encoding='utf-8') as f:
     f.write('# 297 Real plant records from PRISMA_AI_Data_Input_Template.xlsx\n')
+    f.write('# Spread over 2 weeks ending yesterday\n')
     f.write('REAL_PLANT_READINGS = ' + json.dumps(records, indent=2) + '\n')
 
 print('Saved to backend/app/db/real_data.py')
-
-# Also write CSV templates
-csv_rows = []
-for r in records:
-    csv_rows.append({
-        'timestamp': r['timestamp'],
-        'naclo3_feed_m3h': r['flow_rate'],
-        'naclo3_concentration_gpl': r['reaction_efficiency'],
-        'nacl_concentration_gpl': r['orp'],
-        'hcl_feed_m3h': r['so2_dosage'],
-        'hcl_concentration_pct': r['ph'],
-        'generator_temperature_c': r['pressure'],
-        'absorber_water_temperature_c': r['temperature'],
-        'absorber_water_rate_m3h': r['production_capacity'],
-        'actual_clo2_gpl': r['clo2_concentration'],
-        'operator_notes': 'Data Input Template'
-    })
-pd.DataFrame(csv_rows).to_csv(r'c:\MyFiles\MyProject\prisma-ai\frontend\public\PRISMA_AI_Real_Plant_Logsheet.csv', index=False)
-pd.DataFrame(csv_rows).to_csv(r'c:\MyFiles\MyProject\prisma-ai\frontend\public\PRISMA_AI_Process_Data_Template.csv', index=False)
-print('Saved public CSV templates in frontend/public/')
