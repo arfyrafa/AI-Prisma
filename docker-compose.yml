@@ -41,6 +41,7 @@ services:
     container_name: prisma-frontend
     restart: unless-stopped
     extra_hosts:
+      - "host.docker.internal:host-gateway"
       - "backend:host-gateway"
     ports:
       - "${FRONTEND_PORT:-8080}:80"
