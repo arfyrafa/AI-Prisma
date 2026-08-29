@@ -122,6 +122,7 @@ class SensorReadingOut(ORMModel):
 class ParameterSnapshot(BaseModel):
     """One parameter evaluated against its configured operating range."""
 
+    id: int | None = None
     parameter_name: str
     display_name: str
     unit: str

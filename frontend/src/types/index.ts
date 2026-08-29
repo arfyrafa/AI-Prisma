@@ -50,6 +50,7 @@ export interface SensorReading {
 }
 
 export interface ParameterSnapshot {
+  id?: number
   parameter_name: string
   display_name: string
   unit: string

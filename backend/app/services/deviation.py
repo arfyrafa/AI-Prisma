@@ -64,6 +64,7 @@ def build_snapshots(
         status, deviation = evaluate_parameter(parameter, value)
         snapshots.append(
             ParameterSnapshot(
+                id=parameter.id,
                 parameter_name=parameter.parameter_name,
                 display_name=parameter.display_name,
                 unit=parameter.unit,

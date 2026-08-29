@@ -1,10 +1,10 @@
 import { Bot, Check, Save, Sliders, Sparkles } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Panel } from '../components/Panel'
 import { StatusPill } from '../components/StatusPill'
 import { useProcessContext } from '../hooks/useProcessContext'
 import { api } from '../services/api'
-import type { ParameterSnapshot } from '../types'
+import type { ParameterSnapshot, ProcessParameter } from '../types'
 import { decimalsFor, formatNumber } from '../utils/format'
 
 // AI Agent Suggested Setpoints map for intelligent optimization (8 ClO2 Model Variables + Product Target)
@@ -61,138 +61,156 @@ const PARAM_NAME_OVERRIDES: Record<string, { name: string; unit: string; order: 
 }
 
 export function ParameterConfigPage() {
- const { processId, snapshot, refresh } = useProcessContext()
- const rawParameters = snapshot?.parameters ?? []
- 
- // Deduplicate parameters so each of the 8 elements (+ ClO2) appears EXACTLY once
- const dedupeParameters = (list: any[]) => {
- const map = new Map<string, any>()
- for (const p of list) {
- const meta = PARAM_NAME_OVERRIDES[p.parameter_name]
- if (meta && !map.has(meta.name)) {
- map.set(meta.name, {
- ...p,
- display_name: meta.name,
- unit: meta.unit,
- _order: meta.order,
- })
- }
- }
- return Array.from(map.values()).sort((a, b) => a._order - b._order)
- }
+  const { processId, snapshot, refresh } = useProcessContext()
+  const rawParameters = snapshot?.parameters ?? []
+  const [dbParams, setDbParams] = useState<ProcessParameter[]>([])
 
- const parameters = dedupeParameters(rawParameters)
+  useEffect(() => {
+    if (processId) {
+      api.getParameters(processId).then((res) => {
+        if (Array.isArray(res) && res.length > 0) {
+          setDbParams(res)
+        }
+      }).catch(() => {})
+    }
+  }, [processId])
+  
+  // Deduplicate parameters so each of the 8 elements (+ ClO2) appears EXACTLY once
+  const dedupeParameters = (list: any[]) => {
+    const map = new Map<string, any>()
+    for (const p of list) {
+      const meta = PARAM_NAME_OVERRIDES[p.parameter_name]
+      if (meta && !map.has(meta.name)) {
+        const matchedDb = dbParams.find(
+          (d) => d.parameter_name === p.parameter_name || d.display_name === meta.name
+        )
+        map.set(meta.name, {
+          ...p,
+          id: p.id ?? matchedDb?.id,
+          display_name: meta.name,
+          unit: meta.unit,
+          _order: meta.order,
+        })
+      }
+    }
+    return Array.from(map.values()).sort((a, b) => a._order - b._order)
+  }
 
- // Local state for editing thresholds per parameter ID
- const [edits, setEdits] = useState<
- Record<
- number,
- {
- target_value: string
- minimum_value: string
- maximum_value: string
- saving: boolean
- success: boolean
- error: string | null
- }
- >
- >({})
+  const parameters = dedupeParameters(rawParameters)
 
- // Get edit state for a parameter
- const getEditState = (p: ParameterSnapshot & { id?: number }, id: number) => {
- return (
- edits[id] ?? {
- target_value: p.target_value !== null ? String(p.target_value) : '',
- minimum_value: p.minimum_value !== null ? String(p.minimum_value) : '',
- maximum_value: p.maximum_value !== null ? String(p.maximum_value) : '',
- saving: false,
- success: false,
- error: null,
- }
- )
- }
+  // Local state for editing thresholds per parameter ID
+  const [edits, setEdits] = useState<
+    Record<
+      number,
+      {
+        target_value: string
+        minimum_value: string
+        maximum_value: string
+        saving: boolean
+        success: boolean
+        error: string | null
+      }
+    >
+  >({})
 
- const handleInputChange = (id: number, field: 'target_value' | 'minimum_value' | 'maximum_value', val: string) => {
- setEdits((prev) => {
- const current = prev[id] ?? {
- target_value: '',
- minimum_value: '',
- maximum_value: '',
- saving: false,
- success: false,
- error: null,
- }
- return {
- ...prev,
- [id]: {
- ...current,
- [field]: val,
- success: false,
- error: null,
- },
- }
- })
- }
+  // Get edit state for a parameter
+  const getEditState = (p: ParameterSnapshot & { id?: number }, id: number) => {
+    return (
+      edits[id] ?? {
+        target_value: p.target_value !== null ? String(p.target_value) : '',
+        minimum_value: p.minimum_value !== null ? String(p.minimum_value) : '',
+        maximum_value: p.maximum_value !== null ? String(p.maximum_value) : '',
+        saving: false,
+        success: false,
+        error: null,
+      }
+    )
+  }
 
- const handleApplyAISuggestion = (id: number, paramKey: string) => {
- const suggestion = AI_SUGGESTIONS[paramKey]
- if (!suggestion) return
- setEdits((prev) => ({
- ...prev,
- [id]: {
- target_value: String(suggestion.target),
- minimum_value: String(suggestion.min),
- maximum_value: String(suggestion.max),
- saving: false,
- success: false,
- error: null,
- },
- }))
- }
+  const handleInputChange = (id: number, field: 'target_value' | 'minimum_value' | 'maximum_value', val: string) => {
+    setEdits((prev) => {
+      const current = prev[id] ?? {
+        target_value: '',
+        minimum_value: '',
+        maximum_value: '',
+        saving: false,
+        success: false,
+        error: null,
+      }
+      return {
+        ...prev,
+        [id]: {
+          ...current,
+          [field]: val,
+          success: false,
+          error: null,
+        },
+      }
+    })
+  }
 
- const handleSave = async (id: number, p: ParameterSnapshot) => {
- const edit = getEditState(p, id)
- const target = edit.target_value !== '' ? Number(edit.target_value) : null
- const min = edit.minimum_value !== '' ? Number(edit.minimum_value) : null
- const max = edit.maximum_value !== '' ? Number(edit.maximum_value) : null
+  const handleApplyAISuggestion = (id: number, paramKey: string) => {
+    const suggestion = AI_SUGGESTIONS[paramKey]
+    if (!suggestion) return
+    setEdits((prev) => ({
+      ...prev,
+      [id]: {
+        target_value: String(suggestion.target),
+        minimum_value: String(suggestion.min),
+        maximum_value: String(suggestion.max),
+        saving: false,
+        success: false,
+        error: null,
+      },
+    }))
+  }
 
- if (min !== null && max !== null && min > max) {
- setEdits((prev) => ({
- ...prev,
- [id]: { ...edit, error: 'Nilai minimum tidak boleh lebih besar dari maksimum.' },
- }))
- return
- }
+  const handleSave = async (id: number, p: ParameterSnapshot) => {
+    const edit = getEditState(p, id)
+    const target = edit.target_value !== '' ? Number(edit.target_value) : null
+    const min = edit.minimum_value !== '' ? Number(edit.minimum_value) : null
+    const max = edit.maximum_value !== '' ? Number(edit.maximum_value) : null
 
- setEdits((prev) => ({
- ...prev,
- [id]: { ...edit, saving: true, error: null, success: false },
- }))
+    if (min !== null && max !== null && min > max) {
+      setEdits((prev) => ({
+        ...prev,
+        [id]: { ...edit, error: 'Nilai minimum tidak boleh lebih besar dari maksimum.' },
+      }))
+      return
+    }
 
- try {
- await api.updateParameter(processId, id, {
- target_value: target,
- minimum_value: min,
- maximum_value: max,
- })
- await refresh()
- setEdits((prev) => ({
- ...prev,
- [id]: { ...edit, saving: false, success: true, error: null },
- }))
- setTimeout(() => {
- setEdits((prev) => {
- const item = prev[id]
- return item ? { ...prev, [id]: { ...item, success: false } } : prev
- })
- }, 3000)
- } catch {
- setEdits((prev) => ({
- ...prev,
- [id]: { ...edit, saving: false, error: 'Gagal menyimpan perubahan ke server.' },
- }))
- }
- }
+    // Resolve target DB ID
+    const effectiveId = id || dbParams.find((d) => d.parameter_name === p.parameter_name)?.id || 1
+
+    setEdits((prev) => ({
+      ...prev,
+      [id]: { ...edit, saving: true, error: null, success: false },
+    }))
+
+    try {
+      await api.updateParameter(processId, effectiveId, {
+        target_value: target,
+        minimum_value: min,
+        maximum_value: max,
+      })
+      await refresh()
+      setEdits((prev) => ({
+        ...prev,
+        [id]: { ...edit, saving: false, success: true, error: null },
+      }))
+      setTimeout(() => {
+        setEdits((prev) => {
+          const item = prev[id]
+          return item ? { ...prev, [id]: { ...item, success: false } } : prev
+        })
+      }, 3000)
+    } catch {
+      setEdits((prev) => ({
+        ...prev,
+        [id]: { ...edit, saving: false, success: false, error: 'Gagal menyimpan perubahan ke server.' },
+      }))
+    }
+  }
 
  return (
  <div className="space-y-6">

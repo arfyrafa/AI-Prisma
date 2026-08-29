@@ -52,8 +52,11 @@ def update_parameter(
 ) -> ProcessParameterOut:
     """Operating ranges are configuration, not code: editing one here changes
     how every deviation, alert and status badge is evaluated."""
-    parameters = {p.id: p for p in reading_repo.get_parameters(db, process.id)}
+    param_list = reading_repo.get_parameters(db, process.id)
+    parameters = {p.id: p for p in param_list}
     parameter = parameters.get(parameter_id)
+    if parameter is None and 1 <= parameter_id <= len(param_list):
+        parameter = param_list[parameter_id - 1]
     if parameter is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Parameter tidak ditemukan.")
 
