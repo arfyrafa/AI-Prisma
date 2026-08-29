@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
-import { api } from '../services/api'
+import { api, ApiError } from '../services/api'
 
 export type UserRole = 'Admin' | 'Operator'
 
@@ -153,10 +153,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: true }
       }
     } catch (err: any) {
-      // If error from backend API
-      if (err?.message) {
+      // If backend returned a specific auth error (401/403), show it and stop
+      if (err instanceof ApiError && err.status >= 400 && err.status < 500) {
         return { success: false, message: err.message }
       }
+      // For 502/503/network errors, fall through to local fallback below
     }
 
     // Fallback to local admin / user check
