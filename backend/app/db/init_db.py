@@ -308,15 +308,18 @@ def init_db() -> None:
         if settings.SIMULATION_MODE:
             seed_history(db, process.id, settings.SIMULATION_SEED_HOURS, SEED_INTERVAL_SECONDS)
         else:
-            # In Production Mode: Seed the 288 real plant dataset records if not present
+            # In Production Mode: Wipe old mock data and ensure exactly the 297 real plant dataset records exist
             from datetime import datetime
-            from app.models import SensorReading, AIInsight
+            from app.models import SensorReading, AIInsight, Alert, Recommendation
             from app.db.real_data import REAL_PLANT_READINGS
             
-            existing_count = db.scalar(select(func.count(SensorReading.id)).where(SensorReading.process_id == process.id)) or 0
-            if existing_count < 100:
-                logger.info("Memasukkan %d data riil pabrik dari Data Fix.xlsx...", len(REAL_PLANT_READINGS))
+            actual_count = db.scalar(select(func.count(SensorReading.id)).where(SensorReading.process_id == process.id, SensorReading.source == "actual_plant")) or 0
+            if actual_count != len(REAL_PLANT_READINGS):
+                logger.info("Membersihkan data lama dan memasukkan %d data riil pabrik baru...", len(REAL_PLANT_READINGS))
                 db.query(SensorReading).filter(SensorReading.process_id == process.id).delete()
+                db.query(Recommendation).filter(Recommendation.process_id == process.id).delete()
+                db.query(AIInsight).filter(AIInsight.process_id == process.id).delete()
+                db.query(Alert).filter(Alert.process_id == process.id).delete()
                 
                 real_objs = []
                 for r in REAL_PLANT_READINGS:
@@ -337,7 +340,7 @@ def init_db() -> None:
                     ))
                 db.add_all(real_objs)
                 db.commit()
-                logger.info("Berhasil menyimpan %d data riil pabrik ke database!", len(real_objs))
+                logger.info("Berhasil membersihkan data lama dan menyimpan %d data riil pabrik ke database!", len(real_objs))
 
             has_insight = db.scalars(select(AIInsight).where(AIInsight.process_id == process.id).limit(1)).first()
             if not has_insight:
