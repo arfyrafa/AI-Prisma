@@ -120,11 +120,13 @@ class OpenClawAgentProvider(AgentProvider):
         candidate_urls = []
         if self.base_url:
             candidate_urls.append(self.base_url)
-        # Fallbacks for docker host gateway
+        # Fallbacks for docker host gateway and VPS IP
         candidate_urls.extend([
-            "http://host.docker.internal:2026/v1",
             "http://172.17.0.1:2026/v1",
-            "http://localhost:2026/v1",
+            "http://72.62.122.6:2026/v1",
+            "http://host.docker.internal:2026/v1",
+            "https://api.9router.com/v1",
+            "http://172.18.0.1:2026/v1",
             "http://127.0.0.1:2026/v1",
         ])
 
@@ -133,10 +135,11 @@ class OpenClawAgentProvider(AgentProvider):
         urls = [x for x in candidate_urls if not (x in seen or seen.add(x))]
 
         last_error = None
+        errors_summary = []
         for target_url in urls:
             endpoint = f"{target_url}/chat/completions"
             try:
-                with httpx.Client(timeout=self.timeout) as client:
+                with httpx.Client(timeout=min(self.timeout, 12.0)) as client:
                     resp = client.post(
                         endpoint,
                         headers=self._headers(),
@@ -153,11 +156,12 @@ class OpenClawAgentProvider(AgentProvider):
                         return choices[0]["message"].get("content", "")
             except Exception as exc:
                 last_error = exc
+                errors_summary.append(f"{target_url} -> {exc}")
                 logger.debug("Failed connecting to %s: %s", endpoint, exc)
                 continue
 
         raise RuntimeError(
-            f"Koneksi LLM 9Router/OpenClaw gagal di seluruh endpoint ({', '.join(urls)}). Error: {last_error}"
+            f"Koneksi 9Router gagal di seluruh endpoint:\n" + "\n".join(f"• {e}" for e in errors_summary[:3])
         )
 
     # -------------------------------------------------------------------------
