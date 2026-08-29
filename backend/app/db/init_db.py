@@ -233,7 +233,7 @@ def seed_process(db: Session) -> Process:
             db.delete(p)
 
     # Clean up obsolete alerts for non-existent parameters
-    from app.models.alert import Alert
+    from app.models import Alert
     for old_alert in db.scalars(select(Alert)).all():
         if old_alert.parameter_name not in allowed_param_names:
             db.delete(old_alert)
