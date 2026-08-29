@@ -10,54 +10,80 @@ export function exportParametersToCSV(
     'No',
     'Nama Parameter',
     'Identifier',
-    'Nilai Terkini',
+    'Nilai Terkini (DCS)',
     'Satuan',
     'Target Operasi',
-    'Batas Min',
-    'Batas Maks',
+    'Batas Minimum',
+    'Batas Maksimum',
     'Deviasi',
-    'Status',
+    'Status Operasi',
+    'Waktu Catat',
   ]
+
+  const formattedTime = formatDateTime(timestamp || new Date().toISOString())
 
   const rows = parameters.map((p, idx) => [
     idx + 1,
-    `"${p.display_name}"`,
+    `"${(p.display_name || '').replace(/"/g, '""')}"`,
     p.parameter_name,
-    p.current_value !== null ? p.current_value : '',
-    `"${p.unit}"`,
-    p.target_value !== null ? p.target_value : '',
-    p.minimum_value !== null ? p.minimum_value : '',
-    p.maximum_value !== null ? p.maximum_value : '',
-    p.deviation !== null ? p.deviation : '',
-    p.status_label || p.status,
+    p.current_value !== null && p.current_value !== undefined ? p.current_value : '',
+    `"${(p.unit || '').replace(/"/g, '""')}"`,
+    p.target_value !== null && p.target_value !== undefined ? p.target_value : '',
+    p.minimum_value !== null && p.minimum_value !== undefined ? p.minimum_value : '',
+    p.maximum_value !== null && p.maximum_value !== undefined ? p.maximum_value : '',
+    p.deviation !== null && p.deviation !== undefined ? p.deviation : '',
+    `"${(p.status_label || p.status || 'NORMAL').toUpperCase()}"`,
+    `"${formattedTime}"`,
   ])
 
-  const metaHeader = [
-    [`# Laporan Telemetri Parameter - PRISMA AI`],
-    [`# Proses: ${processName}`],
-    [`# Waktu Ekstraksi: ${formatDateTime(timestamp || new Date().toISOString())}`],
-    [`# Total Parameter: ${parameters.length}`],
-    [],
-  ]
-    .map((line) => line.join(','))
-    .join('\n')
+  const csvString = [
+    headers.join(','),
+    ...rows.map((r) => r.join(',')),
+  ].join('\r\n')
 
-  const csvContent =
-    'data:text/csv;charset=utf-8,\uFEFF' +
-    metaHeader +
-    '\n' +
-    headers.join(',') +
-    '\n' +
-    rows.map((r) => r.join(',')).join('\n')
-
-  const encodedUri = encodeURI(csvContent)
+  // Use Blob for reliable cross-browser download with UTF-8 BOM
+  const blob = new Blob(['\uFEFF' + csvString], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   const dateStr = new Date().toISOString().slice(0, 10)
-  link.setAttribute('href', encodedUri)
-  link.setAttribute('download', `PRISMA_AI_Report_${dateStr}.csv`)
+  link.href = url
+  link.setAttribute('download', `PRISMA_AI_${processName.replace(/\s+/g, '_')}_${dateStr}.csv`)
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+}
+
+export function exportHistoryToCSV(
+  points: Array<{ timestamp: string; values: Record<string, number | null> }>,
+  processName = 'Proses Produksi ClO2',
+) {
+  if (!points || points.length === 0) return
+
+  const sampleValues = points[0]?.values || {}
+  const paramKeys = Object.keys(sampleValues)
+
+  const headers = ['Timestamp', ...paramKeys]
+  const rows = points.map((pt) => {
+    const rowVals = [pt.timestamp]
+    for (const k of paramKeys) {
+      const v = pt.values[k]
+      rowVals.push(v !== null && v !== undefined ? String(v) : '')
+    }
+    return rowVals.join(',')
+  })
+
+  const csvString = [headers.join(','), ...rows].join('\r\n')
+  const blob = new Blob(['\uFEFF' + csvString], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  const dateStr = new Date().toISOString().slice(0, 10)
+  link.href = url
+  link.setAttribute('download', `PRISMA_AI_Logsheet_${processName.replace(/\s+/g, '_')}_${dateStr}.csv`)
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
 }
 
 export function printProcessReport(
