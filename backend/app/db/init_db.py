@@ -309,10 +309,9 @@ def init_db() -> None:
             seed_history(db, process.id, settings.SIMULATION_SEED_HOURS, SEED_INTERVAL_SECONDS)
         else:
             # In Production Mode: Seed the 288 real plant dataset records if not present
+            from datetime import datetime
             from app.models import SensorReading, AIInsight
             from app.db.real_data import REAL_PLANT_READINGS
-            from app.services.ai import generate_insight
-            from datetime import datetime
             
             existing_count = db.scalar(select(func.count(SensorReading.id)).where(SensorReading.process_id == process.id)) or 0
             if existing_count < 100:
@@ -343,9 +342,10 @@ def init_db() -> None:
             has_insight = db.scalars(select(AIInsight).where(AIInsight.process_id == process.id).limit(1)).first()
             if not has_insight:
                 try:
-                    generate_insight(db, process.id)
+                    from app.services.ai import run_analysis
+                    run_analysis(db, process.id)
                     logger.info("Seed AI insight & rekomendasi awal")
                 except Exception as e:
-                    logger.warning("Gagal generate insight awal: %s", e)
+                    logger.warning("Lewati analisis awal saat startup: %s", e)
     finally:
         db.close()
