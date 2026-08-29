@@ -15,9 +15,20 @@ export interface ParsedRow {
   [key: string]: unknown
 }
 
+// Map spreadsheet headers accurately to unique database column aliases:
+// X1 NaClO3 Feed -> flow_rate
+// X2 NaClO3 Conc -> reaction_efficiency
+// X3 NaCl Conc -> orp
+// X4 HCl Feed -> so2_dosage
+// X5 HCl Conc -> ph
+// X7 Generator Temp -> pressure
+// X9 Absorber Water Temp -> temperature
+// X10 Absorber Water Rate -> production_capacity
+// Y ClO2 Concentration -> clo2_concentration
 const COLUMN_ALIASES: Record<string, string> = {
-  // ClO2 Product Concentration (Y)
+  // 1. ClO2 Product Concentration (Y)
   actual_clo2_gpl: 'clo2_concentration',
+  actual_clo2: 'clo2_concentration',
   clo2_concentration: 'clo2_concentration',
   clo2_concentration_gpl: 'clo2_concentration',
   clo2_concentration_mg_l: 'clo2_concentration',
@@ -25,57 +36,66 @@ const COLUMN_ALIASES: Record<string, string> = {
   clo2: 'clo2_concentration',
   y: 'clo2_concentration',
 
-  // Temperatures
-  generator_temperature_c: 'temperature',
-  generator_temp: 'temperature',
-  absorber_water_temperature_c: 'temperature',
-  suhu: 'temperature',
-  temperature: 'temperature',
-  temp: 'temperature',
-  x7: 'temperature',
-  x9: 'temperature',
-
-  // Flow & Feed Rates
+  // 2. NaClO3 Feed Rate (X1)
   naclo3_feed_m3h: 'flow_rate',
-  absorber_water_rate_m3h: 'flow_rate',
-  laju_alir: 'flow_rate',
-  flow_rate: 'flow_rate',
-  flow: 'flow_rate',
+  naclo3_feed: 'flow_rate',
+  umpan_naclo3: 'flow_rate',
   x1: 'flow_rate',
-  x10: 'flow_rate',
+  flow_rate: 'flow_rate',
 
-  // Chemical Dosage & HCl Feed
-  hcl_feed_m3h: 'so2_dosage',
-  dosis_so2: 'so2_dosage',
-  so2_dosage: 'so2_dosage',
-  dosage: 'so2_dosage',
-  x4: 'so2_dosage',
-
-  // pH
-  ph: 'ph',
-  ph_reaktor: 'ph',
-
-  // Pressure
-  pressure: 'pressure',
-  tekanan: 'pressure',
-  generator_pressure_bar: 'pressure',
-
-  // ORP & Turbidity
-  orp: 'orp',
-  turbidity: 'turbidity',
-  turbiditas: 'turbidity',
-
-  // Production Capacity
-  production_rate_mt_day: 'production_capacity',
-  production_capacity: 'production_capacity',
-  kapasitas_produksi: 'production_capacity',
-
-  // Reaction Efficiency & Concentrations
-  hcl_concentration_pct: 'reaction_efficiency',
-  reaction_efficiency: 'reaction_efficiency',
-  efisiensi_reaksi: 'reaction_efficiency',
+  // 3. NaClO3 Concentration (X2)
   naclo3_concentration_gpl: 'reaction_efficiency',
-  nacl_concentration_gpl: 'reaction_efficiency',
+  naclo3_concentration: 'reaction_efficiency',
+  konsentrasi_naclo3: 'reaction_efficiency',
+  x2: 'reaction_efficiency',
+  reaction_efficiency: 'reaction_efficiency',
+
+  // 4. NaCl Concentration (X3)
+  nacl_concentration_gpl: 'orp',
+  nacl_concentration: 'orp',
+  konsentrasi_nacl: 'orp',
+  x3: 'orp',
+  orp: 'orp',
+
+  // 5. HCl Feed Rate (X4)
+  hcl_feed_m3h: 'so2_dosage',
+  hcl_feed: 'so2_dosage',
+  umpan_hcl: 'so2_dosage',
+  x4: 'so2_dosage',
+  so2_dosage: 'so2_dosage',
+
+  // 6. HCl Concentration % (X5)
+  hcl_concentration_pct: 'ph',
+  hcl_concentration: 'ph',
+  konsentrasi_hcl: 'ph',
+  x5: 'ph',
+  ph: 'ph',
+
+  // 7. Generator ClO2 Output Temp °C (X7)
+  generator_temperature_c: 'pressure',
+  generator_temperature: 'pressure',
+  generator_temp: 'pressure',
+  suhu_generator: 'pressure',
+  x7: 'pressure',
+  pressure: 'pressure',
+
+  // 8. Absorber Chilled Water Temp °C (X9)
+  absorber_water_temperature_c: 'temperature',
+  absorber_water_temperature: 'temperature',
+  absorber_temp: 'temperature',
+  suhu_absorber: 'temperature',
+  chilled_water_temp: 'temperature',
+  x9: 'temperature',
+  temperature: 'temperature',
+
+  // 9. Absorber Water Rate m3/h (X10) & Production Capacity
+  absorber_water_rate_m3h: 'production_capacity',
+  absorber_water_rate: 'production_capacity',
+  laju_air_absorber: 'production_capacity',
+  x10: 'production_capacity',
+  production_capacity: 'production_capacity',
+  production_rate_mt_day: 'production_capacity',
+  production_rate_tpd: 'production_capacity',
 }
 
 function cleanNumeric(val: unknown): number | null {
@@ -87,17 +107,83 @@ function cleanNumeric(val: unknown): number | null {
     return null
   }
 
-  // Handle Indonesian comma decimals (e.g. "17,420" -> 17.42, "9,72" -> 9.72)
+  // Handle Indonesian comma decimals (e.g. "17,42" -> 17.42, "9,72" -> 9.72)
   let normalized = s.replace(/["']/g, '').trim()
   if (normalized.includes(',') && !normalized.includes('.')) {
     normalized = normalized.replace(',', '.')
   } else if (normalized.includes('.') && normalized.includes(',')) {
-    // Thousands separator dot, decimal comma (e.g. 1.234,56)
     normalized = normalized.replace(/\./g, '').replace(',', '.')
   }
 
   const num = parseFloat(normalized)
   return isNaN(num) ? null : num
+}
+
+function parseTimestamp(cellVal: unknown): string {
+  if (cellVal === null || cellVal === undefined || cellVal === '') {
+    return new Date().toISOString()
+  }
+
+  // If Excel date serial number (e.g. 45533.7916666667)
+  if (typeof cellVal === 'number' && cellVal > 30000) {
+    const dateObj = new Date(Math.round((cellVal - 25569) * 86400 * 1000))
+    return dateObj.toISOString()
+  }
+
+  const s = String(cellVal).trim()
+
+  // Try parsing ISO or standard dates
+  const parsed = Date.parse(s)
+  if (!isNaN(parsed)) {
+    return new Date(parsed).toISOString()
+  }
+
+  // Handle formats like "8/29/2026 19:00" or "29/08/2026 19:00" or "2026-08-29 19:00"
+  const parts = s.split(/[\s,T]+/)
+  if (parts.length >= 2) {
+    const datePart = parts[0]
+    const timePart = parts[1]
+    const dateSegments = datePart.split(/[-/.]/)
+    const timeSegments = timePart.split(':')
+
+    if (dateSegments.length === 3) {
+      let year = parseInt(dateSegments[0], 10)
+      let month = parseInt(dateSegments[1], 10)
+      let day = parseInt(dateSegments[2], 10)
+
+      if (dateSegments[2].length === 4) {
+        year = parseInt(dateSegments[2], 10)
+        if (parseInt(dateSegments[0], 10) > 12) {
+          // DD/MM/YYYY
+          day = parseInt(dateSegments[0], 10)
+          month = parseInt(dateSegments[1], 10)
+        } else {
+          // MM/DD/YYYY
+          month = parseInt(dateSegments[0], 10)
+          day = parseInt(dateSegments[1], 10)
+        }
+      }
+
+      const hours = parseInt(timeSegments[0] || '0', 10)
+      const minutes = parseInt(timeSegments[1] || '0', 10)
+      const seconds = parseInt(timeSegments[2] || '0', 10)
+
+      const dt = new Date(Date.UTC(year, month - 1, day, hours, minutes, seconds))
+      if (!isNaN(dt.getTime())) {
+        return dt.toISOString()
+      }
+    }
+  }
+
+  // If only time given (e.g. "19:00")
+  if (/^\d{1,2}:\d{2}(:\d{2})?$/.test(s)) {
+    const now = new Date()
+    const [h, m, sec] = s.split(':').map((v) => parseInt(v, 10))
+    now.setHours(h || 0, m || 0, sec || 0, 0)
+    return now.toISOString()
+  }
+
+  return new Date().toISOString()
 }
 
 export async function parseSpreadsheetFile(file: File): Promise<ParsedRow[]> {
@@ -119,7 +205,6 @@ export async function parseSpreadsheetFile(file: File): Promise<ParsedRow[]> {
       .filter(Boolean)
 
     rawData = lines.map((line) => {
-      // Basic CSV parser handling quoted values with commas
       const matches = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g)
       if (matches) {
         return matches.map((m) => m.replace(/^"|"$/g, '').trim())
@@ -132,7 +217,7 @@ export async function parseSpreadsheetFile(file: File): Promise<ParsedRow[]> {
     throw new Error('File tidak memiliki data yang cukup (minimal 1 baris header dan 1 baris data).')
   }
 
-  // Find header row (skips title & description rows like "PRISMA AI — Process Data Input Template")
+  // Find header row (skips metadata/title rows)
   let headerIndex = -1
   for (let i = 0; i < Math.min(rawData.length, 15); i++) {
     const row = rawData[i].map((cell) => String(cell).toLowerCase().trim())
@@ -168,15 +253,9 @@ export async function parseSpreadsheetFile(file: File): Promise<ParsedRow[]> {
       if (cellVal === undefined || cellVal === '') return
 
       if (h.includes('timestamp') || h.includes('time') || h.includes('waktu')) {
-        let tsStr = String(cellVal).trim()
-        // If Excel date number, convert
-        if (typeof cellVal === 'number' && cellVal > 30000) {
-          const dateObj = new Date((cellVal - (25567 + 2)) * 86400 * 1000)
-          tsStr = dateObj.toISOString()
-        }
-        rowObj.timestamp = tsStr
+        rowObj.timestamp = parseTimestamp(cellVal)
       } else if (h.includes('note') || h.includes('catatan')) {
-        // skip or save note
+        // optional notes
       } else {
         const targetKey = COLUMN_ALIASES[h] || h
         const cleanNum = cleanNumeric(cellVal)
@@ -187,13 +266,16 @@ export async function parseSpreadsheetFile(file: File): Promise<ParsedRow[]> {
       }
     })
 
-    // Skip example row
+    // Skip example row if any
     const rowStr = JSON.stringify(row).toLowerCase()
     if (rowStr.includes('contoh data') || rowStr.includes('sample data')) {
       continue
     }
 
     if (hasValue) {
+      if (!rowObj.timestamp) {
+        rowObj.timestamp = new Date().toISOString()
+      }
       rows.push(rowObj)
     }
   }
