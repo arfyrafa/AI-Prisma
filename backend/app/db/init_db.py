@@ -5,7 +5,7 @@ migrations when the schema starts evolving in production.
 """
 
 import logging
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.db.base import Base
@@ -308,26 +308,37 @@ def init_db() -> None:
         if settings.SIMULATION_MODE:
             seed_history(db, process.id, settings.SIMULATION_SEED_HOURS, SEED_INTERVAL_SECONDS)
         else:
-            # In Production Mode: If no readings exist yet, seed initial baseline reading so dashboard is alive
+            # In Production Mode: Seed the 288 real plant dataset records if not present
             from app.models import SensorReading, AIInsight
-            from app.services.monitoring import record_reading
+            from app.db.real_data import REAL_PLANT_READINGS
             from app.services.ai import generate_insight
+            from datetime import datetime
             
-            has_reading = db.scalars(select(SensorReading).where(SensorReading.process_id == process.id).limit(1)).first()
-            if not has_reading:
-                baseline_values = {
-                    "clo2_concentration": 9.72,
-                    "flow_rate": 17.37,
-                    "reaction_efficiency": 437.16,
-                    "orp": 95.5,
-                    "so2_dosage": 4.13,
-                    "ph": 31.55,
-                    "pressure": 46.7,
-                    "temperature": 8.42,
-                    "production_capacity": 104.78,
-                }
-                reading, _, _ = record_reading(db, process.id, baseline_values, source="manual")
-                logger.info("Seed 1 baseline reading produksi untuk inisialisasi awal")
+            existing_count = db.scalar(select(func.count(SensorReading.id)).where(SensorReading.process_id == process.id)) or 0
+            if existing_count < 100:
+                logger.info("Memasukkan %d data riil pabrik dari Data Fix.xlsx...", len(REAL_PLANT_READINGS))
+                db.query(SensorReading).filter(SensorReading.process_id == process.id).delete()
+                
+                real_objs = []
+                for r in REAL_PLANT_READINGS:
+                    dt = datetime.fromisoformat(r["timestamp"].replace("Z", "+00:00"))
+                    real_objs.append(SensorReading(
+                        process_id=process.id,
+                        timestamp=dt,
+                        clo2_concentration=r["clo2_concentration"],
+                        flow_rate=r["flow_rate"],
+                        reaction_efficiency=r["reaction_efficiency"],
+                        orp=r["orp"],
+                        so2_dosage=r["so2_dosage"],
+                        ph=r["ph"],
+                        pressure=r["pressure"],
+                        temperature=r["temperature"],
+                        production_capacity=r["production_capacity"],
+                        source="actual_plant"
+                    ))
+                db.add_all(real_objs)
+                db.commit()
+                logger.info("Berhasil menyimpan %d data riil pabrik ke database!", len(real_objs))
 
             has_insight = db.scalars(select(AIInsight).where(AIInsight.process_id == process.id).limit(1)).first()
             if not has_insight:
