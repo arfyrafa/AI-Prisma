@@ -26,48 +26,46 @@ from app.services.monitoring import record_reading
 logger = logging.getLogger(__name__)
 
 BASELINE = {
-    "clo2_concentration": 8.4,
-    "temperature": 15.2,
-    "pressure": 9.5,
-    "ph": 4.5,
-    "flow_rate": 28.0,
-    "so2_dosage": 0.42,
-    "orp": 178.0,
-    "turbidity": 0.8,
-    "production_capacity": 51.5,
-    "reaction_efficiency": 95.8,
+    "clo2_concentration": 9.72,
+    "flow_rate": 17.37,  # NaClO3 Feed (m³/h)
+    "reaction_efficiency": 437.16,  # NaClO3 Conc (g/L)
+    "orp": 95.5,  # NaCl Conc (g/L)
+    "so2_dosage": 4.13,  # HCl Feed (m³/h)
+    "ph": 31.55,  # HCl Conc (%)
+    "pressure": 46.7,  # Generator Temp (°C)
+    "temperature": 8.42,  # Absorber Water Temp (°C)
+    "production_capacity": 104.78,  # Absorber Water Rate (m³/h)
 }
 
 NOISE = {
-    "clo2_concentration": 0.05,
-    "temperature": 0.12,
-    "pressure": 0.05,
-    "ph": 0.02,
-    "flow_rate": 0.15,
-    "so2_dosage": 0.008,
-    "orp": 1.6,
-    "turbidity": 0.03,
-    "production_capacity": 0.25,
-    "reaction_efficiency": 0.15,
+    "clo2_concentration": 0.03,
+    "flow_rate": 0.08,
+    "reaction_efficiency": 1.2,
+    "orp": 0.5,
+    "so2_dosage": 0.04,
+    "ph": 0.15,
+    "pressure": 0.2,
+    "temperature": 0.1,
+    "production_capacity": 0.6,
 }
 
 # Phase -> (duration in ticks, per-tick drift applied to the baseline)
 PHASES: list[tuple[str, int, dict[str, float]]] = [
-    ("normal", 24, {}),
+    ("normal", 30, {}),
     (
         "drift",
-        18,
-        {"ph": -0.018, "so2_dosage": 0.006, "clo2_concentration": 0.055, "orp": 0.9},
+        20,
+        {"so2_dosage": 0.02, "clo2_concentration": 0.015, "pressure": 0.1},
     ),
     (
         "deviation",
-        14,
-        {"ph": -0.006, "so2_dosage": 0.002, "clo2_concentration": 0.028, "turbidity": 0.012},
+        15,
+        {"so2_dosage": 0.04, "clo2_concentration": 0.025, "temperature": 0.15},
     ),
     (
         "recovery",
-        22,
-        {"ph": 0.016, "so2_dosage": -0.007, "clo2_concentration": -0.06, "orp": -0.8, "turbidity": -0.01},
+        25,
+        {"so2_dosage": -0.05, "clo2_concentration": -0.03, "pressure": -0.1},
     ),
 ]
 

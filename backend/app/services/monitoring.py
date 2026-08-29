@@ -94,11 +94,20 @@ def record_reading(
 
     Returns ``(reading, deviations, created_alerts)``.
     """
+    mapped_values = {}
+    for k, v in values.items():
+        if v is not None:
+            col = COLUMN_ALIASES.get(k, k)
+            if col in SensorReading.PARAMETER_COLUMNS:
+                mapped_values[col] = v
+            elif k in SensorReading.PARAMETER_COLUMNS:
+                mapped_values[k] = v
+
     reading = SensorReading(
         process_id=process_id,
         timestamp=timestamp or datetime.now(timezone.utc),
         source=source,
-        **{key: values.get(key) for key in SensorReading.PARAMETER_COLUMNS},
+        **{key: mapped_values.get(key) for key in SensorReading.PARAMETER_COLUMNS},
     )
     db.add(reading)
     db.commit()

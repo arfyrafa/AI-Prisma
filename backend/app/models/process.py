@@ -72,7 +72,26 @@ class SensorReading(Base):
     )
 
     def as_parameter_map(self) -> dict[str, float | None]:
-        return {key: getattr(self, key) for key in self.PARAMETER_COLUMNS}
+        m = {key: getattr(self, key) for key in self.PARAMETER_COLUMNS}
+        # Explicit chemical aliases so UI tables and deviation engine resolve them automatically
+        m["clo2_concentration"] = self.clo2_concentration
+        m["naclo3_feed_m3h"] = self.flow_rate
+        m["naclo3_feed"] = self.flow_rate
+        m["naclo3_concentration_gpl"] = self.reaction_efficiency
+        m["naclo3_concentration"] = self.reaction_efficiency
+        m["nacl_concentration_gpl"] = self.orp
+        m["nacl_concentration"] = self.orp
+        m["hcl_feed_m3h"] = self.so2_dosage
+        m["hcl_feed"] = self.so2_dosage
+        m["hcl_concentration_pct"] = self.ph
+        m["hcl_concentration"] = self.ph
+        m["generator_temperature_c"] = self.pressure
+        m["generator_temperature"] = self.pressure
+        m["absorber_water_temperature_c"] = self.temperature
+        m["absorber_water_temperature"] = self.temperature
+        m["absorber_water_rate_m3h"] = self.production_capacity
+        m["absorber_water_rate"] = self.production_capacity
+        return m
 
 
 class ProcessParameter(Base):
