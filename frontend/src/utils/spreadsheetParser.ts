@@ -273,12 +273,19 @@ export async function parseSpreadsheetFile(file: File): Promise<ParsedRow[]> {
     }
 
     if (hasValue) {
-      if (!rowObj.timestamp) {
-        rowObj.timestamp = new Date().toISOString()
-      }
       rows.push(rowObj)
     }
   }
+
+  // If timestamps were missing in the spreadsheet, assign sequential logical 8-hour shift timestamps up to now
+  const nowMs = Date.now()
+  const total = rows.length
+  rows.forEach((r, idx) => {
+    if (!r.timestamp) {
+      const hoursAgo = (total - 1 - idx) * 8
+      r.timestamp = new Date(nowMs - hoursAgo * 3600 * 1000).toISOString()
+    }
+  })
 
   if (rows.length === 0) {
     throw new Error('Tidak ada baris data valid yang berhasil diekstrak dari spreadsheet.')
