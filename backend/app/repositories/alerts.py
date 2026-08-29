@@ -37,12 +37,14 @@ def get_alert(db: Session, alert_id: int) -> Alert | None:
 
 
 def get_active_alerts(db: Session, process_id: int) -> list[Alert]:
+    from app.repositories import readings as reading_repo
+    params = {p.parameter_name for p in reading_repo.get_parameters(db, process_id)}
     stmt = (
         select(Alert)
         .where(Alert.process_id == process_id, Alert.status == "active")
         .order_by(Alert.created_at.desc())
     )
-    return list(db.scalars(stmt))
+    return [a for a in db.scalars(stmt) if not params or a.parameter_name in params]
 
 
 def count_active_alerts(db: Session, process_id: int) -> int:

@@ -61,7 +61,7 @@ def sync_alerts(
                 existing.severity = deviation.severity
                 existing.message = deviation.message
 
-    for name, alert in active.items():
+    for name, alert in list(active.items()):
         if name not in deviating:
             alert.status = "resolved"
             alert.resolved_at = now
@@ -70,7 +70,7 @@ def sync_alerts(
                 action="alert_resolved",
                 entity_type="alert",
                 entity_id=alert.id,
-                description=f"{alert.parameter_name} kembali ke rentang operasi.",
+                description=f"{alert.parameter_name} kembali ke rentang operasi atau dinonaktifkan.",
                 commit=False,
             )
 

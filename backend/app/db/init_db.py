@@ -226,6 +226,20 @@ def seed_process(db: Session) -> Process:
         db.refresh(process)
         logger.info("Seed proses: %s", process.name)
 
+    # Ensure obsolete parameters (ph, turbidity, orp, etc.) are purged
+    allowed_param_names = {name for name, *rest in PARAMETER_SEED}
+    for p in list(process.parameters):
+        if p.parameter_name not in allowed_param_names:
+            db.delete(p)
+
+    # Clean up obsolete alerts for non-existent parameters
+    from app.models.alert import Alert
+    for old_alert in db.scalars(select(Alert)).all():
+        if old_alert.parameter_name not in allowed_param_names:
+            db.delete(old_alert)
+
+    db.commit()
+
     existing = {p.parameter_name for p in process.parameters}
     added = [
         ProcessParameter(
