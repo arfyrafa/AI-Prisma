@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     PREDICTION_HORIZON_MINUTES: int = 30
 
     # --- Simulation --------------------------------------------------------
-    SIMULATION_MODE: bool = True
+    SIMULATION_MODE: bool = False
     SIMULATION_INTERVAL_SECONDS: float = 5.0
     SIMULATION_SEED_HOURS: int = 24
 
