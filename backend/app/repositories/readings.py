@@ -70,6 +70,8 @@ RANGE_TO_TIMEDELTA = {
     "6h": timedelta(hours=6),
     "24h": timedelta(hours=24),
     "7d": timedelta(days=7),
+    "30d": timedelta(days=30),
+    "1m": timedelta(days=30),
 }
 
 

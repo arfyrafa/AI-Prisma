@@ -5,6 +5,7 @@ const RANGES: { value: TimeRange; label: string }[] = [
   { value: '6h', label: '6 jam' },
   { value: '24h', label: '24 jam' },
   { value: '7d', label: '7 hari' },
+  { value: '30d', label: '1 bulan' },
 ]
 
 interface Props {
