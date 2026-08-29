@@ -120,18 +120,20 @@ class OpenClawAgentProvider(AgentProvider):
         candidate_urls = []
         if self.base_url:
             candidate_urls.append(self.base_url)
-        # Fallbacks for port 20128 (9router default dashboard/API) and 2026 / 18789
+        # Fallbacks for port 20128 (9router default dashboard/API) and 20129 / 2026 / 18789
         candidate_urls.extend([
-            "http://172.17.0.1:20128/v1",
-            "http://72.62.122.6:20128/v1",
             "http://host.docker.internal:20128/v1",
+            "http://host.docker.internal:20129/v1",
+            "http://172.18.0.1:20128/v1",
+            "http://172.18.0.1:20129/v1",
+            "http://172.17.0.1:20128/v1",
+            "http://172.17.0.1:20129/v1",
+            "http://72.62.122.6:20128/v1",
+            "http://72.62.122.6:20129/v1",
             "http://127.0.0.1:20128/v1",
+            "http://127.0.0.1:20129/v1",
             "http://172.17.0.1:2026/v1",
-            "http://72.62.122.6:2026/v1",
             "http://host.docker.internal:2026/v1",
-            "http://127.0.0.1:2026/v1",
-            "http://172.17.0.1:18789/v1",
-            "http://host.docker.internal:18789/v1",
             "https://api.9router.com/v1",
         ])
 
