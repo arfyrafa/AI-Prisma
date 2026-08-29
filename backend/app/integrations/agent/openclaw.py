@@ -153,7 +153,7 @@ class OpenClawAgentProvider(AgentProvider):
             ]
 
             try:
-                with httpx.Client(timeout=min(self.timeout, 15.0)) as client:
+                with httpx.Client(timeout=min(self.timeout, 25.0)) as client:
                     # Try querying /models to get active model list from 9router
                     try:
                         m_resp = client.get(f"{target_url}/models", headers=self._headers(), timeout=4.0)
@@ -163,11 +163,25 @@ class OpenClawAgentProvider(AgentProvider):
                             if m_list and isinstance(m_list, list):
                                 found_ids = [m["id"] for m in m_list if isinstance(m, dict) and "id" in m]
                                 if found_ids:
-                                    model_candidates = found_ids + model_candidates
+                                    # Prioritize ultra-fast mini/spark models over slow sol-reasoning models
+                                    def model_speed_score(name: str) -> int:
+                                        n = name.lower()
+                                        if "mini" in n and "review" not in n:
+                                            return 0
+                                        if "spark" in n and "review" not in n:
+                                            return 1
+                                        if "5.4" in n and "review" not in n:
+                                            return 2
+                                        if "5.5" in n and "review" not in n:
+                                            return 3
+                                        return 10
+
+                                    sorted_ids = sorted(found_ids, key=model_speed_score)
+                                    model_candidates = sorted_ids + model_candidates
                     except Exception:
                         pass
 
-                    # Try selected model
+                    # Try selected model (cx/gpt-5.4-mini first)
                     chosen_model = model_candidates[0]
                     resp = client.post(
                         endpoint,
@@ -176,6 +190,7 @@ class OpenClawAgentProvider(AgentProvider):
                             "model": chosen_model,
                             "messages": messages_payload,
                             "temperature": temperature,
+                            "max_tokens": 1500,
                         },
                     )
                     resp.raise_for_status()
