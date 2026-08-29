@@ -117,21 +117,17 @@ class OpenClawAgentProvider(AgentProvider):
         candidate_urls = []
         if self.base_url:
             candidate_urls.append(self.base_url)
-        # Fallbacks for port 20128 (9router default dashboard/API) and 20129 / 2026 / 18789
+        # Prioritize active 20129 relay endpoints first for instant 2-3s latency
         candidate_urls.extend([
-            "http://host.docker.internal:20128/v1",
             "http://host.docker.internal:20129/v1",
-            "http://172.18.0.1:20128/v1",
             "http://172.18.0.1:20129/v1",
-            "http://172.17.0.1:20128/v1",
             "http://172.17.0.1:20129/v1",
-            "http://72.62.122.6:20128/v1",
-            "http://72.62.122.6:20129/v1",
-            "http://127.0.0.1:20128/v1",
             "http://127.0.0.1:20129/v1",
-            "http://172.17.0.1:2026/v1",
+            "http://72.62.122.6:20129/v1",
+            "http://host.docker.internal:20128/v1",
+            "http://172.18.0.1:20128/v1",
+            "http://172.17.0.1:20128/v1",
             "http://host.docker.internal:2026/v1",
-            "https://api.9router.com/v1",
         ])
 
         # De-duplicate while preserving order
@@ -143,28 +139,24 @@ class OpenClawAgentProvider(AgentProvider):
         for target_url in urls:
             endpoint = f"{target_url}/chat/completions"
             model_candidates = [
-                getattr(settings, "OPENCLAW_MODEL", "gpt-4o-mini"),
                 "cx/gpt-5.4-mini",
-                "cx/gpt-5.4",
-                "cx/gpt-5.5",
-                "cx/gpt-5.6-sol",
                 "cx/gpt-5.3-codex-spark",
+                getattr(settings, "OPENCLAW_MODEL", "cx/gpt-5.4-mini"),
                 "gpt-4o-mini",
-                "gpt-4o",
+                "cx/gpt-5.4",
             ]
 
             try:
-                with httpx.Client(timeout=min(self.timeout, 25.0)) as client:
-                    # Try querying /models to get active model list from 9router
+                with httpx.Client(timeout=18.0) as client:
+                    # Quick check active model list from 9router (timeout 1.5s max)
                     try:
-                        m_resp = client.get(f"{target_url}/models", headers=self._headers(), timeout=4.0)
+                        m_resp = client.get(f"{target_url}/models", headers=self._headers(), timeout=1.5)
                         if m_resp.status_code == 200:
                             m_data = m_resp.json()
                             m_list = m_data.get("data", [])
                             if m_list and isinstance(m_list, list):
                                 found_ids = [m["id"] for m in m_list if isinstance(m, dict) and "id" in m]
                                 if found_ids:
-                                    # Prioritize ultra-fast mini/spark models over slow sol-reasoning models
                                     def model_speed_score(name: str) -> int:
                                         n = name.lower()
                                         if "mini" in n and "review" not in n:
@@ -173,8 +165,6 @@ class OpenClawAgentProvider(AgentProvider):
                                             return 1
                                         if "5.4" in n and "review" not in n:
                                             return 2
-                                        if "5.5" in n and "review" not in n:
-                                            return 3
                                         return 10
 
                                     sorted_ids = sorted(found_ids, key=model_speed_score)
