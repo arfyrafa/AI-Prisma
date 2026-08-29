@@ -347,15 +347,21 @@ def init_db() -> None:
                 from app.models import SensorReading, AIInsight, Alert, Recommendation
                 from app.db.real_data import REAL_PLANT_READINGS
 
-                actual_count = db.scalar(
-                    select(func.count(SensorReading.id)).where(
+                latest_reading = db.scalar(
+                    select(SensorReading).where(
                         SensorReading.process_id == process.id,
                         SensorReading.source == "actual_plant",
-                    )
-                ) or 0
+                    ).order_by(SensorReading.timestamp.desc()).limit(1)
+                )
+                last_target_dt = datetime.fromisoformat(REAL_PLANT_READINGS[-1]["timestamp"].replace("Z", "+00:00"))
+                needs_update = (
+                    actual_count != len(REAL_PLANT_READINGS)
+                    or latest_reading is None
+                    or abs((latest_reading.timestamp - last_target_dt).total_seconds()) > 60
+                )
 
-                if actual_count != len(REAL_PLANT_READINGS):
-                    logger.info("Membersihkan data lama dan memasukkan %d data riil pabrik baru...", len(REAL_PLANT_READINGS))
+                if needs_update:
+                    logger.info("Membersihkan data lama dan memasukkan %d data riil shift 8-jam baru...", len(REAL_PLANT_READINGS))
                     db.query(Recommendation).filter(Recommendation.process_id == process.id).delete()
                     db.query(AIInsight).filter(AIInsight.process_id == process.id).delete()
                     db.query(Alert).filter(Alert.process_id == process.id).delete()

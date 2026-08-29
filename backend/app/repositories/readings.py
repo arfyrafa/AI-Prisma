@@ -72,6 +72,9 @@ RANGE_TO_TIMEDELTA = {
     "7d": timedelta(days=7),
     "30d": timedelta(days=30),
     "1m": timedelta(days=30),
+    "90d": timedelta(days=90),
+    "3m": timedelta(days=90),
+    "all": timedelta(days=365),
 }
 
 

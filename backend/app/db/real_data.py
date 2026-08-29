@@ -1,8 +1,8 @@
 # 297 Real plant records from PRISMA_AI_Data_Input_Template.xlsx
-# Spread over 2 weeks ending yesterday
+# Exactly 8 hours per shift ending today
 REAL_PLANT_READINGS = [
   {
-    "timestamp": "2026-08-14T23:00:00Z",
+    "timestamp": "2026-05-22T23:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.43,
     "reaction_efficiency": 472.0,
@@ -15,7 +15,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-15T00:08:06Z",
+    "timestamp": "2026-05-23T07:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.56,
     "reaction_efficiency": 470.0,
@@ -28,7 +28,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-15T01:16:12Z",
+    "timestamp": "2026-05-23T15:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.46,
     "reaction_efficiency": 472.0,
@@ -41,7 +41,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-15T02:24:19Z",
+    "timestamp": "2026-05-23T23:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.48,
     "reaction_efficiency": 475.0,
@@ -54,7 +54,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-15T03:32:25Z",
+    "timestamp": "2026-05-24T07:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.47,
     "reaction_efficiency": 479.0,
@@ -67,7 +67,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-15T04:40:32Z",
+    "timestamp": "2026-05-24T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.55,
     "reaction_efficiency": 472.0,
@@ -80,7 +80,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-15T05:48:38Z",
+    "timestamp": "2026-05-24T23:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.57,
     "reaction_efficiency": 475.0,
@@ -93,7 +93,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-15T06:56:45Z",
+    "timestamp": "2026-05-25T07:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.36,
     "reaction_efficiency": 471.0,
@@ -106,7 +106,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-15T08:04:51Z",
+    "timestamp": "2026-05-25T15:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.5,
     "reaction_efficiency": 465.0,
@@ -119,7 +119,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-15T09:12:58Z",
+    "timestamp": "2026-05-25T23:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.53,
     "reaction_efficiency": 468.0,
@@ -132,7 +132,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-15T10:21:04Z",
+    "timestamp": "2026-05-26T07:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.41,
     "reaction_efficiency": 472.0,
@@ -145,7 +145,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-15T11:29:11Z",
+    "timestamp": "2026-05-26T15:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.47,
     "reaction_efficiency": 455.0,
@@ -158,7 +158,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-15T12:37:17Z",
+    "timestamp": "2026-05-26T23:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.69,
     "reaction_efficiency": 453.0,
@@ -171,7 +171,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-15T13:45:24Z",
+    "timestamp": "2026-05-27T07:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.52,
     "reaction_efficiency": 457.0,
@@ -184,7 +184,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-15T14:53:30Z",
+    "timestamp": "2026-05-27T15:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.44,
     "reaction_efficiency": 462.0,
@@ -197,7 +197,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-15T16:01:37Z",
+    "timestamp": "2026-05-27T23:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.43,
     "reaction_efficiency": 444.0,
@@ -210,7 +210,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-15T17:09:43Z",
+    "timestamp": "2026-05-28T07:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.55,
     "reaction_efficiency": 451.0,
@@ -223,7 +223,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-15T18:17:50Z",
+    "timestamp": "2026-05-28T15:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.49,
     "reaction_efficiency": 454.0,
@@ -236,7 +236,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-15T19:25:56Z",
+    "timestamp": "2026-05-28T23:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.43,
     "reaction_efficiency": 451.0,
@@ -249,7 +249,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-15T20:34:03Z",
+    "timestamp": "2026-05-29T07:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.51,
     "reaction_efficiency": 453.0,
@@ -262,7 +262,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-15T21:42:09Z",
+    "timestamp": "2026-05-29T15:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.53,
     "reaction_efficiency": 455.0,
@@ -275,7 +275,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-15T22:50:16Z",
+    "timestamp": "2026-05-29T23:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.38,
     "reaction_efficiency": 453.0,
@@ -288,7 +288,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-15T23:58:22Z",
+    "timestamp": "2026-05-30T07:00:00Z",
     "clo2_concentration": 9.8,
     "flow_rate": 17.37,
     "reaction_efficiency": 456.0,
@@ -301,7 +301,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-16T01:06:29Z",
+    "timestamp": "2026-05-30T15:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.29,
     "reaction_efficiency": 459.0,
@@ -314,7 +314,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-16T02:14:35Z",
+    "timestamp": "2026-05-30T23:00:00Z",
     "clo2_concentration": 10.0,
     "flow_rate": 17.32,
     "reaction_efficiency": 451.0,
@@ -327,7 +327,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-16T03:22:42Z",
+    "timestamp": "2026-05-31T07:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.28,
     "reaction_efficiency": 459.0,
@@ -340,7 +340,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-16T04:30:48Z",
+    "timestamp": "2026-05-31T15:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.34,
     "reaction_efficiency": 464.0,
@@ -353,7 +353,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-16T05:38:55Z",
+    "timestamp": "2026-05-31T23:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.25,
     "reaction_efficiency": 456.0,
@@ -366,7 +366,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-16T06:47:01Z",
+    "timestamp": "2026-06-01T07:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.22,
     "reaction_efficiency": 460.0,
@@ -379,7 +379,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-16T07:55:08Z",
+    "timestamp": "2026-06-01T15:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.28,
     "reaction_efficiency": 458.0,
@@ -392,7 +392,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-16T09:03:14Z",
+    "timestamp": "2026-06-01T23:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.33,
     "reaction_efficiency": 468.0,
@@ -405,7 +405,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-16T10:11:21Z",
+    "timestamp": "2026-06-02T07:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.28,
     "reaction_efficiency": 465.0,
@@ -418,7 +418,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-16T11:19:27Z",
+    "timestamp": "2026-06-02T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.37,
     "reaction_efficiency": 463.0,
@@ -431,7 +431,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-16T12:27:34Z",
+    "timestamp": "2026-06-02T23:00:00Z",
     "clo2_concentration": 9.0,
     "flow_rate": 17.24,
     "reaction_efficiency": 472.0,
@@ -444,7 +444,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-16T13:35:40Z",
+    "timestamp": "2026-06-03T07:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.36,
     "reaction_efficiency": 462.0,
@@ -457,7 +457,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-16T14:43:47Z",
+    "timestamp": "2026-06-03T15:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.44,
     "reaction_efficiency": 462.0,
@@ -470,7 +470,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-16T15:51:53Z",
+    "timestamp": "2026-06-03T23:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.33,
     "reaction_efficiency": 451.0,
@@ -483,7 +483,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-16T17:00:00Z",
+    "timestamp": "2026-06-04T07:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.31,
     "reaction_efficiency": 439.0,
@@ -496,7 +496,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-16T18:08:06Z",
+    "timestamp": "2026-06-04T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.43,
     "reaction_efficiency": 435.0,
@@ -509,7 +509,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-16T19:16:12Z",
+    "timestamp": "2026-06-04T23:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.34,
     "reaction_efficiency": 436.0,
@@ -522,7 +522,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-16T20:24:19Z",
+    "timestamp": "2026-06-05T07:00:00Z",
     "clo2_concentration": 9.9,
     "flow_rate": 17.36,
     "reaction_efficiency": 427.0,
@@ -535,7 +535,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-16T21:32:25Z",
+    "timestamp": "2026-06-05T15:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.38,
     "reaction_efficiency": 429.0,
@@ -548,7 +548,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-16T22:40:32Z",
+    "timestamp": "2026-06-05T23:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.37,
     "reaction_efficiency": 429.0,
@@ -561,7 +561,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-16T23:48:38Z",
+    "timestamp": "2026-06-06T07:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.37,
     "reaction_efficiency": 434.0,
@@ -574,7 +574,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-17T00:56:45Z",
+    "timestamp": "2026-06-06T15:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.33,
     "reaction_efficiency": 442.0,
@@ -587,7 +587,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-17T02:04:51Z",
+    "timestamp": "2026-06-06T23:00:00Z",
     "clo2_concentration": 9.8,
     "flow_rate": 17.39,
     "reaction_efficiency": 451.0,
@@ -600,7 +600,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-17T03:12:58Z",
+    "timestamp": "2026-06-07T07:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.41,
     "reaction_efficiency": 457.0,
@@ -613,7 +613,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-17T04:21:04Z",
+    "timestamp": "2026-06-07T15:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.28,
     "reaction_efficiency": 453.0,
@@ -626,7 +626,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-17T05:29:11Z",
+    "timestamp": "2026-06-07T23:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.32,
     "reaction_efficiency": 465.0,
@@ -639,7 +639,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-17T06:37:17Z",
+    "timestamp": "2026-06-08T07:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.37,
     "reaction_efficiency": 461.0,
@@ -652,7 +652,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-17T07:45:24Z",
+    "timestamp": "2026-06-08T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.33,
     "reaction_efficiency": 457.0,
@@ -665,7 +665,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-17T08:53:30Z",
+    "timestamp": "2026-06-08T23:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.33,
     "reaction_efficiency": 460.0,
@@ -678,7 +678,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-17T10:01:37Z",
+    "timestamp": "2026-06-09T07:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.27,
     "reaction_efficiency": 456.0,
@@ -691,7 +691,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-17T11:09:43Z",
+    "timestamp": "2026-06-09T15:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.41,
     "reaction_efficiency": 457.0,
@@ -704,7 +704,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-17T12:17:50Z",
+    "timestamp": "2026-06-09T23:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.28,
     "reaction_efficiency": 451.0,
@@ -717,7 +717,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-17T13:25:56Z",
+    "timestamp": "2026-06-10T07:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.33,
     "reaction_efficiency": 454.0,
@@ -730,7 +730,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-17T14:34:03Z",
+    "timestamp": "2026-06-10T15:00:00Z",
     "clo2_concentration": 9.8,
     "flow_rate": 17.34,
     "reaction_efficiency": 435.0,
@@ -743,7 +743,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-17T15:42:09Z",
+    "timestamp": "2026-06-10T23:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.31,
     "reaction_efficiency": 428.0,
@@ -756,7 +756,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-17T16:50:16Z",
+    "timestamp": "2026-06-11T07:00:00Z",
     "clo2_concentration": 10.0,
     "flow_rate": 17.34,
     "reaction_efficiency": 446.0,
@@ -769,7 +769,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-17T17:58:22Z",
+    "timestamp": "2026-06-11T15:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.3,
     "reaction_efficiency": 440.0,
@@ -782,7 +782,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-17T19:06:29Z",
+    "timestamp": "2026-06-11T23:00:00Z",
     "clo2_concentration": 9.9,
     "flow_rate": 17.36,
     "reaction_efficiency": 448.0,
@@ -795,7 +795,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-17T20:14:35Z",
+    "timestamp": "2026-06-12T07:00:00Z",
     "clo2_concentration": 10.0,
     "flow_rate": 17.27,
     "reaction_efficiency": 436.0,
@@ -808,7 +808,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-17T21:22:42Z",
+    "timestamp": "2026-06-12T15:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.28,
     "reaction_efficiency": 445.0,
@@ -821,7 +821,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-17T22:30:48Z",
+    "timestamp": "2026-06-12T23:00:00Z",
     "clo2_concentration": 9.8,
     "flow_rate": 17.37,
     "reaction_efficiency": 439.0,
@@ -834,7 +834,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-17T23:38:55Z",
+    "timestamp": "2026-06-13T07:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.41,
     "reaction_efficiency": 440.0,
@@ -847,7 +847,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-18T00:47:01Z",
+    "timestamp": "2026-06-13T15:00:00Z",
     "clo2_concentration": 9.8,
     "flow_rate": 17.32,
     "reaction_efficiency": 443.0,
@@ -860,7 +860,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-18T01:55:08Z",
+    "timestamp": "2026-06-13T23:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.35,
     "reaction_efficiency": 434.0,
@@ -873,7 +873,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-18T03:03:14Z",
+    "timestamp": "2026-06-14T07:00:00Z",
     "clo2_concentration": 9.8,
     "flow_rate": 17.37,
     "reaction_efficiency": 434.0,
@@ -886,7 +886,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-18T04:11:21Z",
+    "timestamp": "2026-06-14T15:00:00Z",
     "clo2_concentration": 9.8,
     "flow_rate": 17.41,
     "reaction_efficiency": 430.0,
@@ -899,7 +899,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-18T05:19:27Z",
+    "timestamp": "2026-06-14T23:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.32,
     "reaction_efficiency": 428.0,
@@ -912,7 +912,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-18T06:27:34Z",
+    "timestamp": "2026-06-15T07:00:00Z",
     "clo2_concentration": 9.8,
     "flow_rate": 17.44,
     "reaction_efficiency": 429.0,
@@ -925,7 +925,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-18T07:35:40Z",
+    "timestamp": "2026-06-15T15:00:00Z",
     "clo2_concentration": 9.9,
     "flow_rate": 17.31,
     "reaction_efficiency": 425.0,
@@ -938,7 +938,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-18T08:43:47Z",
+    "timestamp": "2026-06-15T23:00:00Z",
     "clo2_concentration": 9.8,
     "flow_rate": 17.42,
     "reaction_efficiency": 427.0,
@@ -951,7 +951,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-18T09:51:53Z",
+    "timestamp": "2026-06-16T07:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.33,
     "reaction_efficiency": 420.0,
@@ -964,7 +964,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-18T11:00:00Z",
+    "timestamp": "2026-06-16T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.32,
     "reaction_efficiency": 411.0,
@@ -977,7 +977,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-18T12:08:06Z",
+    "timestamp": "2026-06-16T23:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.35,
     "reaction_efficiency": 408.0,
@@ -990,7 +990,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-18T13:16:12Z",
+    "timestamp": "2026-06-17T07:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.36,
     "reaction_efficiency": 412.0,
@@ -1003,7 +1003,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-18T14:24:19Z",
+    "timestamp": "2026-06-17T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.35,
     "reaction_efficiency": 407.0,
@@ -1016,7 +1016,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-18T15:32:25Z",
+    "timestamp": "2026-06-17T23:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.39,
     "reaction_efficiency": 404.0,
@@ -1029,7 +1029,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-18T16:40:32Z",
+    "timestamp": "2026-06-18T07:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.31,
     "reaction_efficiency": 401.0,
@@ -1042,7 +1042,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-18T17:48:38Z",
+    "timestamp": "2026-06-18T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.49,
     "reaction_efficiency": 410.0,
@@ -1055,7 +1055,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-18T18:56:45Z",
+    "timestamp": "2026-06-18T23:00:00Z",
     "clo2_concentration": 9.9,
     "flow_rate": 17.34,
     "reaction_efficiency": 407.0,
@@ -1068,7 +1068,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-18T20:04:51Z",
+    "timestamp": "2026-06-19T07:00:00Z",
     "clo2_concentration": 9.9,
     "flow_rate": 17.41,
     "reaction_efficiency": 413.0,
@@ -1081,7 +1081,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-18T21:12:58Z",
+    "timestamp": "2026-06-19T15:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.35,
     "reaction_efficiency": 424.0,
@@ -1094,7 +1094,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-18T22:21:04Z",
+    "timestamp": "2026-06-19T23:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.43,
     "reaction_efficiency": 432.0,
@@ -1107,7 +1107,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-18T23:29:11Z",
+    "timestamp": "2026-06-20T07:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.41,
     "reaction_efficiency": 428.0,
@@ -1120,7 +1120,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-19T00:37:17Z",
+    "timestamp": "2026-06-20T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.29,
     "reaction_efficiency": 429.0,
@@ -1133,7 +1133,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-19T01:45:24Z",
+    "timestamp": "2026-06-20T23:00:00Z",
     "clo2_concentration": 9.3,
     "flow_rate": 17.53,
     "reaction_efficiency": 449.0,
@@ -1146,7 +1146,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-19T02:53:30Z",
+    "timestamp": "2026-06-21T07:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.49,
     "reaction_efficiency": 464.0,
@@ -1159,7 +1159,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-19T04:01:37Z",
+    "timestamp": "2026-06-21T15:00:00Z",
     "clo2_concentration": 9.2,
     "flow_rate": 17.38,
     "reaction_efficiency": 455.0,
@@ -1172,7 +1172,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-19T05:09:43Z",
+    "timestamp": "2026-06-21T23:00:00Z",
     "clo2_concentration": 10.0,
     "flow_rate": 17.51,
     "reaction_efficiency": 470.0,
@@ -1185,7 +1185,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-19T06:17:50Z",
+    "timestamp": "2026-06-22T07:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.49,
     "reaction_efficiency": 468.0,
@@ -1198,7 +1198,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-19T07:25:56Z",
+    "timestamp": "2026-06-22T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.53,
     "reaction_efficiency": 461.0,
@@ -1211,7 +1211,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-19T08:34:03Z",
+    "timestamp": "2026-06-22T23:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.39,
     "reaction_efficiency": 450.0,
@@ -1224,7 +1224,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-19T09:42:09Z",
+    "timestamp": "2026-06-23T07:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.34,
     "reaction_efficiency": 455.0,
@@ -1237,7 +1237,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-19T10:50:16Z",
+    "timestamp": "2026-06-23T15:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.47,
     "reaction_efficiency": 452.0,
@@ -1250,7 +1250,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-19T11:58:22Z",
+    "timestamp": "2026-06-23T23:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.6,
     "reaction_efficiency": 460.0,
@@ -1263,7 +1263,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-19T13:06:29Z",
+    "timestamp": "2026-06-24T07:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.55,
     "reaction_efficiency": 450.0,
@@ -1276,7 +1276,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-19T14:14:35Z",
+    "timestamp": "2026-06-24T15:00:00Z",
     "clo2_concentration": 9.9,
     "flow_rate": 17.48,
     "reaction_efficiency": 459.0,
@@ -1289,7 +1289,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-19T15:22:42Z",
+    "timestamp": "2026-06-24T23:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.52,
     "reaction_efficiency": 457.0,
@@ -1302,7 +1302,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-19T16:30:48Z",
+    "timestamp": "2026-06-25T07:00:00Z",
     "clo2_concentration": 9.8,
     "flow_rate": 17.55,
     "reaction_efficiency": 461.0,
@@ -1315,7 +1315,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-19T17:38:55Z",
+    "timestamp": "2026-06-25T15:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.45,
     "reaction_efficiency": 460.0,
@@ -1328,7 +1328,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-19T18:47:01Z",
+    "timestamp": "2026-06-25T23:00:00Z",
     "clo2_concentration": 9.8,
     "flow_rate": 17.45,
     "reaction_efficiency": 457.0,
@@ -1341,7 +1341,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-19T19:55:08Z",
+    "timestamp": "2026-06-26T07:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.4,
     "reaction_efficiency": 450.0,
@@ -1354,7 +1354,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-19T21:03:14Z",
+    "timestamp": "2026-06-26T15:00:00Z",
     "clo2_concentration": 9.9,
     "flow_rate": 17.59,
     "reaction_efficiency": 445.0,
@@ -1367,7 +1367,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-19T22:11:21Z",
+    "timestamp": "2026-06-26T23:00:00Z",
     "clo2_concentration": 9.8,
     "flow_rate": 17.45,
     "reaction_efficiency": 429.0,
@@ -1380,7 +1380,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-19T23:19:27Z",
+    "timestamp": "2026-06-27T07:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.61,
     "reaction_efficiency": 424.0,
@@ -1393,7 +1393,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-20T00:27:34Z",
+    "timestamp": "2026-06-27T15:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.55,
     "reaction_efficiency": 430.0,
@@ -1406,7 +1406,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-20T01:35:40Z",
+    "timestamp": "2026-06-27T23:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.45,
     "reaction_efficiency": 425.0,
@@ -1419,7 +1419,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-20T02:43:47Z",
+    "timestamp": "2026-06-28T07:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.53,
     "reaction_efficiency": 416.0,
@@ -1432,7 +1432,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-20T03:51:53Z",
+    "timestamp": "2026-06-28T15:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.46,
     "reaction_efficiency": 423.0,
@@ -1445,7 +1445,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-20T05:00:00Z",
+    "timestamp": "2026-06-28T23:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.51,
     "reaction_efficiency": 415.0,
@@ -1458,7 +1458,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-20T06:08:06Z",
+    "timestamp": "2026-06-29T07:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.5,
     "reaction_efficiency": 417.0,
@@ -1471,7 +1471,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-20T07:16:12Z",
+    "timestamp": "2026-06-29T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.49,
     "reaction_efficiency": 422.0,
@@ -1484,7 +1484,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-20T08:24:19Z",
+    "timestamp": "2026-06-29T23:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.51,
     "reaction_efficiency": 424.0,
@@ -1497,7 +1497,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-20T09:32:25Z",
+    "timestamp": "2026-06-30T07:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.53,
     "reaction_efficiency": 420.0,
@@ -1510,7 +1510,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-20T10:40:32Z",
+    "timestamp": "2026-06-30T15:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.55,
     "reaction_efficiency": 418.0,
@@ -1523,7 +1523,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-20T11:48:38Z",
+    "timestamp": "2026-06-30T23:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.59,
     "reaction_efficiency": 432.0,
@@ -1536,7 +1536,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-20T12:56:45Z",
+    "timestamp": "2026-07-01T07:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.36,
     "reaction_efficiency": 413.0,
@@ -1549,7 +1549,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-20T14:04:51Z",
+    "timestamp": "2026-07-01T15:00:00Z",
     "clo2_concentration": 9.9,
     "flow_rate": 17.5,
     "reaction_efficiency": 416.0,
@@ -1562,7 +1562,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-20T15:12:58Z",
+    "timestamp": "2026-07-01T23:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.44,
     "reaction_efficiency": 417.0,
@@ -1575,7 +1575,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-20T16:21:04Z",
+    "timestamp": "2026-07-02T07:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.63,
     "reaction_efficiency": 413.0,
@@ -1588,7 +1588,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-20T17:29:11Z",
+    "timestamp": "2026-07-02T15:00:00Z",
     "clo2_concentration": 9.8,
     "flow_rate": 17.54,
     "reaction_efficiency": 431.0,
@@ -1601,7 +1601,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-20T18:37:17Z",
+    "timestamp": "2026-07-02T23:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.63,
     "reaction_efficiency": 430.0,
@@ -1614,7 +1614,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-20T19:45:24Z",
+    "timestamp": "2026-07-03T07:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.63,
     "reaction_efficiency": 439.0,
@@ -1627,7 +1627,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-20T20:53:30Z",
+    "timestamp": "2026-07-03T15:00:00Z",
     "clo2_concentration": 9.9,
     "flow_rate": 17.6,
     "reaction_efficiency": 458.0,
@@ -1640,7 +1640,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-20T22:01:37Z",
+    "timestamp": "2026-07-03T23:00:00Z",
     "clo2_concentration": 9.8,
     "flow_rate": 17.66,
     "reaction_efficiency": 455.0,
@@ -1653,7 +1653,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-20T23:09:43Z",
+    "timestamp": "2026-07-04T07:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.57,
     "reaction_efficiency": 460.0,
@@ -1666,7 +1666,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-21T00:17:50Z",
+    "timestamp": "2026-07-04T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.72,
     "reaction_efficiency": 447.0,
@@ -1679,7 +1679,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-21T01:25:56Z",
+    "timestamp": "2026-07-04T23:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.36,
     "reaction_efficiency": 472.0,
@@ -1692,7 +1692,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-21T02:34:03Z",
+    "timestamp": "2026-07-05T07:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.46,
     "reaction_efficiency": 456.0,
@@ -1705,7 +1705,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-21T03:42:09Z",
+    "timestamp": "2026-07-05T15:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.53,
     "reaction_efficiency": 459.0,
@@ -1718,7 +1718,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-21T04:50:16Z",
+    "timestamp": "2026-07-05T23:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.47,
     "reaction_efficiency": 463.0,
@@ -1731,7 +1731,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-21T05:58:22Z",
+    "timestamp": "2026-07-06T07:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.49,
     "reaction_efficiency": 460.0,
@@ -1744,7 +1744,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-21T07:06:29Z",
+    "timestamp": "2026-07-06T15:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.55,
     "reaction_efficiency": 446.0,
@@ -1757,7 +1757,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-21T08:14:35Z",
+    "timestamp": "2026-07-06T23:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.49,
     "reaction_efficiency": 452.0,
@@ -1770,7 +1770,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-21T09:22:42Z",
+    "timestamp": "2026-07-07T07:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.45,
     "reaction_efficiency": 450.0,
@@ -1783,7 +1783,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-21T10:30:48Z",
+    "timestamp": "2026-07-07T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.43,
     "reaction_efficiency": 456.0,
@@ -1796,7 +1796,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-21T11:38:55Z",
+    "timestamp": "2026-07-07T23:00:00Z",
     "clo2_concentration": 9.1,
     "flow_rate": 17.44,
     "reaction_efficiency": 456.0,
@@ -1809,7 +1809,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-21T12:47:01Z",
+    "timestamp": "2026-07-08T07:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.62,
     "reaction_efficiency": 471.0,
@@ -1822,7 +1822,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-21T13:55:08Z",
+    "timestamp": "2026-07-08T15:00:00Z",
     "clo2_concentration": 9.3,
     "flow_rate": 17.48,
     "reaction_efficiency": 456.0,
@@ -1835,7 +1835,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-21T15:03:14Z",
+    "timestamp": "2026-07-08T23:00:00Z",
     "clo2_concentration": 9.3,
     "flow_rate": 17.48,
     "reaction_efficiency": 446.0,
@@ -1848,7 +1848,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-21T16:11:21Z",
+    "timestamp": "2026-07-09T07:00:00Z",
     "clo2_concentration": 9.2,
     "flow_rate": 17.52,
     "reaction_efficiency": 445.0,
@@ -1861,7 +1861,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-21T17:19:27Z",
+    "timestamp": "2026-07-09T15:00:00Z",
     "clo2_concentration": 9.8,
     "flow_rate": 17.51,
     "reaction_efficiency": 440.0,
@@ -1874,7 +1874,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-21T18:27:34Z",
+    "timestamp": "2026-07-09T23:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.59,
     "reaction_efficiency": 437.0,
@@ -1887,7 +1887,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-21T19:35:40Z",
+    "timestamp": "2026-07-10T07:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.52,
     "reaction_efficiency": 432.0,
@@ -1900,7 +1900,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-21T20:43:47Z",
+    "timestamp": "2026-07-10T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.44,
     "reaction_efficiency": 435.0,
@@ -1913,7 +1913,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-21T21:51:53Z",
+    "timestamp": "2026-07-10T23:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.51,
     "reaction_efficiency": 431.0,
@@ -1926,7 +1926,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-21T23:00:00Z",
+    "timestamp": "2026-07-11T07:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.52,
     "reaction_efficiency": 433.0,
@@ -1939,7 +1939,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-22T00:08:06Z",
+    "timestamp": "2026-07-11T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.51,
     "reaction_efficiency": 427.0,
@@ -1952,7 +1952,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-22T01:16:12Z",
+    "timestamp": "2026-07-11T23:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.54,
     "reaction_efficiency": 450.0,
@@ -1965,7 +1965,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-22T02:24:19Z",
+    "timestamp": "2026-07-12T07:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.52,
     "reaction_efficiency": 440.0,
@@ -1978,7 +1978,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-22T03:32:25Z",
+    "timestamp": "2026-07-12T15:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.51,
     "reaction_efficiency": 443.0,
@@ -1991,7 +1991,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-22T04:40:32Z",
+    "timestamp": "2026-07-12T23:00:00Z",
     "clo2_concentration": 9.8,
     "flow_rate": 17.46,
     "reaction_efficiency": 449.0,
@@ -2004,7 +2004,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-22T05:48:38Z",
+    "timestamp": "2026-07-13T07:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.54,
     "reaction_efficiency": 440.0,
@@ -2017,7 +2017,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-22T06:56:45Z",
+    "timestamp": "2026-07-13T15:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.48,
     "reaction_efficiency": 443.0,
@@ -2030,7 +2030,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-22T08:04:51Z",
+    "timestamp": "2026-07-13T23:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.44,
     "reaction_efficiency": 446.0,
@@ -2043,7 +2043,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-22T09:12:58Z",
+    "timestamp": "2026-07-14T07:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.47,
     "reaction_efficiency": 439.0,
@@ -2056,7 +2056,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-22T10:21:04Z",
+    "timestamp": "2026-07-14T15:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.51,
     "reaction_efficiency": 438.0,
@@ -2069,7 +2069,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-22T11:29:11Z",
+    "timestamp": "2026-07-14T23:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.45,
     "reaction_efficiency": 443.0,
@@ -2082,7 +2082,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-22T12:37:17Z",
+    "timestamp": "2026-07-15T07:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.45,
     "reaction_efficiency": 438.0,
@@ -2095,7 +2095,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-22T13:45:24Z",
+    "timestamp": "2026-07-15T15:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.56,
     "reaction_efficiency": 435.0,
@@ -2108,7 +2108,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-22T14:53:30Z",
+    "timestamp": "2026-07-15T23:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.45,
     "reaction_efficiency": 429.0,
@@ -2121,7 +2121,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-22T16:01:37Z",
+    "timestamp": "2026-07-16T07:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.5,
     "reaction_efficiency": 422.0,
@@ -2134,7 +2134,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-22T17:09:43Z",
+    "timestamp": "2026-07-16T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.53,
     "reaction_efficiency": 416.0,
@@ -2147,7 +2147,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-22T18:17:50Z",
+    "timestamp": "2026-07-16T23:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.52,
     "reaction_efficiency": 419.0,
@@ -2160,7 +2160,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-22T19:25:56Z",
+    "timestamp": "2026-07-17T07:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.45,
     "reaction_efficiency": 382.0,
@@ -2173,7 +2173,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-22T20:34:03Z",
+    "timestamp": "2026-07-17T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.54,
     "reaction_efficiency": 405.0,
@@ -2186,7 +2186,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-22T21:42:09Z",
+    "timestamp": "2026-07-17T23:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.48,
     "reaction_efficiency": 414.0,
@@ -2199,7 +2199,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-22T22:50:16Z",
+    "timestamp": "2026-07-18T07:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.57,
     "reaction_efficiency": 434.0,
@@ -2212,7 +2212,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-22T23:58:22Z",
+    "timestamp": "2026-07-18T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.57,
     "reaction_efficiency": 433.0,
@@ -2225,7 +2225,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-23T01:06:29Z",
+    "timestamp": "2026-07-18T23:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.47,
     "reaction_efficiency": 428.0,
@@ -2238,7 +2238,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-23T02:14:35Z",
+    "timestamp": "2026-07-19T07:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.49,
     "reaction_efficiency": 440.0,
@@ -2251,7 +2251,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-23T03:22:42Z",
+    "timestamp": "2026-07-19T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.56,
     "reaction_efficiency": 425.0,
@@ -2264,7 +2264,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-23T04:30:48Z",
+    "timestamp": "2026-07-19T23:00:00Z",
     "clo2_concentration": 9.2,
     "flow_rate": 17.48,
     "reaction_efficiency": 427.0,
@@ -2277,7 +2277,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-23T05:38:55Z",
+    "timestamp": "2026-07-20T07:00:00Z",
     "clo2_concentration": 9.3,
     "flow_rate": 17.54,
     "reaction_efficiency": 418.0,
@@ -2290,7 +2290,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-23T06:47:01Z",
+    "timestamp": "2026-07-20T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.66,
     "reaction_efficiency": 435.0,
@@ -2303,7 +2303,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-23T07:55:08Z",
+    "timestamp": "2026-07-20T23:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.51,
     "reaction_efficiency": 437.0,
@@ -2316,7 +2316,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-23T09:03:14Z",
+    "timestamp": "2026-07-21T07:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.48,
     "reaction_efficiency": 444.0,
@@ -2329,7 +2329,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-23T10:11:21Z",
+    "timestamp": "2026-07-21T15:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.53,
     "reaction_efficiency": 443.0,
@@ -2342,7 +2342,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-23T11:19:27Z",
+    "timestamp": "2026-07-21T23:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.52,
     "reaction_efficiency": 456.0,
@@ -2355,7 +2355,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-23T12:27:34Z",
+    "timestamp": "2026-07-22T07:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.53,
     "reaction_efficiency": 461.0,
@@ -2368,7 +2368,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-23T13:35:40Z",
+    "timestamp": "2026-07-22T15:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.52,
     "reaction_efficiency": 459.0,
@@ -2381,7 +2381,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-23T14:43:47Z",
+    "timestamp": "2026-07-22T23:00:00Z",
     "clo2_concentration": 9.3,
     "flow_rate": 17.48,
     "reaction_efficiency": 456.0,
@@ -2394,7 +2394,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-23T15:51:53Z",
+    "timestamp": "2026-07-23T07:00:00Z",
     "clo2_concentration": 9.2,
     "flow_rate": 17.5,
     "reaction_efficiency": 451.0,
@@ -2407,7 +2407,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-23T17:00:00Z",
+    "timestamp": "2026-07-23T15:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.5,
     "reaction_efficiency": 446.0,
@@ -2420,7 +2420,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-23T18:08:06Z",
+    "timestamp": "2026-07-23T23:00:00Z",
     "clo2_concentration": 9.9,
     "flow_rate": 17.54,
     "reaction_efficiency": 448.0,
@@ -2433,7 +2433,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-23T19:16:12Z",
+    "timestamp": "2026-07-24T07:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.51,
     "reaction_efficiency": 459.0,
@@ -2446,7 +2446,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-23T20:24:19Z",
+    "timestamp": "2026-07-24T15:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.47,
     "reaction_efficiency": 442.0,
@@ -2459,7 +2459,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-23T21:32:25Z",
+    "timestamp": "2026-07-24T23:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.48,
     "reaction_efficiency": 444.0,
@@ -2472,7 +2472,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-23T22:40:32Z",
+    "timestamp": "2026-07-25T07:00:00Z",
     "clo2_concentration": 9.3,
     "flow_rate": 17.47,
     "reaction_efficiency": 440.0,
@@ -2485,7 +2485,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-23T23:48:38Z",
+    "timestamp": "2026-07-25T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.45,
     "reaction_efficiency": 440.0,
@@ -2498,7 +2498,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-24T00:56:45Z",
+    "timestamp": "2026-07-25T23:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.48,
     "reaction_efficiency": 448.0,
@@ -2511,7 +2511,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-24T02:04:51Z",
+    "timestamp": "2026-07-26T07:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.5,
     "reaction_efficiency": 445.0,
@@ -2524,7 +2524,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-24T03:12:58Z",
+    "timestamp": "2026-07-26T15:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.5,
     "reaction_efficiency": 439.0,
@@ -2537,7 +2537,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-24T04:21:04Z",
+    "timestamp": "2026-07-26T23:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.45,
     "reaction_efficiency": 420.0,
@@ -2550,7 +2550,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-24T05:29:11Z",
+    "timestamp": "2026-07-27T07:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.47,
     "reaction_efficiency": 438.0,
@@ -2563,7 +2563,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-24T06:37:17Z",
+    "timestamp": "2026-07-27T15:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.45,
     "reaction_efficiency": 426.0,
@@ -2576,7 +2576,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-24T07:45:24Z",
+    "timestamp": "2026-07-27T23:00:00Z",
     "clo2_concentration": 9.2,
     "flow_rate": 17.44,
     "reaction_efficiency": 433.0,
@@ -2589,7 +2589,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-24T08:53:30Z",
+    "timestamp": "2026-07-28T07:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.38,
     "reaction_efficiency": 434.0,
@@ -2602,7 +2602,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-24T10:01:37Z",
+    "timestamp": "2026-07-28T15:00:00Z",
     "clo2_concentration": 9.3,
     "flow_rate": 17.44,
     "reaction_efficiency": 448.0,
@@ -2615,7 +2615,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-24T11:09:43Z",
+    "timestamp": "2026-07-28T23:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.51,
     "reaction_efficiency": 450.0,
@@ -2628,7 +2628,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-24T12:17:50Z",
+    "timestamp": "2026-07-29T07:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.49,
     "reaction_efficiency": 418.0,
@@ -2641,7 +2641,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-24T13:25:56Z",
+    "timestamp": "2026-07-29T15:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.52,
     "reaction_efficiency": 420.0,
@@ -2654,7 +2654,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-24T14:34:03Z",
+    "timestamp": "2026-07-29T23:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.4,
     "reaction_efficiency": 422.0,
@@ -2667,7 +2667,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-24T15:42:09Z",
+    "timestamp": "2026-07-30T07:00:00Z",
     "clo2_concentration": 9.2,
     "flow_rate": 17.51,
     "reaction_efficiency": 415.0,
@@ -2680,7 +2680,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-24T16:50:16Z",
+    "timestamp": "2026-07-30T15:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.69,
     "reaction_efficiency": 417.0,
@@ -2693,7 +2693,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-24T17:58:22Z",
+    "timestamp": "2026-07-30T23:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.51,
     "reaction_efficiency": 434.0,
@@ -2706,7 +2706,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-24T19:06:29Z",
+    "timestamp": "2026-07-31T07:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.43,
     "reaction_efficiency": 440.0,
@@ -2719,7 +2719,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-24T20:14:35Z",
+    "timestamp": "2026-07-31T15:00:00Z",
     "clo2_concentration": 9.2,
     "flow_rate": 17.58,
     "reaction_efficiency": 444.0,
@@ -2732,7 +2732,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-24T21:22:42Z",
+    "timestamp": "2026-07-31T23:00:00Z",
     "clo2_concentration": 9.3,
     "flow_rate": 17.37,
     "reaction_efficiency": 450.0,
@@ -2745,7 +2745,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-24T22:30:48Z",
+    "timestamp": "2026-08-01T07:00:00Z",
     "clo2_concentration": 9.2,
     "flow_rate": 17.59,
     "reaction_efficiency": 420.0,
@@ -2758,7 +2758,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-24T23:38:55Z",
+    "timestamp": "2026-08-01T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.53,
     "reaction_efficiency": 428.0,
@@ -2771,7 +2771,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-25T00:47:01Z",
+    "timestamp": "2026-08-01T23:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.43,
     "reaction_efficiency": 433.0,
@@ -2784,7 +2784,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-25T01:55:08Z",
+    "timestamp": "2026-08-02T07:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.62,
     "reaction_efficiency": 427.0,
@@ -2797,7 +2797,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-25T03:03:14Z",
+    "timestamp": "2026-08-02T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.5,
     "reaction_efficiency": 428.0,
@@ -2810,7 +2810,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-25T04:11:21Z",
+    "timestamp": "2026-08-02T23:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.47,
     "reaction_efficiency": 434.0,
@@ -2823,7 +2823,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-25T05:19:27Z",
+    "timestamp": "2026-08-03T07:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.48,
     "reaction_efficiency": 439.0,
@@ -2836,7 +2836,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-25T06:27:34Z",
+    "timestamp": "2026-08-03T15:00:00Z",
     "clo2_concentration": 9.3,
     "flow_rate": 17.48,
     "reaction_efficiency": 428.0,
@@ -2849,7 +2849,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-25T07:35:40Z",
+    "timestamp": "2026-08-03T23:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.5,
     "reaction_efficiency": 471.0,
@@ -2862,7 +2862,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-25T08:43:47Z",
+    "timestamp": "2026-08-04T07:00:00Z",
     "clo2_concentration": 9.3,
     "flow_rate": 17.41,
     "reaction_efficiency": 468.0,
@@ -2875,7 +2875,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-25T09:51:53Z",
+    "timestamp": "2026-08-04T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.62,
     "reaction_efficiency": 450.0,
@@ -2888,7 +2888,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-25T11:00:00Z",
+    "timestamp": "2026-08-04T23:00:00Z",
     "clo2_concentration": 9.3,
     "flow_rate": 17.5,
     "reaction_efficiency": 446.0,
@@ -2901,7 +2901,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-25T12:08:06Z",
+    "timestamp": "2026-08-05T07:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.54,
     "reaction_efficiency": 444.0,
@@ -2914,7 +2914,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-25T13:16:12Z",
+    "timestamp": "2026-08-05T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.58,
     "reaction_efficiency": 446.0,
@@ -2927,7 +2927,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-25T14:24:19Z",
+    "timestamp": "2026-08-05T23:00:00Z",
     "clo2_concentration": 9.3,
     "flow_rate": 17.48,
     "reaction_efficiency": 429.0,
@@ -2940,7 +2940,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-25T15:32:25Z",
+    "timestamp": "2026-08-06T07:00:00Z",
     "clo2_concentration": 9.0,
     "flow_rate": 17.51,
     "reaction_efficiency": 429.0,
@@ -2953,7 +2953,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-25T16:40:32Z",
+    "timestamp": "2026-08-06T15:00:00Z",
     "clo2_concentration": 9.0,
     "flow_rate": 17.5,
     "reaction_efficiency": 438.0,
@@ -2966,7 +2966,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-25T17:48:38Z",
+    "timestamp": "2026-08-06T23:00:00Z",
     "clo2_concentration": 9.0,
     "flow_rate": 17.6,
     "reaction_efficiency": 440.0,
@@ -2979,7 +2979,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-25T18:56:45Z",
+    "timestamp": "2026-08-07T07:00:00Z",
     "clo2_concentration": 9.0,
     "flow_rate": 17.49,
     "reaction_efficiency": 448.0,
@@ -2992,7 +2992,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-25T20:04:51Z",
+    "timestamp": "2026-08-07T15:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.48,
     "reaction_efficiency": 444.0,
@@ -3005,7 +3005,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-25T21:12:58Z",
+    "timestamp": "2026-08-07T23:00:00Z",
     "clo2_concentration": 9.8,
     "flow_rate": 17.57,
     "reaction_efficiency": 438.0,
@@ -3018,7 +3018,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-25T22:21:04Z",
+    "timestamp": "2026-08-08T07:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.4,
     "reaction_efficiency": 426.0,
@@ -3031,7 +3031,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-25T23:29:11Z",
+    "timestamp": "2026-08-08T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.43,
     "reaction_efficiency": 421.0,
@@ -3044,7 +3044,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-26T00:37:17Z",
+    "timestamp": "2026-08-08T23:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.42,
     "reaction_efficiency": 414.0,
@@ -3057,7 +3057,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-26T01:45:24Z",
+    "timestamp": "2026-08-09T07:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.5,
     "reaction_efficiency": 390.0,
@@ -3070,7 +3070,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-26T02:53:30Z",
+    "timestamp": "2026-08-09T15:00:00Z",
     "clo2_concentration": 9.3,
     "flow_rate": 17.55,
     "reaction_efficiency": 397.0,
@@ -3083,7 +3083,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-26T04:01:37Z",
+    "timestamp": "2026-08-09T23:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.5,
     "reaction_efficiency": 384.0,
@@ -3096,7 +3096,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-26T05:09:43Z",
+    "timestamp": "2026-08-10T07:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.49,
     "reaction_efficiency": 381.0,
@@ -3109,7 +3109,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-26T06:17:50Z",
+    "timestamp": "2026-08-10T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.38,
     "reaction_efficiency": 408.0,
@@ -3122,7 +3122,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-26T07:25:56Z",
+    "timestamp": "2026-08-10T23:00:00Z",
     "clo2_concentration": 9.8,
     "flow_rate": 17.38,
     "reaction_efficiency": 416.0,
@@ -3135,7 +3135,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-26T08:34:03Z",
+    "timestamp": "2026-08-11T07:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.6,
     "reaction_efficiency": 407.0,
@@ -3148,7 +3148,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-26T09:42:09Z",
+    "timestamp": "2026-08-11T15:00:00Z",
     "clo2_concentration": 9.8,
     "flow_rate": 17.41,
     "reaction_efficiency": 404.0,
@@ -3161,7 +3161,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-26T10:50:16Z",
+    "timestamp": "2026-08-11T23:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.46,
     "reaction_efficiency": 415.0,
@@ -3174,7 +3174,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-26T11:58:22Z",
+    "timestamp": "2026-08-12T07:00:00Z",
     "clo2_concentration": 9.8,
     "flow_rate": 17.53,
     "reaction_efficiency": 421.0,
@@ -3187,7 +3187,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-26T13:06:29Z",
+    "timestamp": "2026-08-12T15:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.55,
     "reaction_efficiency": 416.0,
@@ -3200,7 +3200,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-26T14:14:35Z",
+    "timestamp": "2026-08-12T23:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.5,
     "reaction_efficiency": 424.0,
@@ -3213,7 +3213,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-26T15:22:42Z",
+    "timestamp": "2026-08-13T07:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.44,
     "reaction_efficiency": 416.0,
@@ -3226,7 +3226,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-26T16:30:48Z",
+    "timestamp": "2026-08-13T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.47,
     "reaction_efficiency": 393.0,
@@ -3239,7 +3239,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-26T17:38:55Z",
+    "timestamp": "2026-08-13T23:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.55,
     "reaction_efficiency": 426.0,
@@ -3252,7 +3252,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-26T18:47:01Z",
+    "timestamp": "2026-08-14T07:00:00Z",
     "clo2_concentration": 9.9,
     "flow_rate": 17.43,
     "reaction_efficiency": 417.0,
@@ -3265,7 +3265,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-26T19:55:08Z",
+    "timestamp": "2026-08-14T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.5,
     "reaction_efficiency": 400.0,
@@ -3278,7 +3278,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-26T21:03:14Z",
+    "timestamp": "2026-08-14T23:00:00Z",
     "clo2_concentration": 9.9,
     "flow_rate": 17.55,
     "reaction_efficiency": 420.0,
@@ -3291,7 +3291,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-26T22:11:21Z",
+    "timestamp": "2026-08-15T07:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.49,
     "reaction_efficiency": 414.0,
@@ -3304,7 +3304,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-26T23:19:27Z",
+    "timestamp": "2026-08-15T15:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.47,
     "reaction_efficiency": 440.0,
@@ -3317,7 +3317,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-27T00:27:34Z",
+    "timestamp": "2026-08-15T23:00:00Z",
     "clo2_concentration": 9.9,
     "flow_rate": 17.45,
     "reaction_efficiency": 413.0,
@@ -3330,7 +3330,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-27T01:35:40Z",
+    "timestamp": "2026-08-16T07:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.5,
     "reaction_efficiency": 417.0,
@@ -3343,7 +3343,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-27T02:43:47Z",
+    "timestamp": "2026-08-16T15:00:00Z",
     "clo2_concentration": 9.8,
     "flow_rate": 17.52,
     "reaction_efficiency": 431.0,
@@ -3356,7 +3356,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-27T03:51:53Z",
+    "timestamp": "2026-08-16T23:00:00Z",
     "clo2_concentration": 9.7,
     "flow_rate": 17.5,
     "reaction_efficiency": 407.0,
@@ -3369,7 +3369,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-27T05:00:00Z",
+    "timestamp": "2026-08-17T07:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 17.55,
     "reaction_efficiency": 409.0,
@@ -3382,7 +3382,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-27T06:08:06Z",
+    "timestamp": "2026-08-17T15:00:00Z",
     "clo2_concentration": 9.3,
     "flow_rate": 17.55,
     "reaction_efficiency": 400.0,
@@ -3395,7 +3395,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-27T07:16:12Z",
+    "timestamp": "2026-08-17T23:00:00Z",
     "clo2_concentration": 9.2,
     "flow_rate": 17.52,
     "reaction_efficiency": 392.0,
@@ -3408,7 +3408,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-27T08:24:19Z",
+    "timestamp": "2026-08-18T07:00:00Z",
     "clo2_concentration": 8.9,
     "flow_rate": 17.55,
     "reaction_efficiency": 380.0,
@@ -3421,7 +3421,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-27T09:32:25Z",
+    "timestamp": "2026-08-18T15:00:00Z",
     "clo2_concentration": 9.1,
     "flow_rate": 17.51,
     "reaction_efficiency": 380.0,
@@ -3434,7 +3434,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-27T10:40:32Z",
+    "timestamp": "2026-08-18T23:00:00Z",
     "clo2_concentration": 9.0,
     "flow_rate": 17.13,
     "reaction_efficiency": 394.0,
@@ -3447,7 +3447,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-27T11:48:38Z",
+    "timestamp": "2026-08-19T07:00:00Z",
     "clo2_concentration": 8.9,
     "flow_rate": 17.4,
     "reaction_efficiency": 383.0,
@@ -3460,7 +3460,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-27T12:56:45Z",
+    "timestamp": "2026-08-19T15:00:00Z",
     "clo2_concentration": 8.9,
     "flow_rate": 17.49,
     "reaction_efficiency": 385.0,
@@ -3473,7 +3473,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-27T14:04:51Z",
+    "timestamp": "2026-08-19T23:00:00Z",
     "clo2_concentration": 8.7,
     "flow_rate": 17.43,
     "reaction_efficiency": 378.0,
@@ -3486,7 +3486,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-27T15:12:58Z",
+    "timestamp": "2026-08-20T07:00:00Z",
     "clo2_concentration": 8.8,
     "flow_rate": 17.52,
     "reaction_efficiency": 380.0,
@@ -3499,7 +3499,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-27T16:21:04Z",
+    "timestamp": "2026-08-20T15:00:00Z",
     "clo2_concentration": 8.7,
     "flow_rate": 17.5,
     "reaction_efficiency": 382.0,
@@ -3512,7 +3512,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-27T17:29:11Z",
+    "timestamp": "2026-08-20T23:00:00Z",
     "clo2_concentration": 9.3,
     "flow_rate": 15.99,
     "reaction_efficiency": 378.0,
@@ -3525,7 +3525,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-27T18:37:17Z",
+    "timestamp": "2026-08-21T07:00:00Z",
     "clo2_concentration": 9.3,
     "flow_rate": 16.01,
     "reaction_efficiency": 378.0,
@@ -3538,7 +3538,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-27T19:45:24Z",
+    "timestamp": "2026-08-21T15:00:00Z",
     "clo2_concentration": 9.2,
     "flow_rate": 16.05,
     "reaction_efficiency": 374.0,
@@ -3551,7 +3551,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-27T20:53:30Z",
+    "timestamp": "2026-08-21T23:00:00Z",
     "clo2_concentration": 9.2,
     "flow_rate": 15.99,
     "reaction_efficiency": 368.0,
@@ -3564,7 +3564,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-27T22:01:37Z",
+    "timestamp": "2026-08-22T07:00:00Z",
     "clo2_concentration": 9.2,
     "flow_rate": 16.0,
     "reaction_efficiency": 373.0,
@@ -3577,7 +3577,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-27T23:09:43Z",
+    "timestamp": "2026-08-22T15:00:00Z",
     "clo2_concentration": 9.1,
     "flow_rate": 16.1,
     "reaction_efficiency": 387.0,
@@ -3590,7 +3590,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-28T00:17:50Z",
+    "timestamp": "2026-08-22T23:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 16.06,
     "reaction_efficiency": 385.0,
@@ -3603,7 +3603,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-28T01:25:56Z",
+    "timestamp": "2026-08-23T07:00:00Z",
     "clo2_concentration": 9.3,
     "flow_rate": 15.9,
     "reaction_efficiency": 400.0,
@@ -3616,7 +3616,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-28T02:34:03Z",
+    "timestamp": "2026-08-23T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 16.0,
     "reaction_efficiency": 398.0,
@@ -3629,7 +3629,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-28T03:42:09Z",
+    "timestamp": "2026-08-23T23:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 16.0,
     "reaction_efficiency": 408.0,
@@ -3642,7 +3642,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-28T04:50:16Z",
+    "timestamp": "2026-08-24T07:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 15.93,
     "reaction_efficiency": 422.0,
@@ -3655,7 +3655,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-28T05:58:22Z",
+    "timestamp": "2026-08-24T15:00:00Z",
     "clo2_concentration": 9.8,
     "flow_rate": 15.94,
     "reaction_efficiency": 410.0,
@@ -3668,7 +3668,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-28T07:06:29Z",
+    "timestamp": "2026-08-24T23:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 16.13,
     "reaction_efficiency": 410.0,
@@ -3681,7 +3681,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-28T08:14:35Z",
+    "timestamp": "2026-08-25T07:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 16.28,
     "reaction_efficiency": 411.0,
@@ -3694,7 +3694,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-28T09:22:42Z",
+    "timestamp": "2026-08-25T15:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 16.0,
     "reaction_efficiency": 428.0,
@@ -3707,7 +3707,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-28T10:30:48Z",
+    "timestamp": "2026-08-25T23:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 16.17,
     "reaction_efficiency": 455.0,
@@ -3720,7 +3720,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-28T11:38:55Z",
+    "timestamp": "2026-08-26T07:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 16.43,
     "reaction_efficiency": 464.0,
@@ -3733,7 +3733,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-28T12:47:01Z",
+    "timestamp": "2026-08-26T15:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 16.56,
     "reaction_efficiency": 479.0,
@@ -3746,7 +3746,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-28T13:55:08Z",
+    "timestamp": "2026-08-26T23:00:00Z",
     "clo2_concentration": 9.9,
     "flow_rate": 17.07,
     "reaction_efficiency": 504.0,
@@ -3759,7 +3759,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-28T15:03:14Z",
+    "timestamp": "2026-08-27T07:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 16.96,
     "reaction_efficiency": 496.0,
@@ -3772,7 +3772,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-28T16:11:21Z",
+    "timestamp": "2026-08-27T15:00:00Z",
     "clo2_concentration": 9.3,
     "flow_rate": 16.9,
     "reaction_efficiency": 503.0,
@@ -3785,7 +3785,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-28T17:19:27Z",
+    "timestamp": "2026-08-27T23:00:00Z",
     "clo2_concentration": 9.9,
     "flow_rate": 16.98,
     "reaction_efficiency": 500.0,
@@ -3798,7 +3798,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-28T18:27:34Z",
+    "timestamp": "2026-08-28T07:00:00Z",
     "clo2_concentration": 9.4,
     "flow_rate": 17.0,
     "reaction_efficiency": 497.0,
@@ -3811,7 +3811,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-28T19:35:40Z",
+    "timestamp": "2026-08-28T15:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.03,
     "reaction_efficiency": 507.0,
@@ -3824,7 +3824,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-28T20:43:47Z",
+    "timestamp": "2026-08-28T23:00:00Z",
     "clo2_concentration": 9.8,
     "flow_rate": 16.99,
     "reaction_efficiency": 490.0,
@@ -3837,7 +3837,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-28T21:51:53Z",
+    "timestamp": "2026-08-29T07:00:00Z",
     "clo2_concentration": 9.6,
     "flow_rate": 17.0,
     "reaction_efficiency": 494.0,
@@ -3850,7 +3850,7 @@ REAL_PLANT_READINGS = [
     "source": "actual_plant"
   },
   {
-    "timestamp": "2026-08-28T23:00:00Z",
+    "timestamp": "2026-08-29T15:00:00Z",
     "clo2_concentration": 9.5,
     "flow_rate": 16.97,
     "reaction_efficiency": 497.0,

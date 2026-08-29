@@ -3,7 +3,7 @@
 
 export type Severity = 'INFO' | 'WARNING' | 'CRITICAL'
 export type ParameterStatus = 'normal' | 'warning' | 'critical' | 'no_data'
-export type TimeRange = '1h' | '6h' | '24h' | '7d' | '30d'
+export type TimeRange = '1h' | '6h' | '24h' | '7d' | '30d' | '3m' | 'all'
 
 export interface HealthResponse {
   status: string

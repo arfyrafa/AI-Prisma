@@ -91,7 +91,7 @@ def update_parameter(
 def get_history(
     process: CurrentProcess,
     db: DbSession,
-    range: Annotated[str, Query(pattern="^(1h|6h|24h|7d|30d|1m)$")] = "6h",
+    range: Annotated[str, Query(pattern="^(1h|6h|24h|7d|30d|1m|90d|3m|all)$")] = "6h",
     parameters: Annotated[str | None, Query(description="Daftar parameter dipisah koma")] = None,
 ) -> HistoryResponse:
     selected = [p.strip() for p in parameters.split(",")] if parameters else None
