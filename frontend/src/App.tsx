@@ -2,7 +2,6 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { AppLayout } from './layouts/AppLayout'
-import { AssistantPage } from './pages/AssistantPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { InsightsPage } from './pages/InsightsPage'
 import { KnowledgeBasePage } from './pages/KnowledgeBasePage'
@@ -41,7 +40,6 @@ export function App() {
           <Route path="/insights" element={<InsightsPage />} />
           <Route path="/recommendations" element={<RecommendationsPage />} />
           <Route path="/knowledge-base" element={<KnowledgeBasePage />} />
-          <Route path="/assistant" element={<AssistantPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>

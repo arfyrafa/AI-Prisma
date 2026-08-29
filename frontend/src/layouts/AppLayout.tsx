@@ -12,7 +12,6 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
-
 import { FloatingAssistantWidget } from '../components/FloatingAssistantWidget'
 import { NotificationPopover } from '../components/NotificationPopover'
 import { StatusPill } from '../components/StatusPill'
@@ -50,9 +49,8 @@ export function AppLayout() {
     <div className="flex min-h-screen bg-canvas text-slate-900 transition-colors">
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 shrink-0 bg-slate-950 text-white transition-transform duration-300 ease-in-out border-r border-slate-800/80 lg:static lg:translate-x-0 ${
-          menuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
-        }`}
+        className={`fixed inset-y-0 left-0 z-40 w-64 shrink-0 bg-slate-950 text-white transition-transform duration-300 ease-in-out border-r border-slate-800/80 lg:static lg:translate-x-0 ${menuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
+          }`}
       >
         <div className="flex h-16 items-center gap-3 border-b border-slate-800/80 px-5 bg-slate-950/80">
           <img
@@ -81,10 +79,9 @@ export function AppLayout() {
                     end={item.end}
                     onClick={() => setMenuOpen(false)}
                     className={({ isActive }) =>
-                      `flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-medium transition-all duration-200 ${
-                        isActive
-                          ? 'bg-gradient-to-r from-sky-500/20 to-blue-500/10 text-sky-300 font-semibold border-l-4 border-sky-400 shadow-sm'
-                          : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+                      `flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-medium transition-all duration-200 ${isActive
+                        ? 'bg-gradient-to-r from-sky-500/20 to-blue-500/10 text-sky-300 font-semibold border-l-4 border-sky-400 shadow-sm'
+                        : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200'
                       }`
                     }
                   >
@@ -148,11 +145,10 @@ export function AppLayout() {
 
               {/* Real-time Status Badge */}
               <div
-                className={`hidden sm:flex items-center gap-2 rounded-full border px-3 py-1 ${
-                  online
+                className={`hidden sm:flex items-center gap-2 rounded-full border px-3 py-1 ${online
                     ? 'border-emerald-200 bg-emerald-50/80 text-emerald-800'
                     : 'border-rose-200 bg-rose-50 text-rose-800'
-                }`}
+                  }`}
               >
                 <span
                   aria-hidden="true"
