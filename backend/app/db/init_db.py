@@ -388,17 +388,8 @@ def init_db() -> None:
                 db.rollback()
                 logger.warning("Seeding data riil gagal (backend tetap jalan): %s", e)
 
-            # Step 5: AI Insight (optional)
-            try:
-                from app.models import AIInsight
-                has_insight = db.scalars(select(AIInsight).where(AIInsight.process_id == process.id).limit(1)).first()
-                if not has_insight:
-                    from app.services.ai import run_analysis
-                    run_analysis(db, process.id)
-                    logger.info("Seed AI insight & rekomendasi awal")
-            except Exception as e:
-                db.rollback()
-                logger.warning("Lewati analisis AI awal: %s", e)
+            # AI Insight dihilangkan dari startup karena memblokir server.
+            # User bisa generate insight on-demand dari halaman Insight AI.
 
         logger.info("=== PRISMA AI backend siap melayani request ===")
     finally:
