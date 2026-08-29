@@ -290,12 +290,22 @@ USER_SEED = [
 
 
 def seed_users(db: Session) -> None:
-    existing_emails = {u.email for u in db.scalars(select(User)).all()}
-    new_users = [User(**u) for u in USER_SEED if u["email"] not in existing_emails]
-    if new_users:
-        db.add_all(new_users)
+    admin_hash = hashlib.sha256(b"admin123").hexdigest()
+    admin_user = db.scalar(select(User).where(User.email == "admin@prisma.ai"))
+    if admin_user:
+        admin_user.password_hash = admin_hash
+        admin_user.is_active = True
         db.commit()
-        logger.info("Seed %s pengguna awal ke database", len(new_users))
+    else:
+        db.add(User(
+            name="Administrator",
+            email="admin@prisma.ai",
+            password_hash=admin_hash,
+            role="Admin",
+            is_active=True,
+        ))
+        db.commit()
+    logger.info("Verifikasi akun Administrator admin@prisma.ai selesai.")
 
 
 def init_db() -> None:
