@@ -315,6 +315,26 @@ class KnowledgeDocumentDetail(KnowledgeDocumentOut):
     content: str | None = None
 
 
+class KnowledgeDocumentCreate(BaseModel):
+    title: str = Field(min_length=3, max_length=200)
+    doc_type: str = Field(default="SOP", max_length=64)
+    reference_code: str | None = Field(default=None, max_length=64)
+    version: str | None = Field(default="1.0", max_length=32)
+    summary: str | None = None
+    content: str = Field(min_length=10)
+    tags: list[str] | None = None
+
+
+class KnowledgeDocumentUpdate(BaseModel):
+    title: str | None = None
+    doc_type: str | None = None
+    reference_code: str | None = None
+    version: str | None = None
+    summary: str | None = None
+    content: str | None = None
+    tags: list[str] | None = None
+
+
 # --------------------------------------------------------------------------
 # Audit
 # --------------------------------------------------------------------------

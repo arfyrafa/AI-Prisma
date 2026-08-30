@@ -39,11 +39,17 @@ export const isAgentUnavailable = (error: unknown): boolean =>
   error instanceof ApiError && error.status === 503
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const isFormData = init?.body instanceof FormData
+  const defaultHeaders: Record<string, string> = isFormData ? {} : { 'Content-Type': 'application/json' }
+
   let response: Response
   try {
     response = await fetch(`${API}${path}`, {
-      headers: { 'Content-Type': 'application/json' },
       ...init,
+      headers: {
+        ...defaultHeaders,
+        ...(init?.headers as Record<string, string>),
+      },
     })
   } catch {
     throw new ApiError('Tidak dapat terhubung ke layanan data.', 0)
@@ -155,6 +161,22 @@ export const api = {
   },
   getKnowledgeDocument: (documentId: number) =>
     request<KnowledgeDocumentDetail>(`/knowledge-base/${documentId}`),
+  uploadKnowledgeDocument: (formData: FormData) =>
+    request<KnowledgeDocumentDetail>('/knowledge-base/upload', {
+      method: 'POST',
+      body: formData,
+    }),
+  createKnowledgeDocument: (payload: {
+    title: string
+    doc_type: string
+    reference_code?: string
+    version?: string
+    summary?: string
+    content: string
+    tags?: string[]
+  }) => post<KnowledgeDocumentDetail>('/knowledge-base', payload),
+  deleteKnowledgeDocument: (documentId: number) =>
+    request<void>(`/knowledge-base/${documentId}`, { method: 'DELETE' }),
 
   listAuditLogs: (limit = 120, action?: string) => {
     const params = new URLSearchParams({ limit: String(limit) })
