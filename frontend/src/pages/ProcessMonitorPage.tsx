@@ -19,7 +19,7 @@ const TEMPLATE_GOOGLE_SHEETS_URL =
 
 export function ProcessMonitorPage() {
  const { processId, snapshot, loading, error, refresh } = useProcessContext()
- const [range, setRange] = useState<TimeRange>('6h')
+ const [range, setRange] = useState<TimeRange>('7d')
  const [selected, setSelected] = useState<string[]>(['clo2_concentration'])
 
  // Excel / CSV Upload State

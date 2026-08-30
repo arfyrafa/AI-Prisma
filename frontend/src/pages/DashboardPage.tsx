@@ -22,7 +22,7 @@ const PRIMARY_PARAMETER = 'clo2_concentration'
 
 export function DashboardPage() {
   const { processId, snapshot, loading, error, refresh } = useProcessContext()
-  const [range, setRange] = useState<TimeRange>('6h')
+  const [range, setRange] = useState<TimeRange>('7d')
   const [analyzing, setAnalyzing] = useState(false)
   const [agentDown, setAgentDown] = useState(false)
   const [analysisError, setAnalysisError] = useState<string | null>(null)
