@@ -87,3 +87,27 @@
     transition-duration: 0.001ms !important;
   }
 }
+
+/* Mobile Performance: disable expensive hover effects on touch devices */
+@media (hover: none) {
+  .panel,
+  section {
+    transition: none !important;
+  }
+  section:hover {
+    border-color: inherit !important;
+  }
+  /* Reduce animate-pulse intensity on mobile to prevent GPU thrashing */
+  .animate-pulse {
+    animation-duration: 3s !important;
+  }
+}
+
+/* Hide scrollbars on time range selector while keeping scroll functional */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}

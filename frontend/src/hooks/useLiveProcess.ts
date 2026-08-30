@@ -15,8 +15,9 @@ interface LiveProcessState {
   refresh: () => Promise<void>
 }
 
-const POLL_INTERVAL_MS = 5000
-const RECONNECT_DELAY_MS = 4000
+const POLL_INTERVAL_MS = 15000
+const RECONNECT_DELAY_MS = 10000
+const MAX_RECONNECT_ATTEMPTS = 5
 
 /**
  * Keeps one process snapshot current.
@@ -37,6 +38,7 @@ export function useLiveProcess(processId: number): LiveProcessState {
   const reconnectRef = useRef<number | null>(null)
   const pollRef = useRef<number | null>(null)
   const activeRef = useRef(true)
+  const reconnectAttemptsRef = useRef(0)
 
   const refresh = useCallback(async () => {
     try {
@@ -87,6 +89,7 @@ export function useLiveProcess(processId: number): LiveProcessState {
       socket.onopen = () => {
         if (!activeRef.current) return
         setMode('websocket')
+        reconnectAttemptsRef.current = 0
         socket.send('ping')
       }
 
@@ -115,7 +118,10 @@ export function useLiveProcess(processId: number): LiveProcessState {
         socketRef.current = null
         if (!activeRef.current) return
         setMode('polling')
-        reconnectRef.current = window.setTimeout(connect, RECONNECT_DELAY_MS)
+        reconnectAttemptsRef.current += 1
+        if (reconnectAttemptsRef.current <= MAX_RECONNECT_ATTEMPTS) {
+          reconnectRef.current = window.setTimeout(connect, RECONNECT_DELAY_MS)
+        }
       }
 
       socket.onerror = () => socket.close()
