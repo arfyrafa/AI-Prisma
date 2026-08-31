@@ -14,9 +14,6 @@ import { parseSpreadsheetFile, type ParsedRow } from '../utils/spreadsheetParser
 
 const SERIES_COLORS = ['#1B4F91', '#0E7C5A', '#B45309', '#7B4FBF', '#2E6FD0', '#C2261D', '#059669', '#D97706']
 
-const TEMPLATE_GOOGLE_SHEETS_URL =
- 'https://docs.google.com/spreadsheets/d/1oig02t3ZtWFiFv7_rqqYzu_wugFH04YstlxwbleSpck/edit?gid=2025358027#gid=2025358027'
-
 export function ProcessMonitorPage() {
  const { processId, snapshot, loading, error, refresh } = useProcessContext()
  const [range, setRange] = useState<TimeRange>('7d')
@@ -261,28 +258,18 @@ export function ProcessMonitorPage() {
  </button>
  </div>
 
- {/* Template Download & Link Bar */}
+ {/* Template Download Bar */}
  <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-slate-50 p-3 border border-slate-200 text-xs">
  <div className="text-slate-600">
- <span className="font-bold">Template Resmi:</span> Format input logsheet standar
+ <span className="font-bold">Template Logsheet:</span> Format input data shift standar (.xlsx / .csv)
  </div>
- <div className="flex items-center gap-2">
- <a
- href={TEMPLATE_GOOGLE_SHEETS_URL}
- target="_blank"
- rel="noopener noreferrer"
- className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-sky-600 hover:underline"
- >
- Buka di Google Sheets ↗
- </a>
  <button
  type="button"
  onClick={downloadCsvTemplate}
- className="rounded-lg bg-emerald-600 text-white px-2.5 py-1 text-[11px] font-semibold hover:bg-emerald-500 inline-flex items-center gap-1 shadow-xs"
+ className="rounded-lg bg-emerald-600 text-white px-3 py-1.5 text-xs font-semibold hover:bg-emerald-500 inline-flex items-center gap-1.5 shadow-xs"
  >
- <Download className="h-3 w-3" /> Unduh CSV
+ <Download className="h-3.5 w-3.5" /> Unduh Template CSV
  </button>
- </div>
  </div>
 
  {/* Drop Zone for .xlsx and .csv */}
