@@ -1,9 +1,10 @@
-import { Download, Printer, RefreshCw, Sparkles } from 'lucide-react'
+import { Download, PlusCircle, Printer, RefreshCw, Sparkles } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { DeviationPanel } from '../components/DeviationPanel'
 import { InsightCard } from '../components/InsightCard'
 import { KpiCard } from '../components/KpiCard'
+import { ManualShiftEntryModal } from '../components/ManualShiftEntryModal'
 import { Panel } from '../components/Panel'
 import { PipelineStrip, type PipelineStage } from '../components/PipelineStrip'
 import { RecommendationCard } from '../components/RecommendationCard'
@@ -23,6 +24,7 @@ const PRIMARY_PARAMETER = 'clo2_concentration'
 export function DashboardPage() {
   const { processId, snapshot, loading, error, refresh } = useProcessContext()
   const [range, setRange] = useState<TimeRange>('7d')
+  const [manualEntryOpen, setManualEntryOpen] = useState(false)
   const [analyzing, setAnalyzing] = useState(false)
   const [agentDown, setAgentDown] = useState(false)
   const [analysisError, setAnalysisError] = useState<string | null>(null)
@@ -233,8 +235,18 @@ export function DashboardPage() {
               {formatDateTime(snapshot?.reading?.timestamp)}
             </span>
 
-            {/* Export Actions */}
-            <div className="flex items-center gap-1.5">
+            {/* Input & Export Actions */}
+            <div className="flex flex-wrap items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setManualEntryOpen(true)}
+                title="Input Data Shift Logsheet Baru"
+                className="btn bg-gradient-to-r from-sky-500 to-blue-600 text-white hover:from-sky-400 hover:to-blue-500 border border-sky-400/40 shadow-sm px-3 py-1.5 text-xs font-bold inline-flex items-center gap-1.5"
+              >
+                <PlusCircle className="h-3.5 w-3.5" />
+                <span>+ Input Data Shift</span>
+              </button>
+
               <button
                 type="button"
                 onClick={() =>
@@ -424,6 +436,17 @@ export function DashboardPage() {
           ))
         )}
       </Panel>
+
+      {/* MANUAL SHIFT ENTRY MODAL */}
+      <ManualShiftEntryModal
+        isOpen={manualEntryOpen}
+        onClose={() => setManualEntryOpen(false)}
+        onSuccess={() => {
+          void history.reload(true)
+          void deviations.reload(true)
+          void parameters.reload(true)
+        }}
+      />
     </div>
   )
 }

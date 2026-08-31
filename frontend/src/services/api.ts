@@ -10,6 +10,7 @@ import type {
   Deviation,
   HealthResponse,
   HistoryResponse,
+  IngestionResponse,
   Insight,
   KnowledgeDocument,
   KnowledgeDocumentDetail,
@@ -195,6 +196,19 @@ export const api = {
     request<void>(`/auth/users/${userId}`, { method: 'DELETE' }),
 
   // --- ingestion --------------------------------------------------------
+  ingestSensor: (
+    processId: number,
+    parameters: Record<string, number | null>,
+    timestamp?: string,
+    source = 'manual_shift_entry',
+  ) =>
+    post<IngestionResponse>('/ingestion/sensor', {
+      process_id: processId,
+      parameters,
+      timestamp: timestamp || undefined,
+      source,
+    }),
+
   ingestBatch: (processId: number, items: Array<Record<string, unknown>>) =>
     post<{ processed_count: number; alerts_created_count: number }>('/ingestion/batch', {
       process_id: processId,

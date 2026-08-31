@@ -1,6 +1,7 @@
-import { Check, Download, FileSpreadsheet, UploadCloud, X } from 'lucide-react'
+import { Check, Download, FileSpreadsheet, PlusCircle, UploadCloud, X } from 'lucide-react'
 import { useState } from 'react'
 
+import { ManualShiftEntryModal } from '../components/ManualShiftEntryModal'
 import { Panel } from '../components/Panel'
 import { ParameterTable } from '../components/ParameterTable'
 import { EmptyState, ErrorState, LoadingState } from '../components/StateViews'
@@ -18,6 +19,9 @@ export function ProcessMonitorPage() {
  const { processId, snapshot, loading, error, refresh } = useProcessContext()
  const [range, setRange] = useState<TimeRange>('7d')
  const [selected, setSelected] = useState<string[]>(['clo2_concentration'])
+
+ // Manual Shift Entry Modal State
+ const [manualEntryOpen, setManualEntryOpen] = useState(false)
 
  // Excel / CSV Upload State
  const [uploadModalOpen, setUploadModalOpen] = useState(false)
@@ -162,25 +166,43 @@ export function ProcessMonitorPage() {
 
  return (
  <div className="space-y-6">
- {/* Header Bar with Upload Action */}
- <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-panel">
- <div>
- <h1 className="text-xl font-bold text-slate-900">Pemantauan Telemetri DCS</h1>
- <p className="text-xs text-slate-500 mt-1">
- Visualisasi time-series 8 parameter proses kimia dan evaluasi deviasi proses real-time.
- </p>
- </div>
- <div className="flex items-center gap-2.5">
- <button
- type="button"
- onClick={() => setUploadModalOpen(true)}
- className="btn bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs inline-flex items-center gap-2 shadow-xs"
- >
- <UploadCloud className="h-4 w-4" />
- Import Dataset (Excel / CSV)
- </button>
- </div>
- </div>
+      {/* Header Bar with Quick Entry & Upload Actions */}
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-panel">
+        <div>
+          <h1 className="text-xl font-bold text-slate-900">Pemantauan Telemetri DCS</h1>
+          <p className="text-xs text-slate-500 mt-1">
+            Visualisasi time-series 8 parameter proses kimia dan evaluasi deviasi proses real-time.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <button
+            type="button"
+            onClick={() => setManualEntryOpen(true)}
+            className="btn-primary font-bold text-xs inline-flex items-center gap-2 shadow-sm"
+          >
+            <PlusCircle className="h-4 w-4" />
+            + Input Data Shift
+          </button>
+          <button
+            type="button"
+            onClick={() => setUploadModalOpen(true)}
+            className="btn-secondary font-bold text-xs inline-flex items-center gap-2 shadow-2xs"
+          >
+            <UploadCloud className="h-4 w-4 text-sky-600" />
+            Import Excel / CSV
+          </button>
+        </div>
+      </div>
+
+      {/* MANUAL SHIFT ENTRY MODAL */}
+      <ManualShiftEntryModal
+        isOpen={manualEntryOpen}
+        onClose={() => setManualEntryOpen(false)}
+        onSuccess={() => {
+          void history.reload(true)
+          void parameters.reload(true)
+        }}
+      />
 
  <Panel
  eyebrow="Tren proses"

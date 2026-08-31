@@ -216,3 +216,9 @@ export interface ReadingEventPayload {
   alerts: Alert[]
   phase: string
 }
+
+export interface IngestionResponse {
+  reading: SensorReading
+  deviations: Deviation[]
+  alerts_created: Alert[]
+}
