@@ -36,89 +36,100 @@ const PARAMETER_FIELDS: ParameterFieldDef[] = [
     key: 'clo2_concentration',
     label: 'Konsentrasi ClO₂',
     unit: 'g/L',
-    min: 8.0,
-    max: 10.0,
+    min: 9.0,
+    max: 11.0,
     step: '0.01',
     icon: '⚗️',
-    placeholder: 'Contoh: 8.85',
-    description: 'Target Kualitas Produk',
+    placeholder: 'Contoh: 9.60',
+    description: 'Target Kualitas Produk ClO₂',
   },
   {
-    key: 'naclo3_feed',
-    label: 'Laju Umpan NaClO₃',
+    key: 'naclo3_feed_m3h',
+    label: 'NaClO₃ Feed',
     unit: 'm³/h',
-    min: 2.5,
-    max: 3.2,
+    min: 14.0,
+    max: 20.0,
     step: '0.01',
     icon: '🧪',
-    placeholder: 'Contoh: 2.85',
-    description: 'Reaktan Utama Klorat',
+    placeholder: 'Contoh: 17.37',
+    description: 'Laju Umpan Sodium Klorat',
   },
   {
-    key: 'hcl_feed',
-    label: 'Laju Umpan HCl',
-    unit: 'm³/h',
-    min: 1.8,
-    max: 2.4,
+    key: 'naclo3_concentration_gpl',
+    label: 'NaClO₃ Concentration',
+    unit: 'g/L',
+    min: 380.0,
+    max: 480.0,
     step: '0.01',
     icon: '🧪',
-    placeholder: 'Contoh: 2.10',
-    description: 'Reaktan Asam Klorida',
+    placeholder: 'Contoh: 437.16',
+    description: 'Kadar Larutan Klorat Umpan',
   },
   {
-    key: 'generator_temperature',
-    label: 'Temperatur Generator',
+    key: 'nacl_concentration_gpl',
+    label: 'NaCl Concentration',
+    unit: 'g/L',
+    min: 80.0,
+    max: 120.0,
+    step: '0.01',
+    icon: '🧂',
+    placeholder: 'Contoh: 95.50',
+    description: 'Kadar Garam NaCl Sisa',
+  },
+  {
+    key: 'hcl_feed_m3h',
+    label: 'HCl Feed',
+    unit: 'm³/h',
+    min: 3.0,
+    max: 5.5,
+    step: '0.01',
+    icon: '🧪',
+    placeholder: 'Contoh: 4.13',
+    description: 'Laju Umpan Asam Klorida',
+  },
+  {
+    key: 'hcl_concentration_pct',
+    label: 'HCl Concentration',
+    unit: '%',
+    min: 28.0,
+    max: 35.0,
+    step: '0.01',
+    icon: '🧪',
+    placeholder: 'Contoh: 31.55',
+    description: 'Konsentrasi Asam Klorida',
+  },
+  {
+    key: 'generator_temperature_c',
+    label: 'Generator Temperature',
     unit: '°C',
-    min: 42.0,
-    max: 48.0,
+    min: 40.0,
+    max: 55.0,
     step: '0.1',
     icon: '🌡️',
-    placeholder: 'Contoh: 45.2',
-    description: 'Suhu Reaksi Reaktor',
+    placeholder: 'Contoh: 46.70',
+    description: 'Suhu Ruang Reaksi Generator',
   },
   {
-    key: 'generator_pressure',
-    label: 'Tekanan Generator',
-    unit: 'kPa',
-    min: -45.0,
-    max: -25.0,
+    key: 'absorber_water_temperature_c',
+    label: 'Absorber Water Temperature',
+    unit: '°C',
+    min: 4.0,
+    max: 15.0,
     step: '0.1',
-    icon: '🌀',
-    placeholder: 'Contoh: -35.0',
-    description: 'Vakum Ruang Reaksi',
+    icon: '❄️',
+    placeholder: 'Contoh: 8.42',
+    description: 'Temperatur Air Dingin Absorber',
   },
   {
-    key: 'absorber_water_rate',
+    key: 'absorber_water_rate_m3h',
     label: 'Absorber Water Rate',
     unit: 'm³/h',
     min: 85.0,
     max: 120.0,
     step: '0.1',
     icon: '💧',
-    placeholder: 'Contoh: 104.5',
-    description: 'Laju Air Pendingin Absorber',
-  },
-  {
-    key: 'chilled_water_temp',
-    label: 'Suhu Chilled Water',
-    unit: '°C',
-    min: 4.0,
-    max: 9.0,
-    step: '0.1',
-    icon: '❄️',
-    placeholder: 'Contoh: 6.8',
-    description: 'Suhu Masuk Chiller',
-  },
-  {
-    key: 'air_flow',
-    label: 'Air Flow (Laju Udara)',
-    unit: 'Nm³/h',
-    min: 120.0,
-    max: 180.0,
-    step: '0.1',
-    icon: '💨',
-    placeholder: 'Contoh: 152.0',
-    description: 'Udara Pengencer Blower',
+    placeholder: 'Contoh: 104.78',
+    description: 'Laju Alir Air Pendingin Absorber',
   },
 ]
 
@@ -235,7 +246,7 @@ export function ManualShiftEntryModal({ isOpen, onClose, onSuccess }: Props) {
             <div>
               <h3 className="text-base font-bold text-slate-900">Input Data Shift Logsheet</h3>
               <p className="text-xs text-slate-500">
-                Pencatatan pembacaan 8 parameter produksi ClO₂ langsung ke database
+                Pencatatan 9 parameter produksi ClO₂ langsung ke database
               </p>
             </div>
           </div>
@@ -322,11 +333,11 @@ export function ManualShiftEntryModal({ isOpen, onClose, onSuccess }: Props) {
             </div>
           </div>
 
-          {/* 8 Parameter Grid Inputs */}
+          {/* 9 Parameter Grid Inputs */}
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
-                <Activity className="h-3 w-3" /> 8 Parameter Operasional Kinetika
+                <Activity className="h-3 w-3" /> 9 Parameter Operasional (1 ClO₂ + 8 Proses)
               </span>
               <span className="text-[10px] text-slate-400">
                 Nilai normal otomatis ditandai hijau
