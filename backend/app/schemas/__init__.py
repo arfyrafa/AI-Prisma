@@ -366,8 +366,9 @@ class SensorIngestionPayload(BaseModel):
     @classmethod
     def validate_parameters(cls, value: dict[str, float | None]) -> dict[str, float | None]:
         from app.models.process import SensorReading
+        from app.services.monitoring import COLUMN_ALIASES
 
-        allowed = set(SensorReading.PARAMETER_COLUMNS) | {"co2_concentration"}
+        allowed = set(SensorReading.PARAMETER_COLUMNS) | set(COLUMN_ALIASES.keys()) | {"co2_concentration"}
         unknown = sorted(set(value) - allowed)
         if unknown:
             raise ValueError(f"Parameter tidak dikenal: {', '.join(unknown)}")
