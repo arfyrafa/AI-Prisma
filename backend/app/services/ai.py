@@ -203,8 +203,38 @@ def verify_recommendation(
 def chat(
     db: Session, process_id: int, message: str, history: list[dict[str, str]]
 ) -> tuple[str, str, list[str]]:
+    import re
     provider = get_agent_provider()
     context = build_context(db, process_id)
+
+    # Dynamic RAG search across Knowledge Base documents based on user message
+    keywords = [w.strip().lower() for w in re.findall(r'\w+', message) if len(w) > 2]
+    all_docs = list(db.scalars(select(KnowledgeDocument).order_by(KnowledgeDocument.updated_at.desc()).limit(40)))
+    
+    scored_docs: list[tuple[int, KnowledgeDocument]] = []
+    for doc in all_docs:
+        doc_text = f"{doc.title} {doc.reference_code or ''} {' '.join(doc.tags or [])} {doc.content or ''}".lower()
+        score = sum(1 for kw in keywords if kw in doc_text)
+        title_score = sum(3 for kw in keywords if kw in doc.title.lower())
+        total_score = score + title_score
+        if total_score > 0:
+            scored_docs.append((total_score, doc))
+            
+    scored_docs.sort(key=lambda x: x[0], reverse=True)
+    selected_docs = [doc for _, doc in scored_docs[:5]] if scored_docs else all_docs[:3]
+    
+    context.knowledge_refs = [
+        {
+            "id": doc.id,
+            "title": doc.title,
+            "reference_code": doc.reference_code,
+            "doc_type": doc.doc_type,
+            "summary": doc.summary,
+            "content": doc.content[:1500] if doc.content else "",
+        }
+        for doc in selected_docs
+    ]
+
     reply = provider.chat(context, message, history)
     log_event(
         db,

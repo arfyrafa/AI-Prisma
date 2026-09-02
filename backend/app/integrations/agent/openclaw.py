@@ -101,7 +101,11 @@ class OpenClawAgentProvider(AgentProvider):
         for s in sop_docs:
             code = s.get("reference_code", "")
             title = s.get("title", "")
-            sop_summary.append(f"- [{code}] {title}")
+            content = s.get("content", "")
+            if content:
+                sop_summary.append(f"• [{code}] {title}:\n  {content[:800]}")
+            else:
+                sop_summary.append(f"• [{code}] {title}")
 
         return (
             f"=== DATA TELEMETRI REAL-TIME PABRIK CLO2 ===\n"
@@ -109,7 +113,7 @@ class OpenClawAgentProvider(AgentProvider):
             f"1. Pembacaan Sensor Terkini:\n" + ("\n".join(params_info) if params_info else "- Data sensor aktif.") + "\n\n"
             f"2. Deviasi / Anomali Aktif ({len(context.deviations)} deviasi):\n" + ("\n".join(dev_info) if dev_info else "- Tidak ada deviasi, seluruh parameter normal.") + "\n\n"
             f"3. Tren Dinamis 30 Menit Terakhir:\n" + ("\n".join(trend_summary) if trend_summary else "- Data tren stabil.") + "\n\n"
-            f"4. Dokumen SOP Terdaftar di Database:\n" + ("\n".join(sop_summary) if sop_summary else "- SOP-CLO2-DEC01, SOP-CLO2-LOW01, SOP-CHW-ABS02")
+            f"4. Dokumen Knowledge Base & SOP Relevan (RAG Context):\n" + ("\n\n".join(sop_summary) if sop_summary else "- SOP-USR-18 Model Prediksi MLR, SOP-USR-19 Pengaruh Parameter")
         )
 
     def _post_chat_completion(self, messages_payload: list[dict[str, Any]], temperature: float = 0.4) -> str:
@@ -117,22 +121,13 @@ class OpenClawAgentProvider(AgentProvider):
         candidate_urls = []
         if self.base_url:
             candidate_urls.append(self.base_url)
-        # Prioritize active 20129 relay endpoints first for instant 2-3s latency
         candidate_urls.extend([
-            "http://host.docker.internal:20129/v1",
-            "http://172.18.0.1:20129/v1",
-            "http://172.17.0.1:20129/v1",
             "http://127.0.0.1:20129/v1",
-            "http://72.62.122.6:20129/v1",
-            "http://host.docker.internal:20128/v1",
-            "http://172.18.0.1:20128/v1",
-            "http://172.17.0.1:20128/v1",
-            "http://host.docker.internal:2026/v1",
+            "http://host.docker.internal:20129/v1",
         ])
 
-        # De-duplicate while preserving order
         seen = set()
-        urls = [x for x in candidate_urls if not (x in seen or seen.add(x))]
+        urls = [x for x in candidate_urls if not (x in seen or seen.add(x))][:2]
 
         last_error = None
         errors_summary = []
@@ -143,11 +138,10 @@ class OpenClawAgentProvider(AgentProvider):
                 "cx/gpt-5.3-codex-spark",
                 getattr(settings, "OPENCLAW_MODEL", "cx/gpt-5.4-mini"),
                 "gpt-4o-mini",
-                "cx/gpt-5.4",
             ]
 
             try:
-                with httpx.Client(timeout=6.0) as client:
+                with httpx.Client(timeout=httpx.Timeout(10.0, connect=1.2)) as client:
                     # Quick check active model list from 9router (timeout 1.0s max)
                     try:
                         m_resp = client.get(f"{target_url}/models", headers=self._headers(), timeout=1.0)
@@ -259,7 +253,101 @@ class OpenClawAgentProvider(AgentProvider):
             deviations_list = getattr(context, "deviations", [])
             q = message.lower()
 
-            if "kondisi" in q or "status" in q or "saat ini" in q:
+            # 1. Model Prediksi MLR / Persamaan Regresi / Variabel Input
+            if any(k in q for k in ["persamaan", "rumus", "formula", "mlr", "regresi", "variabel input", "persamaan model"]):
+                fallback_text = (
+                    "### 📐 Model Prediksi Multiple Linear Regression (MLR) ClO₂\n\n"
+                    "Berdasarkan dokumen riset **Model Prediksi MLR**, persamaan empiris untuk memprediksi konsentrasi produk ClO₂ (**Y**) adalah:\n\n"
+                    "> **Y = 3.11 - 0.1407·X₁ + 0.003192·X₂ + 0.00613·X₃ + 0.799·X₄ + 0.2343·X₅ - 0.0220·X₇ - 0.0607·X₉ - 0.02148·X₁₀**\n\n"
+                    "**8 Variabel Input Utama Operasional:**\n"
+                    "1. **X₁ — NaClO₃ Feed** (`m³/h`): Laju alir umpan natrium klorat (koefisien `-0.1407`).\n"
+                    "2. **X₂ — NaClO₃ Concentration** (`g/L`): Kepekatan natrium klorat umpan (koefisien `+0.003192`).\n"
+                    "3. **X₃ — NaCl Concentration** (`g/L`): Konsentrasi garam pembawa (koefisien `+0.00613`).\n"
+                    "4. **X₄ — HCl Feed** (`m³/h`): Laju alir asam klorida (parameter dengan signifikansi positif terbesar, koefisien `+0.799`).\n"
+                    "5. **X₅ — HCl Concentration** (`%`): Kepekatan asam klorida umpan (koefisien `+0.2343`).\n"
+                    "6. **X₇ — Generator Temperature** (`°C`): Temperatur reaksi generator (koefisien `-0.0220`).\n"
+                    "7. **X₉ — Absorber Water Temperature** (`°C`): Suhu air pendingin absorber (koefisien `-0.0607`).\n"
+                    "8. **X₁₀ — Absorber Water Rate** (`m³/h`): Laju alir air pendingin absorber (koefisien `-0.02148`).\n\n"
+                    "• **Target Spesifikasi Produk ClO₂ (Y)**: **9.70 – 9.80 g/L**.\n"
+                    "*(Rujukan: Dokumen Knowledge Base Model Prediksi MLR & Kamus Parameter)*"
+                )
+
+            # 2. Pengaruh Parameter / T-Value / Variabel Paling Dominan
+            elif any(k in q for k in ["t-value", "t value", "paling dominan", "signifikansi", "pengaruh parameter"]):
+                fallback_text = (
+                    "### 📊 Analisis Pengaruh Parameter & T-Value Model MLR\n\n"
+                    "Berdasarkan dokumen **Pengaruh Parameter dan T-Value**, urutan signifikansi statistik parameter terhadap konsentrasi produk ClO₂ adalah:\n\n"
+                    "1. **HCl Feed (X₄)** — *T-Value = +28.4* (Dominan Positif Utama):\n"
+                    "   Peningkatan laju alir asam klorida meningkatkan konversi klorat secara drastis sehingga menaikkan yield produksi gas ClO₂.\n\n"
+                    "2. **Absorber Water Rate (X₁₀)** — *T-Value = -18.2* (Dominan Negatif Utama):\n"
+                    "   Merupakan faktor pengencer produk utama di kolom absorpsi. Semakin besar laju air absorber, konsentrasi produk ClO₂ akan turun.\n\n"
+                    "3. **HCl Concentration (X₅)** — *T-Value = +12.1*:\n"
+                    "   Keasaman reaktor yang lebih pekat mempercepat kinetika reaksi reduksi klorat.\n\n"
+                    "4. **Absorber Water Temperature (X₉)** — *T-Value = -8.5*:\n"
+                    "   Suhu air yang lebih hangat menurunkan daya larut gas ClO₂ (*Henry's Law*), meningkatkan risiko gas lolos ke vent.\n\n"
+                    "*(Rujukan: Dokumen Knowledge Base Pengaruh Parameter dan T-Value)*"
+                )
+
+            # 3. Batas Keputusan AI & Human-in-the-Loop (HITL)
+            elif any(k in q for k in ["human in the loop", "hitl", "otoritas", "langsung", "tanpa persetujuan", "eksekusi valve", "keputusan ai"]):
+                fallback_text = (
+                    "### 🛡️ Batas Keputusan AI dan Human-in-the-Loop (HITL)\n\n"
+                    "Berdasarkan dokumen **Batas Keputusan AI dan Human in the Loop**:\n\n"
+                    "• **Tingkat Otoritas AI**: PRISMA AI beroperasi murni pada level **Advisory (Decision Support System)**.\n"
+                    "• **Larangan Eksekusi Otomatis**: Sistem **TIDAK PERNAH** melakukan penulisan (*setpoint write*) ke DCS atau memutar valve secara mandiri tanpa persetujuan manusia.\n"
+                    "• **Alur Verifikasi Operator**:\n"
+                    "  1. AI mendeteksi anomali telemetri dan menghitung rekomendasi optimasi.\n"
+                    "  2. Rekomendasi tampil di dashboard dengan status *Pending Verification*.\n"
+                    "  3. Process Operator / Engineer meninjau alasan kimiawi & SOP, lalu memilih: **Accept (Setuju)**, **Reject (Tolak)**, atau **Needs Analysis**.\n"
+                    "  4. Seluruh keputusan tercatat permanen di audit trail untuk kepatuhan ISO & keselamatan pabrik.\n\n"
+                    "*(Rujukan: Dokumen Knowledge Base Batas Keputusan AI dan Human in the Loop)*"
+                )
+
+            # 4. Keselamatan ClO2, Puffing, & Bahaya Reaksi
+            elif any(k in q for k in ["puffing", "dekomposisi", "bahaya", "ledakan", "keselamatan", "kebocoran", "apd"]):
+                fallback_text = (
+                    "### ⚠️ Keselamatan Proses & Pencegahan Dekomposisi (Puffing) ClO₂\n\n"
+                    "Berdasarkan dokumen **Kimia ClO₂ dan Bahaya Proses** & **Keselamatan ClO₂ dan Eskalasi Darurat**:\n\n"
+                    "• **Ambang Bahaya Dekomposisi Termal (*Puffing*)**:\n"
+                    "  - Terjadi jika konsentrasi gas ClO₂ di fasa uap generator melebihi **10–12%** atau suhu naik drastis di atas **55°C**.\n"
+                    "  - Reaksi dekomposisi: `2 ClO₂ → Cl₂ + O₂ + Panas (Eksotermis Cepat)`.\n\n"
+                    "• **Tindakan Mitigasi Darurat Lapangan**:\n"
+                    "  1. Injeksi gas pengencer (*Dilution Air / Nitrogen Purge*) secara maksimal ke reaktor.\n"
+                    "  2. Hentikan pemanasan steam generator seketika.\n"
+                    "  3. Turunkan feed reaktan HCl dan NaClO₃ secara serentak.\n"
+                    "  4. Pastikan sirkulasi chilled water absorber bekerja penuh untuk mendinginkan aliran gas.\n\n"
+                    "• **Prosedur APD Wajib**: Respirator dengan canister gas asam / SCBA, pelindung wajah (*face shield*), dan baju pelindung kimia tahan asam.\n\n"
+                    "*(Rujukan: Dokumen Knowledge Base Keselamatan ClO₂ & Kimia ClO₂ dan Bahaya Proses)*"
+                )
+
+            # 5. Anomali Sensor vs Gangguan Proses Nyata
+            elif any(k in q for k in ["anomali sensor", "drift", "validasi data", "kalibrasi", "titrasi"]):
+                fallback_text = (
+                    "### 🔍 Diagnosis Anomali Sensor vs Gangguan Proses Aktual\n\n"
+                    "Berdasarkan dokumen **Anomali Sensor, DCS, Lab, dan Data**:\n\n"
+                    "• **Kriteria Drift Sensor**:\n"
+                    "  - Terjadi bila salah satu pembacaan konsentrasi ClO₂ melonjak tajam tanpa disertai perubahan parameter reaktan (feed HCl & NaClO₃ tetap stabil).\n"
+                    "  - Solusi: Lakukan uji *cross-check* titrasi iodometri lab setiap shift (toleransi error batas lab ±0.30 g/L).\n\n"
+                    "• **Kriteria Gangguan Proses Aktual**:\n"
+                    "  - Perubahan konsentrasi diikuti deviasi simultan pada suhu generator, rasio asam, atau kenaikan suhu absorber water.\n\n"
+                    "*(Rujukan: Dokumen Knowledge Base Anomali Sensor, DCS, Lab, dan Data)*"
+                )
+
+            # 6. Pencocokan Otomatis dari Dokumen RAG yang Relevan
+            elif getattr(context, "knowledge_refs", None) and any(d.get("content") for d in context.knowledge_refs):
+                best_doc = context.knowledge_refs[0]
+                doc_title = best_doc.get("title", "Dokumen Knowledge Base")
+                doc_code = best_doc.get("reference_code", "SOP")
+                doc_content = best_doc.get("content", "").strip()
+                fallback_text = (
+                    f"### 📖 {doc_title} [{doc_code}]\n\n"
+                    f"Berdasarkan dokumen Knowledge Base terkait:\n\n"
+                    f"{doc_content[:950]}\n\n"
+                    f"*(Sumber: {doc_title} · Kode {doc_code})*"
+                )
+
+            # 7. Status Kondisi Telemetri Terkini
+            elif any(k in q for k in ["kondisi", "status", "saat ini", "telemetri", "baca"]):
                 status_header = (
                     f"### 📊 Status & Kondisi Produksi ClO₂ Terkini\n\n"
                     f"• **Konsentrasi Aktual ClO₂**: `{clo2_val:.2f} g/L` *(Target Operasi: 9,50 – 9,80 g/L)*\n"
@@ -282,10 +370,11 @@ class OpenClawAgentProvider(AgentProvider):
                             "2. Periksa rasio umpan asam HCl terhadap klorat agar reaksi pembentukan ClO₂ berjalan optimal."
                         )
                 else:
-                    status_header += "✅ **Status Keseluruhan**: Seluruh 9 parameter berada dalam batas normal operasi."
+                    status_header += "✅ **Status Keseluruhan**: Seluruh parameter berada dalam batas normal operasi."
                 fallback_text = status_header
 
-            elif "10" in q or "konsentrasi" in q or "sesuaikan" in q or "naik" in q:
+            # 8. Rekomendasi Penyesuaian Parameter / Optimasi Target
+            elif any(k in q for k in ["sesuaikan", "penyesuaian", "mencapai target", "naikkan target", "optimasi parameter", "turunkan target"]):
                 fallback_text = (
                     f"Untuk mencapai target konsentrasi **ClO₂ 10,00 g/L** dari kondisi aktual saat ini (`{clo2_val:.2f} g/L`), berikut parameter yang harus disesuaikan secara bertahap:\n\n"
                     f"1. **Absorber Water Rate (Laju Air Dingin)**:\n"
@@ -296,7 +385,7 @@ class OpenClawAgentProvider(AgentProvider):
                     f"3. **Suhu Chilled Water & Generator**:\n"
                     f"   - Pastikan suhu air absorber tetap dingin **< 8,5°C** (saat ini `{chw_temp:.1f}°C`) untuk memaksimalkan daya larut gas ClO₂.\n"
                     f"   - Pertahankan suhu generator di rentang aman **42–48°C** (saat ini `{gen_temp:.1f}°C`).\n\n"
-                    f"*(Rujukan: SOP-CLO2-DEC01 & SOP-CHW-ABS02)*"
+                    f"*(Rujukan: SOP Penyesuaian Lapangan 4-Tingkat)*"
                 )
             else:
                 fallback_text = (
@@ -304,7 +393,7 @@ class OpenClawAgentProvider(AgentProvider):
                     f"• **Feed Reaktan**: HCl = `{hcl_feed:.2f} m³/h` ({hcl_conc:.1f}%), NaClO₃ = `{naclo3_feed:.2f} m³/h` ({naclo3_conc:.1f} g/L)\n"
                     f"• **Absorber**: Laju air = `{chw_rate:.1f} m³/h` | Suhu chilled water = `{chw_temp:.1f}°C`\n"
                     f"• **Generator**: Suhu = `{gen_temp:.1f}°C`\n\n"
-                    f"Silakan ajukan pertanyaan seputar optimasi rasio stoikiometri, penurunan suhu chiller, atau prosedur SOP penanganan deviasi."
+                    f"Silakan ajukan pertanyaan seputar model prediksi MLR, pengaruh parameter (T-Value), keselamatan reaksi ClO₂, atau SOP penanganan deviasi."
                 )
 
             return AgentChatReply(
