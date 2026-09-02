@@ -39,6 +39,8 @@ services:
       PREDICTION_HORIZON_MINUTES: ${PREDICTION_HORIZON_MINUTES:-30}
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    volumes:
+      - ./backend/app:/app/app
     ports:
       - "${BACKEND_PORT:-8000}:8000"
 
