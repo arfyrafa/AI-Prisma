@@ -1,5 +1,5 @@
 import { Download, PlusCircle, Printer, RefreshCw, Sparkles } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { DeviationPanel } from '../components/DeviationPanel'
 import { InsightCard } from '../components/InsightCard'
@@ -38,6 +38,19 @@ export function DashboardPage() {
     const rows = await api.listPredictions(processId, PRIMARY_PARAMETER, 1)
     return rows[0] ?? null
   }, [processId])
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      void history.reload(true)
+      void deviations.reload(true)
+      void parameters.reload(true)
+      void insights.reload(true)
+      void recommendations.reload(true)
+      void prediction.reload(true)
+    }
+    window.addEventListener('prisma:reading-updated', handleUpdate)
+    return () => window.removeEventListener('prisma:reading-updated', handleUpdate)
+  }, [history, deviations, parameters, insights, recommendations, prediction])
 
   // 8 Process Elements + Target Product Configuration
   const PARAM_NAME_OVERRIDES: Record<string, { name: string; unit: string; order: number }> = {

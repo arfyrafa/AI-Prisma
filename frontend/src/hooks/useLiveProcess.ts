@@ -75,6 +75,11 @@ export function useLiveProcess(processId: number): LiveProcessState {
     activeRef.current = true
     void refresh()
 
+    const handleReadingUpdated = () => {
+      void refresh()
+    }
+    window.addEventListener('prisma:reading-updated', handleReadingUpdated)
+
     const connect = () => {
       if (!activeRef.current) return
       let socket: WebSocket
@@ -130,6 +135,7 @@ export function useLiveProcess(processId: number): LiveProcessState {
     connect()
 
     return () => {
+      window.removeEventListener('prisma:reading-updated', handleReadingUpdated)
       activeRef.current = false
       if (reconnectRef.current) window.clearTimeout(reconnectRef.current)
       const socket = socketRef.current

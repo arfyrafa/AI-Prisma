@@ -1,5 +1,5 @@
 import { Check, Download, FileSpreadsheet, PlusCircle, UploadCloud, X } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { ManualShiftEntryModal } from '../components/ManualShiftEntryModal'
 import { Panel } from '../components/Panel'
@@ -36,6 +36,15 @@ export function ProcessMonitorPage() {
  () => api.getHistory(processId, range, selected),
  [processId, range, selected.join(',')],
  )
+
+ useEffect(() => {
+   const handleUpdate = () => {
+     void history.reload(true)
+     void parameters.reload(true)
+   }
+   window.addEventListener('prisma:reading-updated', handleUpdate)
+   return () => window.removeEventListener('prisma:reading-updated', handleUpdate)
+ }, [history, parameters])
 
  const toggle = (parameterName: string) => {
  setSelected((prev) => {

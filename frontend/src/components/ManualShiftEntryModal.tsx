@@ -238,13 +238,15 @@ export function ManualShiftEntryModal({ isOpen, onClose, onSuccess }: Props) {
         }`
       )
 
+      // Notify entire app to immediately refresh all charts, snapshots and alerts
+      window.dispatchEvent(new CustomEvent('prisma:reading-updated'))
       await refresh()
       onSuccess?.()
 
       setTimeout(() => {
         setSuccessMsg(null)
         onClose()
-      }, 1300)
+      }, 900)
     } catch (err: any) {
       setErrorMsg(err?.message || 'Gagal menyimpan data shift ke server.')
     } finally {
@@ -253,8 +255,8 @@ export function ManualShiftEntryModal({ isOpen, onClose, onSuccess }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-3 sm:p-4 overflow-y-auto">
-      <div className="relative w-full max-w-2xl rounded-2xl bg-white p-5 sm:p-6 shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-150 my-6 max-h-[92vh] flex flex-col">
+    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-slate-900/70 backdrop-blur-xs p-3 sm:p-4 overflow-y-auto pb-20 sm:pb-6">
+      <div className="relative w-full max-w-2xl rounded-2xl bg-white p-5 sm:p-6 shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-150 my-auto max-h-[90vh] flex flex-col">
         {/* Modal Header */}
         <div className="flex items-center justify-between border-b border-slate-100 pb-4 shrink-0">
           <div className="flex items-center gap-3">
