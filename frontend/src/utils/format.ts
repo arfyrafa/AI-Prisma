@@ -131,16 +131,26 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
 }
 
 export const PARAMETER_UNIT_HINT: Record<string, string> = {
-  clo2_concentration: 'mg/L',
+  clo2_concentration: 'g/L',
+  naclo3_feed_m3h: 'm³/h',
+  naclo3_feed: 'm³/h',
+  naclo3_concentration_gpl: 'g/L',
+  naclo3_concentration: 'g/L',
+  nacl_concentration_gpl: 'g/L',
+  nacl_concentration: 'g/L',
+  hcl_feed_m3h: 'm³/h',
+  hcl_feed: 'm³/h',
+  hcl_concentration_pct: '%',
+  hcl_concentration: '%',
+  generator_temperature_c: '°C',
+  generator_temperature: '°C',
+  absorber_water_temperature_c: '°C',
+  absorber_water_temperature: '°C',
+  absorber_water_rate_m3h: 'm³/h',
+  absorber_water_rate: 'm³/h',
   temperature: '°C',
-  pressure: 'bar',
-  ph: '',
-  flow_rate: 'm³/jam',
-  so2_dosage: 'kg/jam',
-  orp: 'mV',
-  turbidity: 'NTU',
-  production_capacity: 'ton/hari',
-  reaction_efficiency: '%',
+  pressure: 'kPa',
+  flow_rate: 'm³/h',
 }
 
 export function decimalsFor(parameter: string): number {

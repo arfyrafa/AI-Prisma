@@ -9,7 +9,7 @@ import {
   RefreshCw,
   X,
 } from 'lucide-react'
-import { useState, type FormEvent } from 'react'
+import { useMemo, useState, type FormEvent } from 'react'
 import { useProcessContext } from '../hooks/useProcessContext'
 import { api } from '../services/api'
 
@@ -31,7 +31,7 @@ interface ParameterFieldDef {
   description: string
 }
 
-const PARAMETER_FIELDS: ParameterFieldDef[] = [
+const PARAMETER_FIELDS_META: ParameterFieldDef[] = [
   {
     key: 'clo2_concentration',
     label: 'Konsentrasi ClO₂',
@@ -145,10 +145,28 @@ export function ManualShiftEntryModal({ isOpen, onClose, onSuccess }: Props) {
   // Timestamp
   const [timestamp, setTimestamp] = useState<string>(() => getLocalIsoString())
 
-  // 8 Parameters values
+  // Dynamic parameter definition synced directly with DB operating ranges
+  const dynamicFields = useMemo(() => {
+    const snapMap = new Map(
+      (snapshot?.parameters ?? []).map((p) => [p.parameter_name, p])
+    )
+    return PARAMETER_FIELDS_META.map((meta) => {
+      const dbParam = snapMap.get(meta.key)
+      return {
+        ...meta,
+        label: dbParam?.display_name || meta.label,
+        unit: dbParam?.unit || meta.unit,
+        min: dbParam?.minimum_value !== null && dbParam?.minimum_value !== undefined ? dbParam.minimum_value : meta.min,
+        max: dbParam?.maximum_value !== null && dbParam?.maximum_value !== undefined ? dbParam.maximum_value : meta.max,
+        target: dbParam?.target_value !== null && dbParam?.target_value !== undefined ? dbParam.target_value : null,
+      }
+    })
+  }, [snapshot?.parameters])
+
+  // 9 Parameters values
   const [values, setValues] = useState<Record<string, string>>(() => {
     const initial: Record<string, string> = {}
-    PARAMETER_FIELDS.forEach((p) => {
+    PARAMETER_FIELDS_META.forEach((p) => {
       const currentVal = snapshot?.reading?.[p.key as keyof typeof snapshot.reading]
       initial[p.key] = currentVal !== null && currentVal !== undefined ? String(currentVal) : ''
     })
@@ -169,7 +187,7 @@ export function ManualShiftEntryModal({ isOpen, onClose, onSuccess }: Props) {
   const handleCopyLatest = () => {
     if (!snapshot?.reading) return
     const copied: Record<string, string> = {}
-    PARAMETER_FIELDS.forEach((p) => {
+    dynamicFields.forEach((p) => {
       const val = snapshot.reading?.[p.key as keyof typeof snapshot.reading]
       copied[p.key] = val !== null && val !== undefined ? String(val) : ''
     })
@@ -192,7 +210,7 @@ export function ManualShiftEntryModal({ isOpen, onClose, onSuccess }: Props) {
       const numericParams: Record<string, number | null> = {}
       let filledCount = 0
 
-      PARAMETER_FIELDS.forEach((p) => {
+      dynamicFields.forEach((p) => {
         const raw = values[p.key]
         if (raw !== undefined && raw.trim() !== '') {
           const num = parseFloat(raw.replace(',', '.'))
@@ -345,7 +363,7 @@ export function ManualShiftEntryModal({ isOpen, onClose, onSuccess }: Props) {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {PARAMETER_FIELDS.map((param) => {
+              {dynamicFields.map((param) => {
                 const rawVal = values[param.key] ?? ''
                 const numVal = parseFloat(rawVal.replace(',', '.'))
                 const isFilled = rawVal.trim() !== '' && !isNaN(numVal)
@@ -370,7 +388,7 @@ export function ManualShiftEntryModal({ isOpen, onClose, onSuccess }: Props) {
                         <span>{param.icon}</span>
                         <span>{param.label}</span>
                       </label>
-                      <span className="text-[10px] font-mono text-slate-400">
+                      <span className="text-[10px] font-mono font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
                         {param.min}–{param.max} {param.unit}
                       </span>
                     </div>
@@ -382,7 +400,7 @@ export function ManualShiftEntryModal({ isOpen, onClose, onSuccess }: Props) {
                         step={param.step}
                         value={rawVal}
                         onChange={(e) => handleInputChange(param.key, e.target.value)}
-                        placeholder={param.placeholder}
+                        placeholder={param.target !== null ? `Target: ${param.target}` : param.placeholder}
                         className={`field text-xs font-mono font-bold pr-14 ${
                           isFilled
                             ? isNormal
