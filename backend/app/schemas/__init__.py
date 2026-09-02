@@ -285,6 +285,7 @@ class ChatMessage(BaseModel):
 
 class ChatRequest(BaseModel):
     process_id: int = 1
+    user_id: str = "operator@prisma.ai"
     message: str = Field(min_length=1, max_length=4000)
     history: list[ChatMessage] = []
 
@@ -295,6 +296,19 @@ class ChatResponse(BaseModel):
     related_parameters: list[str] | None = None
     timestamp: datetime
     latency_ms: int | None = None
+
+
+class ChatMessageRecordOut(BaseModel):
+    id: int
+    user_id: str
+    process_id: int
+    role: Literal["user", "assistant"]
+    content: str
+    source: str | None = None
+    latency_ms: int | None = None
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 # --------------------------------------------------------------------------

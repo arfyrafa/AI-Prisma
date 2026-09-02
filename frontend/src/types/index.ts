@@ -176,6 +176,17 @@ export interface ChatMessage {
   content: string
 }
 
+export interface ChatMessageRecord {
+  id: number
+  user_id: string
+  process_id: number
+  role: 'user' | 'assistant'
+  content: string
+  source?: string | null
+  latency_ms?: number | null
+  created_at: string
+}
+
 export interface ChatResponse {
   reply: string
   source: string

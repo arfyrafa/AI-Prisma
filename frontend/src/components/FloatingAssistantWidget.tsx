@@ -1,218 +1,287 @@
 import {
- Bot,
- Check,
- ChevronDown,
- Copy,
- Maximize2,
- Minimize2,
- Send,
- Sparkles,
- Trash2,
- X,
+  Bot,
+  Check,
+  ChevronDown,
+  Copy,
+  Maximize2,
+  Minimize2,
+  Send,
+  Sparkles,
+  Trash2,
+  X,
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import { useAuth } from '../context/AuthContext'
 import { useProcessContext } from '../hooks/useProcessContext'
 import { api } from '../services/api'
 import type { ChatMessage } from '../types'
 import { formatClock } from '../utils/format'
 
 const QUICK_SUGGESTIONS = [
- 'Bagaimana kondisi ClO₂ saat ini?',
- 'Apa rekomendasi jika ClO₂ > 9.80 g/L?',
- 'Jelaskan pengaruh HCl Feed (X4) ke produk',
- 'Apa SOP saat suhu generator naik > 47°C?',
+  'Bagaimana kondisi ClO₂ saat ini?',
+  'Apa rekomendasi jika ClO₂ > 9.80 g/L?',
+  'Jelaskan pengaruh HCl Feed (X4) ke produk',
+  'Apa SOP saat suhu generator naik > 47°C?',
 ]
 
 interface Bubble extends ChatMessage {
- at: Date
- source?: string
- latencyMs?: number
+  at: Date
+  source?: string
+  latencyMs?: number
 }
 
 function FormattedMessage({ content, isUser }: { content: string; isUser: boolean }) {
- const lines = content.split('\n')
+  const lines = content.split('\n')
 
- return (
- <div className="space-y-1 leading-relaxed">
- {lines.map((line, lineIdx) => {
- if (!line.trim()) {
- return <div key={lineIdx} className="h-1.5" />
- }
+  return (
+    <div className="space-y-1 leading-relaxed">
+      {lines.map((line, lineIdx) => {
+        if (!line.trim()) {
+          return <div key={lineIdx} className="h-1.5" />
+        }
 
- const parts = line.split(/(\*\*[^*]+\*\*)/g)
+        const parts = line.split(/(\*\*[^*]+\*\*)/g)
 
- return (
- <p key={lineIdx} className={`${line.startsWith('•') || line.startsWith('-') ? 'pl-1.5' : ''}`}>
- {parts.map((part, partIdx) => {
- if (part.startsWith('**') && part.endsWith('**')) {
- const boldText = part.slice(2, -2)
- return (
- <strong
- key={partIdx}
- className={`font-semibold ${isUser ? 'text-white' : 'text-slate-900'}`}
- >
- {boldText}
- </strong>
- )
- }
- return <span key={partIdx}>{part}</span>
- })}
- </p>
- )
- })}
- </div>
- )
+        return (
+          <p key={lineIdx} className={`${line.startsWith('•') || line.startsWith('-') ? 'pl-1.5' : ''}`}>
+            {parts.map((part, partIdx) => {
+              if (part.startsWith('**') && part.endsWith('**')) {
+                const boldText = part.slice(2, -2)
+                return (
+                  <strong
+                    key={partIdx}
+                    className={`font-semibold ${isUser ? 'text-white' : 'text-slate-900'}`}
+                  >
+                    {boldText}
+                  </strong>
+                )
+              }
+              return <span key={partIdx}>{part}</span>
+            })}
+          </p>
+        )
+      })}
+    </div>
+  )
 }
 
 export function FloatingAssistantWidget() {
- const { processId, health } = useProcessContext()
- const [isOpen, setIsOpen] = useState(false)
- const [isExpanded, setIsExpanded] = useState(false)
- const [messages, setMessages] = useState<Bubble[]>([
- {
- role: 'assistant',
- content:
- 'Halo Bapak! Saya Asisten AI OpenClaw untuk unit produksi ClO₂. Ada kondisi proses atau parameter yang ingin dianalisis bersama?',
- at: new Date(),
- },
- ])
- const [input, setInput] = useState('')
- const [sending, setSending] = useState(false)
- const [copiedIndex, setCopiedIndex] = useState<number | null>(null)
- const chatEndRef = useRef<HTMLDivElement | null>(null)
- const inputRef = useRef<HTMLInputElement | null>(null)
+  const { processId, health } = useProcessContext()
+  const { user } = useAuth()
+  const userId = user?.email || user?.id || 'operator@prisma.ai'
 
- useEffect(() => {
- if (isOpen) {
- chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
- inputRef.current?.focus()
- }
- }, [isOpen, messages, sending])
+  const DEFAULT_WELCOME: Bubble = {
+    role: 'assistant',
+    content:
+      'Halo Bapak! Saya Asisten AI OpenClaw untuk unit produksi ClO₂. Ada kondisi proses atau parameter yang ingin dianalisis bersama?',
+    at: new Date(),
+  }
 
- const handleSend = async (textToSend?: string) => {
- const question = (textToSend ?? input).trim()
- if (!question || sending) return
+  const [isOpen, setIsOpen] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [messages, setMessages] = useState<Bubble[]>([DEFAULT_WELCOME])
+  const [input, setInput] = useState('')
+  const [sending, setSending] = useState(false)
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null)
+  const chatEndRef = useRef<HTMLDivElement | null>(null)
+  const inputRef = useRef<HTMLInputElement | null>(null)
 
- const history: ChatMessage[] = messages.map(({ role, content }) => ({ role, content }))
- setMessages((prev) => [...prev, { role: 'user', content: question, at: new Date() }])
- if (!textToSend) setInput('')
- setSending(true)
+  // Load chat history from backend database when user/widget mounts or changes
+  useEffect(() => {
+    let isCancelled = false
 
- try {
- const response = await api.chat(processId, question, history)
- setMessages((prev) => [
- ...prev,
- {
- role: 'assistant',
- content: response.reply,
- at: new Date(response.timestamp),
- source: response.source,
- latencyMs: response.latency_ms,
- },
- ])
- } catch (err) {
+    // Load from local storage cache first for instant rendering
+    try {
+      const saved = localStorage.getItem(`prisma_chat_history_${userId}`)
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setMessages(
+            parsed.map((m: any) => ({
+              ...m,
+              at: new Date(m.at || Date.now()),
+            }))
+          )
+        }
+      } else {
+        setMessages([DEFAULT_WELCOME])
+      }
+    } catch {}
+
+    // Fetch persistent history from server database
+    api
+      .getChatHistory(userId, processId)
+      .then((records) => {
+        if (isCancelled) return
+        if (records && records.length > 0) {
+          const loaded: Bubble[] = records.map((r) => ({
+            role: r.role,
+            content: r.content,
+            source: r.source || undefined,
+            latencyMs: r.latency_ms || undefined,
+            at: new Date(r.created_at),
+          }))
+          setMessages(loaded)
+          localStorage.setItem(`prisma_chat_history_${userId}`, JSON.stringify(loaded))
+        }
+      })
+      .catch(() => {
+        // Graceful fallback to local cache
+      })
+
+    return () => {
+      isCancelled = true
+    }
+  }, [userId, processId])
+
+  useEffect(() => {
+    if (isOpen) {
+      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+      inputRef.current?.focus()
+    }
+  }, [isOpen, messages, sending])
+
+  const updateMessages = (updater: Bubble[] | ((prev: Bubble[]) => Bubble[])) => {
+    setMessages((prev) => {
+      const next = typeof updater === 'function' ? updater(prev) : updater
+      try {
+        localStorage.setItem(`prisma_chat_history_${userId}`, JSON.stringify(next))
+      } catch {}
+      return next
+    })
+  }
+
+  const handleSend = async (textToSend?: string) => {
+    const question = (textToSend ?? input).trim()
+    if (!question || sending) return
+
+    const history: ChatMessage[] = messages.map(({ role, content }) => ({ role, content }))
+    const userBubble: Bubble = { role: 'user', content: question, at: new Date() }
+    updateMessages((prev) => [...prev, userBubble])
+    if (!textToSend) setInput('')
+    setSending(true)
+
+    try {
+      const response = await api.chat(processId, question, history, userId)
+      const botBubble: Bubble = {
+        role: 'assistant',
+        content: response.reply,
+        at: new Date(response.timestamp),
+        source: response.source,
+        latencyMs: response.latency_ms,
+      }
+      updateMessages((prev) => [...prev, botBubble])
+    } catch (err) {
       const errMsg = err instanceof Error ? err.message : 'Terjadi kendala koneksi ke server.'
-      setMessages((prev) => [
-        ...prev,
+      const errBubble: Bubble = {
+        role: 'assistant',
+        content: `**[Kendala Koneksi Chat]**\n\n${errMsg}\n\nSilakan periksa koneksi backend atau coba beberapa saat lagi.`,
+        at: new Date(),
+      }
+      updateMessages((prev) => [...prev, errBubble])
+    } finally {
+      setSending(false)
+    }
+  }
+
+  const handleCopy = (content: string, index: number) => {
+    void navigator.clipboard.writeText(content)
+    setCopiedIndex(index)
+    setTimeout(() => setCopiedIndex(null), 2000)
+  }
+
+  const handleClear = async () => {
+    if (window.confirm('Bersihkan seluruh riwayat percakapan untuk akun ini?')) {
+      try {
+        await api.clearChatHistory(userId, processId)
+      } catch {}
+      localStorage.removeItem(`prisma_chat_history_${userId}`)
+      setMessages([
         {
           role: 'assistant',
-          content: `**[Kendala Koneksi Chat]**\n\n${errMsg}\n\nSilakan periksa koneksi backend atau coba beberapa saat lagi.`,
+          content: 'Percakapan telah dibersihkan. Silakan ajukan pertanyaan seputar operasi ClO₂.',
           at: new Date(),
         },
       ])
-    } finally {
- setSending(false)
- }
- }
+    }
+  }
 
- const handleCopy = (content: string, index: number) => {
- void navigator.clipboard.writeText(content)
- setCopiedIndex(index)
- setTimeout(() => setCopiedIndex(null), 2000)
- }
+  return (
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+      {/* Floating Chat Popup Window */}
+      {isOpen && (
+        <div
+          className={`mb-4 flex flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white/95 backdrop-blur-xl shadow-2xl transition-all duration-300 ${
+            isExpanded
+              ? 'h-[85vh] w-[90vw] max-w-3xl sm:w-[650px]'
+              : 'h-[540px] w-[92vw] max-w-sm sm:w-[420px]'
+          }`}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between border-b border-slate-100 bg-gradient-to-r from-slate-900 via-sky-950 to-slate-900 px-4 py-3.5 text-white">
+            <div className="flex items-center gap-3">
+              <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-sky-500/20 border border-sky-400/30 shadow-inner">
+                <img
+                  src="/assets/img/logo only prisma.png"
+                  alt="PRISMA AI"
+                  className="h-6 w-6 object-contain drop-shadow"
+                />
+                <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-400 ring-2 ring-slate-900" />
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <h3 className="text-xs font-bold text-white">PRISMA AI Assistant</h3>
+                  <span className="rounded bg-sky-500/30 px-1 py-0.2 text-[9px] font-extrabold uppercase tracking-wider text-sky-300 border border-sky-400/20">
+                    OpenClaw
+                  </span>
+                </div>
+                <p className="text-[10px] text-slate-300 flex items-center gap-1.5 truncate max-w-[220px]">
+                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
+                  <span>{health?.agent_available ? 'Online' : 'Offline'}</span>
+                  <span className="text-slate-400">•</span>
+                  <span className="text-sky-300 font-medium truncate" title={user?.email || user?.name || 'Operator'}>
+                    {user?.name || user?.email || 'Operator'}
+                  </span>
+                </p>
+              </div>
+            </div>
 
- const handleClear = () => {
- setMessages([
- {
- role: 'assistant',
- content: 'Percakapan telah direset. Silakan ajukan pertanyaan seputar operasi ClO₂.',
- at: new Date(),
- },
- ])
- }
+            {/* Window Controls */}
+            <div className="flex items-center gap-1 text-slate-300">
+              <button
+                type="button"
+                onClick={handleClear}
+                title="Bersihkan Riwayat Percakapan Akun Ini"
+                className="rounded-lg p-1.5 hover:bg-white/10 hover:text-white transition-colors"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsExpanded(!isExpanded)}
+                title={isExpanded ? 'Kecilkan Window' : 'Perbesar Window'}
+                className="rounded-lg p-1.5 hover:bg-white/10 hover:text-white transition-colors hidden sm:block"
+              >
+                {isExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                title="Tutup Chat"
+                className="rounded-lg p-1.5 hover:bg-white/10 hover:text-white transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
 
- return (
- <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
- {/* Floating Chat Popup Window */}
- {isOpen && (
- <div
- className={`mb-4 flex flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white/95 backdrop-blur-xl shadow-2xl transition-all duration-300 ${
- isExpanded
- ? 'h-[85vh] w-[90vw] max-w-3xl sm:w-[650px]'
- : 'h-[540px] w-[92vw] max-w-sm sm:w-[420px]'
- }`}
- >
- {/* Header */}
- <div className="flex items-center justify-between border-b border-slate-100 bg-gradient-to-r from-slate-900 via-sky-950 to-slate-900 px-4 py-3.5 text-white">
- <div className="flex items-center gap-3">
- <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-sky-500/20 border border-sky-400/30 shadow-inner">
- <img
- src="/assets/img/logo only prisma.png"
- alt="PRISMA AI"
- className="h-6 w-6 object-contain drop-shadow"
- />
- <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-400 ring-2 ring-slate-900" />
- </div>
- <div>
- <div className="flex items-center gap-1.5">
- <h3 className="text-xs font-bold text-white">PRISMA AI Assistant</h3>
- <span className="rounded bg-sky-500/30 px-1 py-0.2 text-[9px] font-extrabold uppercase tracking-wider text-sky-300 border border-sky-400/20">
- OpenClaw
- </span>
- </div>
- <p className="text-[10px] text-slate-300 flex items-center gap-1">
- <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
- {health?.agent_available ? 'Online & Siap Analisis' : 'Offline'}
- </p>
- </div>
- </div>
-
- {/* Window Controls */}
- <div className="flex items-center gap-1 text-slate-300">
- <button
- type="button"
- onClick={handleClear}
- title="Bersihkan Percakapan"
- className="rounded-lg p-1.5 hover:bg-white/10 hover:text-white transition-colors"
- >
- <Trash2 className="h-4 w-4" />
- </button>
- <button
- type="button"
- onClick={() => setIsExpanded(!isExpanded)}
- title={isExpanded ? 'Kecilkan Window' : 'Perbesar Window'}
- className="rounded-lg p-1.5 hover:bg-white/10 hover:text-white transition-colors hidden sm:block"
- >
- {isExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
- </button>
- <button
- type="button"
- onClick={() => setIsOpen(false)}
- title="Tutup Chat"
- className="rounded-lg p-1.5 hover:bg-white/10 hover:text-white transition-colors"
- >
- <X className="h-4 w-4" />
- </button>
- </div>
- </div>
-
- {/* Chat Message Stream */}
- <div className="flex-1 space-y-3.5 overflow-y-auto p-4 text-xs">
- {messages.map((msg, idx) => (
- <div
- key={idx}
- className={`flex items-start gap-2.5 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
- >
+          {/* Chat Message Stream */}
+          <div className="flex-1 space-y-3.5 overflow-y-auto p-4 text-xs">
+            {messages.map((msg, idx) => (
+              <div
+                key={idx}
+                className={`flex items-start gap-2.5 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
  {msg.role === 'assistant' && (
  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-sky-100 border border-sky-200 text-sky-600 shadow-xs">
  <Bot className="h-4 w-4" />

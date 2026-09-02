@@ -6,6 +6,7 @@ import type {
   AnalyzeResponse,
   AuditLog,
   ChatMessage,
+  ChatMessageRecord,
   ChatResponse,
   Deviation,
   HealthResponse,
@@ -78,6 +79,9 @@ const post = <T>(path: string, body: unknown) =>
 const patch = <T>(path: string, body: unknown) =>
   request<T>(path, { method: 'PATCH', body: JSON.stringify(body) })
 
+const del = <T>(path: string) =>
+  request<T>(path, { method: 'DELETE' })
+
 export const api = {
   health: () => request<HealthResponse>('/health'),
 
@@ -149,8 +153,23 @@ export const api = {
     payload: { decision: string; notes?: string; verified_by: string; reviewed: boolean },
   ) => post<Verification>(`/recommendations/${recommendationId}/verify`, payload),
 
-  chat: (processId: number, message: string, history: ChatMessage[]) =>
-    post<ChatResponse>('/agent/chat', { process_id: processId, message, history }),
+  chat: (processId: number, message: string, history: ChatMessage[], userId?: string) =>
+    post<ChatResponse>('/agent/chat', {
+      process_id: processId,
+      message,
+      history,
+      user_id: userId || 'operator@prisma.ai',
+    }),
+
+  getChatHistory: (userId: string, processId: number = 1) =>
+    request<ChatMessageRecord[]>(
+      `/agent/chat/history?user_id=${encodeURIComponent(userId)}&process_id=${processId}`
+    ),
+
+  clearChatHistory: (userId: string, processId: number = 1) =>
+    del<{ success: boolean; deleted_count: number }>(
+      `/agent/chat/history?user_id=${encodeURIComponent(userId)}&process_id=${processId}`
+    ),
 
   // --- knowledge & audit ------------------------------------------------
   listKnowledge: (query?: string, docType?: string) => {

@@ -78,3 +78,19 @@ class EngineerVerification(Base):
     verified_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     recommendation: Mapped[Recommendation] = relationship(back_populates="verifications")
+
+
+class ChatMessageRecord(Base):
+    __tablename__ = "chat_messages"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    user_id: Mapped[str] = mapped_column(String(120), index=True, nullable=False)
+    process_id: Mapped[int] = mapped_column(Integer, default=1, index=True)
+    role: Mapped[str] = mapped_column(String(20), nullable=False)  # "user" | "assistant"
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    source: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    latency_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), index=True
+    )
+
