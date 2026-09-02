@@ -23,7 +23,6 @@ def extract_text_from_file(filename: str, content: bytes) -> str:
             with zipfile.ZipFile(io.BytesIO(content)) as docx_zip:
                 xml_content = docx_zip.read('word/document.xml')
                 tree = ET.fromstring(xml_content)
-                # Word XML namespaces
                 namespaces = {'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
                 paragraphs = []
                 for p in tree.iterfind('.//w:p', namespaces):
@@ -32,13 +31,14 @@ def extract_text_from_file(filename: str, content: bytes) -> str:
                         paragraphs.append(''.join(texts))
                 extracted = '\n\n'.join(paragraphs).strip()
                 if extracted:
-                    return extracted
+                    return extracted.replace('\x00', '')
         except Exception as e:
             logger.warning("DOCX extraction via zipfile failed: %s", e)
+        return ""
 
     # 2. PDF (Adobe Acrobat)
     if lower_name.endswith('.pdf'):
-        # Try pypdf first if available
+        # Try pypdf first
         try:
             from pypdf import PdfReader
             reader = PdfReader(io.BytesIO(content))
@@ -48,38 +48,52 @@ def extract_text_from_file(filename: str, content: bytes) -> str:
                 if t:
                     pages_text.append(t)
             extracted = '\n\n'.join(pages_text).strip()
-            if extracted:
-                return extracted
-        except Exception:
-            pass
+            if extracted and len(extracted) > 5:
+                return extracted.replace('\x00', '')
+        except Exception as e:
+            logger.warning("pypdf extraction failed: %s", e)
 
-        # Fallback PDF text stream regex extractor (Pure Python)
+        # Fallback PDF text stream regex + zlib decompressor
         try:
-            raw_str = content.decode('latin-1', errors='ignore')
-            # Extract text within BT ... ET blocks or Tj / TJ operators
+            import zlib
             text_chunks = []
-            for match in re.finditer(r'\((.*?)\)\s*Tj', raw_str):
-                chunk = match.group(1).replace(r'\(', '(').replace(r'\)', ')')
-                if len(chunk.strip()) > 1:
-                    text_chunks.append(chunk)
-            for match in re.finditer(r'\[(.*?)\]\s*TJ', raw_str):
-                items = re.findall(r'\((.*?)\)', match.group(1))
-                chunk = ''.join(items)
-                if len(chunk.strip()) > 1:
-                    text_chunks.append(chunk)
+            for stream_match in re.finditer(rb'stream[\r\n]+([\s\S]*?)[\r\n]+endstream', content):
+                stream_data = stream_match.group(1)
+                try:
+                    decompressed = zlib.decompress(stream_data)
+                except Exception:
+                    decompressed = stream_data
+                try:
+                    s = decompressed.decode('latin-1', errors='ignore')
+                    for match in re.finditer(r'\((.*?)\)\s*Tj', s):
+                        chunk = match.group(1).replace(r'\(', '(').replace(r'\)', ')')
+                        if len(chunk.strip()) > 1:
+                            text_chunks.append(chunk)
+                    for match in re.finditer(r'\[(.*?)\]\s*TJ', s):
+                        items = re.findall(r'\((.*?)\)', match.group(1))
+                        chunk = ''.join(items)
+                        if len(chunk.strip()) > 1:
+                            text_chunks.append(chunk)
+                except Exception:
+                    pass
             if text_chunks:
-                return '\n'.join(text_chunks[:500])
+                extracted = '\n'.join(text_chunks[:1000]).strip()
+                if extracted:
+                    return extracted.replace('\x00', '')
         except Exception as e:
             logger.warning("Fallback PDF stream extraction failed: %s", e)
+
+        # Do NOT fall through to decoding raw binary bytes as plaintext
+        return ""
 
     # 3. Plaintext, Markdown, CSV, JSON
     for enc in ('utf-8', 'utf-8-sig', 'latin-1', 'cp1252'):
         try:
-            return content.decode(enc).strip()
+            return content.decode(enc).replace('\x00', '').strip()
         except Exception:
             continue
 
-    return content.decode('utf-8', errors='ignore').strip()
+    return content.decode('utf-8', errors='ignore').replace('\x00', '').strip()
 
 
 def list_documents(

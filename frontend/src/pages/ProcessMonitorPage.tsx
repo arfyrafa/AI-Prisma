@@ -20,10 +20,10 @@ export function ProcessMonitorPage() {
  const [range, setRange] = useState<TimeRange>('7d')
  const [selected, setSelected] = useState<string[]>(['clo2_concentration'])
 
- // Manual Shift Entry Modal State
+
  const [manualEntryOpen, setManualEntryOpen] = useState(false)
 
- // Excel / CSV Upload State
+
  const [uploadModalOpen, setUploadModalOpen] = useState(false)
  const [spreadsheetFile, setSpreadsheetFile] = useState<File | null>(null)
  const [parsedRows, setParsedRows] = useState<ParsedRow[]>([])

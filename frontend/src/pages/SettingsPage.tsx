@@ -33,14 +33,14 @@ export function SettingsPage() {
   } = useAuth()
   const { health } = useProcessContext()
 
-  // Profile Form state
+
   const [name, setName] = useState(user?.name ?? 'Alex Rivera')
   const [email, setEmail] = useState(user?.email ?? 'admin@prisma.ai')
   const [department, setDepartment] = useState(user?.department ?? 'Operasi ClO₂ & Chemical Plant')
   const [engineerId, setEngineerId] = useState(user?.engineerId ?? 'ENG-ADM-001')
   const [profileSaved, setProfileSaved] = useState(false)
 
-  // Password Form state
+
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -49,11 +49,11 @@ export function SettingsPage() {
   const [showConfirmPass, setShowConfirmPass] = useState(false)
   const [passwordMsg, setPasswordMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
-  // AI Diagnostic State
+
   const [aiTesting, setAiTesting] = useState(false)
   const [aiTestResult, setAiTestResult] = useState<string | null>(null)
 
-  // User Management Modal State
+
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false)
   const [newUserName, setNewUserName] = useState('')
   const [newUserEmail, setNewUserEmail] = useState('')
@@ -63,7 +63,7 @@ export function SettingsPage() {
   const [newUserEngId, setNewUserEngId] = useState('OPR-2026-')
   const [userActionMsg, setUserActionMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
-  // Reset Password Modal State
+
   const [resetModalUser, setResetModalUser] = useState<UserProfile | null>(null)
   const [resetNewPass, setResetNewPass] = useState('')
 

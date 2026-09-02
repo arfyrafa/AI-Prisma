@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { useRef, useState, type FormEvent } from 'react'
 
+import { MarkdownViewer } from '../components/MarkdownViewer'
 import { Panel } from '../components/Panel'
 import { EmptyState, ErrorState, LoadingState } from '../components/StateViews'
 import { useAuth } from '../context/AuthContext'
@@ -27,7 +28,7 @@ export function KnowledgeBasePage() {
   const [selected, setSelected] = useState<KnowledgeDocumentDetail | null>(null)
   const [loadingDoc, setLoadingDoc] = useState(false)
 
-  // Upload Modal State
+
   const [isUploadOpen, setIsUploadOpen] = useState(false)
   const [uploadFile, setUploadFile] = useState<File | null>(null)
   const [uploadTitle, setUploadTitle] = useState('')
@@ -40,7 +41,7 @@ export function KnowledgeBasePage() {
   const [uploadSuccess, setUploadSuccess] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Delete State
+
   const [deletingId, setDeletingId] = useState<number | null>(null)
 
   const documents = useAsync(
@@ -322,10 +323,8 @@ export function KnowledgeBasePage() {
                 </div>
               </dl>
 
-              <div className="rounded-xl bg-white border border-slate-200 p-5 shadow-xs">
-                <p className="whitespace-pre-line text-xs sm:text-sm leading-relaxed text-slate-800 font-sans">
-                  {selected.content ?? 'Dokumen belum memiliki isi.'}
-                </p>
+              <div className="rounded-xl bg-white border border-slate-200 p-5 shadow-xs overflow-hidden">
+                <MarkdownViewer content={selected.content ?? ''} />
               </div>
 
               {selected.tags?.length ? (

@@ -52,6 +52,11 @@ async def upload_document(
         
         extracted_text = knowledge_service.extract_text_from_file(filename, content_bytes)
         if not extracted_text or len(extracted_text.strip()) < 10:
+            if filename.lower().endswith('.pdf'):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Tidak dapat mengekstrak teks dari PDF ini. Pastikan file PDF memiliki layer teks (bukan hasil scan/foto murni tanpa OCR).",
+                )
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Tidak dapat mengekstrak teks dari file yang diunggah. Pastikan file berisi teks yang dapat dibaca.",
