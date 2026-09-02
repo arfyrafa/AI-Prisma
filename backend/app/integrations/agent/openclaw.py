@@ -439,19 +439,50 @@ class OpenClawAgentProvider(AgentProvider):
                     "*(Rujukan: Dokumen Knowledge Base Anomali Sensor, DCS, Lab, dan Data)*"
                 )
 
-            # 9. Penyesuaian Setpoint untuk Target Tertentu (misal target 10.00 g/L)
-            elif any(k in q for k in ["sesuaikan", "penyesuaian", "mencapai target", "naikkan target", "optimasi parameter", "turunkan target"]):
+            # 9. Penyesuaian Setpoint & Perhitungan Matematis Model MLR (SOP-USR-18 & SOP-USR-19)
+            target_match = re.search(r'(?:ke|target|mencapai)\s*([0-9]+[.,]?[0-9]*)\s*(?:g/l|gpl)?', q)
+            target_val = None
+            if target_match:
+                try:
+                    target_val = float(target_match.group(1).replace(',', '.'))
+                except ValueError:
+                    pass
+
+            is_adjustment_query = any(k in q for k in [
+                "menaik", "naik", "menurun", "turun", "sesuai", "target", "angka",
+                "parameter apa yang harus", "secara signifikan", "berapa angka", "hitung"
+            ])
+
+            if (target_val is not None or is_adjustment_query) and not any(k in q for k in ["persamaan", "rumus", "formula", "apa itu", "kondisi saat ini"]):
+                target_num = target_val if target_val is not None else 9.70
+                delta_y = target_num - clo2_val
+                delta_x4 = delta_y / 0.799
+                new_hcl = max(3.0, min(5.5, hcl_feed + delta_x4))
+                delta_x10 = -delta_y / 0.02148
+                new_chw = max(85.0, min(120.0, chw_rate + delta_x10))
+                delta_sign = "+" if delta_y >= 0 else ""
+
                 fallback_text = (
-                    f"Untuk mencapai target konsentrasi **ClO₂ 10,00 g/L** dari kondisi aktual saat ini (`{clo2_val:.2f} g/L`), berikut parameter yang harus disesuaikan secara bertahap:\n\n"
-                    f"1. **Absorber Water Rate (Laju Air Dingin)**:\n"
-                    f"   - Kurangi laju air pendingin absorber sebesar **3–5%** (dari `{chw_rate:.1f} m³/h` ke kisaran **`{max(85.0, chw_rate - 4.0):.1f} m³/h`**) untuk memekatkan larutan produk di packed column.\n\n"
-                    f"2. **Rasio Umpan Stoikiometri (HCl & NaClO₃)**:\n"
-                    f"   - Naikkan feed **NaClO₃** secara bertahap ke **`{naclo3_feed * 1.03:.2f} m³/h`**.\n"
-                    f"   - Pertahankan rasio molar asam **HCl : NaClO₃** dengan menaikkan HCl feed ke **`{hcl_feed * 1.03:.2f} m³/h`** guna mencegah *unreacted chlorate*.\n\n"
-                    f"3. **Suhu Chilled Water & Generator**:\n"
-                    f"   - Pastikan suhu air absorber tetap dingin **< 8,5°C** (saat ini `{chw_temp:.1f}°C`) untuk memaksimalkan daya larut gas ClO₂.\n"
-                    f"   - Pertahankan suhu generator di rentang aman **42–48°C** (saat ini `{gen_temp:.1f}°C`).\n\n"
-                    f"*(Rujukan: SOP Penyesuaian Lapangan 4-Tingkat)*"
+                    f"### 🎯 Perhitungan Model MLR untuk Target ClO₂ {target_num:.2f} g/L\n\n"
+                    f"Berdasarkan **Model Prediksi MLR (SOP-USR-18)** dan **Pengaruh Parameter & T-Value (SOP-USR-19)**:\n\n"
+                    f"**1. Parameter yang Harus Dinaikkan Paling Signifikan:**\n"
+                    f"• **HCl Feed (X₄)** adalah parameter operasional dengan pengaruh positif paling dominan terhadap konsentrasi produk dengan **T-Value = +28.4** dan koefisien regresi tertinggi (**+0.799**).\n"
+                    f"• Setiap kenaikan `1.00 m³/h` HCl Feed akan meningkatkan konsentrasi produk ClO₂ sebesar `+0.799 g/L`.\n\n"
+                    f"**2. Perhitungan Matematis (Persamaan Regresi Model E):**\n"
+                    f"> *Persamaan: Y = 3.11 - 0.1407·X₁ + 0.003192·X₂ + 0.00613·X₃ + 0.799·X₄ + 0.2343·X₅ - 0.0220·X₇ - 0.0607·X₉ - 0.02148·X₁₀*\n\n"
+                    f"• **Konsentrasi Aktual Saat Ini (Y)**: `{clo2_val:.2f} g/L`\n"
+                    f"• **Target Konsentrasi**: `{target_num:.2f} g/L`\n"
+                    f"• **Perubahan Konsentrasi Diperlukan (ΔY)**: `{delta_sign}{delta_y:.2f} g/L`\n\n"
+                    f"**3. Rekomendasi Penyesuaian Set Point & Angka Riil:**\n\n"
+                    f"**Opsi Utama — Kenaikan Laju Umpan Asam HCl (X₄):**\n"
+                    f"• Rumus: `ΔX₄ = ΔY / 0.799 = {delta_y:.2f} / 0.799`\n"
+                    f"• Kebutuhan Penyesuaian Laju HCl: **`{delta_x4:+.3f} m³/h`**\n"
+                    f"• **Set Point Baru HCl Feed**: Dari `{hcl_feed:.2f} m³/h` disesuaikan ke **`{new_hcl:.2f} m³/h`** *(rentang aman operasi: 3.00 – 5.50 m³/h)*.\n\n"
+                    f"**Opsi Sekunder — Pengurangan Laju Air Absorber (X₁₀) di Kolom Absorpsi:**\n"
+                    f"• Karena koefisien X₁₀ bernilai `-0.02148` (efek pengencer larutan), konsentrasi dapat dinaikkan dengan mengurangi air absorber:\n"
+                    f"• Rumus: `ΔX₁₀ = -ΔY / 0.02148 = {delta_x10:+.2f} m³/h`\n"
+                    f"• **Set Point Baru Absorber Water Rate**: Dari `{chw_rate:.1f} m³/h` disesuaikan ke **`{new_chw:.1f} m³/h`** *(rentang aman operasi: 85.0 – 120.0 m³/h)*.\n\n"
+                    f"*(Rujukan: SOP-USR-18 Model Prediksi MLR & SOP-USR-19 Pengaruh Parameter dan T-Value)*"
                 )
 
             # 10. Pencocokan Otomatis dari Dokumen RAG (hanya jika pertanyaan menyebut dokumen / sop atau sebagai fallback cerdas)
