@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.db.base import Base
 from app.db.session import SessionLocal, engine
-from app.models import KnowledgeDocument, Process, ProcessParameter
+from app.models import Process, ProcessParameter
 from app.simulations.simulator import seed_history
 
 logger = logging.getLogger(__name__)
@@ -39,179 +39,7 @@ PARAMETER_SEED = [
     ("absorber_water_rate_m3h", "Absorber Water Rate", "m³/h", 104.78, 85.0, 120.0),
 ]
 
-KNOWLEDGE_SEED = [
-    {
-        "title": "SOP Pengendalian Konsentrasi ClO₂",
-        "doc_type": "SOP",
-        "reference_code": "SOP-CLO2-01",
-        "version": "3.1",
-        "summary": "Langkah pengendalian ketika konsentrasi ClO₂ mendekati atau melewati batas atas.",
-        "tags": ["clo2_concentration", "so2_dosage", "ph"],
-        "content": (
-            "1. Verifikasi pembacaan analyzer terhadap hasil laboratorium terakhir.\n"
-            "2. Periksa dosis SO₂ terhadap set point yang berlaku pada laju produksi saat ini.\n"
-            "3. Periksa pH larutan umpan; pH di bawah rentang mempercepat pembentukan ClO₂.\n"
-            "4. Jika konsentrasi tetap di atas batas atas selama lebih dari 15 menit, "
-            "turunkan laju produksi sesuai instruksi supervisor shift.\n"
-            "5. Catat seluruh tindakan pada logsheet dan sistem audit."
-        ),
-    },
-    {
-        "title": "Rentang Operasi Normal Generator ClO₂",
-        "doc_type": "Rentang Operasi",
-        "reference_code": "OPR-CLO2-02",
-        "version": "2.0",
-        "summary": "Rentang operasi yang dijadikan acuan deteksi penyimpangan pada dashboard.",
-        "tags": ["clo2_concentration", "ph", "flow_rate", "temperature", "pressure"],
-        "content": (
-            "Konsentrasi ClO₂: 5,0–9,0 mg/L (target 8,5)\n"
-            "Suhu reaktor: 12,0–18,0 °C (target 15,0)\n"
-            "Tekanan: 8,5–10,5 bar (target 9,5)\n"
-            "pH: 4,0–5,0 (target 4,5)\n"
-            "Laju alir: 25,0–30,0 m³/jam (target 28,0)\n"
-            "Dosis SO₂: 0,35–0,55 kg/jam (target 0,42)\n"
-            "ORP: 150–220 mV (target 180)\n"
-            "Turbiditas: 0,0–1,5 NTU (target 0,8)"
-        ),
-    },
-    {
-        "title": "Troubleshooting pH Turun di Bawah Target",
-        "doc_type": "Troubleshooting",
-        "reference_code": "TRB-PH-04",
-        "version": "1.4",
-        "summary": "Penyebab umum dan pemeriksaan awal ketika pH bergerak turun.",
-        "tags": ["ph", "so2_dosage"],
-        "content": (
-            "Penyebab umum:\n"
-            "• Dosis SO₂ berlebih terhadap laju umpan klorat.\n"
-            "• Kalibrasi probe pH sudah kedaluwarsa.\n"
-            "• Perubahan konsentrasi larutan umpan.\n\n"
-            "Pemeriksaan awal:\n"
-            "1. Bandingkan pembacaan probe dengan pengukuran manual.\n"
-            "2. Periksa tanggal kalibrasi terakhir.\n"
-            "3. Periksa stroke dosing pump SO₂ dan tekanan suplai."
-        ),
-    },
-    {
-        "title": "Prosedur Pengambilan Sampel dan Verifikasi Laboratorium",
-        "doc_type": "Prosedur",
-        "reference_code": "PRC-LAB-07",
-        "version": "1.0",
-        "summary": "Cara memverifikasi pembacaan analyzer dengan hasil laboratorium.",
-        "tags": ["clo2_concentration", "turbidity"],
-        "content": (
-            "1. Gunakan APD lengkap sebelum mengambil sampel.\n"
-            "2. Bilas sampling line minimal 30 detik.\n"
-            "3. Ambil sampel pada titik SP-02 dan tutup rapat wadah.\n"
-            "4. Serahkan ke laboratorium dengan label waktu pengambilan.\n"
-            "5. Bandingkan hasil dengan pembacaan analyzer pada waktu yang sama."
-        ),
-    },
-    {
-        "title": "Kinetika Reaksi & Neraca Massa Integrated ClO₂ Plant",
-        "doc_type": "Teori Proses",
-        "reference_code": "DOC-CLO2-KB01",
-        "version": "2.0",
-        "summary": "Teori proses reaksi generator Mathieson/ERCO R3, elektrolisis klorat, dan absorpsi ClO₂.",
-        "tags": ["clo2_concentration", "reaction_efficiency", "temperature", "flow_rate"],
-        "content": (
-            "1. Sodium Chlorate Electrolysis: 2NaCl + 6H₂O + Listrik -> 2NaClO₃ + 6H₂.\n"
-            "2. ClO₂ Generation: 2NaClO₃ + 4.8HCl -> 1.8ClO₂ + 2NaCl + 2.4H₂O + 1.5Cl₂.\n"
-            "3. HCl Synthesis: 2.4H₂ + 2.4Cl₂ -> 4.8HCl.\n"
-            "Target konsentrasi larutan ClO₂ produk di absorber adalah 9–11 g/L. "
-            "Kestabilan suhu pendingin (chilled water) dan laju alir absorber H₂O menentukan efektivitas penyerapan gas."
-        ),
-    },
-    {
-        "title": "Panduan Standar Operasional Penyesuaian Lapangan 4-Tingkat",
-        "doc_type": "SOP Lapangan",
-        "reference_code": "SOP-CLO2-ADJ04",
-        "version": "1.5",
-        "summary": "Aturan penyesuaian bertahap: Prioritas 1 Absorber, Prioritas 2 Generator, Prioritas 3 Kualitas Kimia, Prioritas 4 Validasi Lab.",
-        "tags": ["clo2_concentration", "so2_dosage", "ph", "flow_rate"],
-        "content": (
-            "Hierarki Penyesuaian Bertahap:\n"
-            "• Prioritas 1 (Absorber): Evaluasi laju air absorber dan jaga kestabilan suhu chilled water.\n"
-            "• Prioritas 2 (Generator): Koreksi rasio HCl dan NaClO₃ Feed secara bertahap (2–5% per interval 15 menit).\n"
-            "• Prioritas 3 (Kualitas): Periksa konsentrasi HCl (±32%) dan strong chlorate (460 g/L).\n"
-            "• Prioritas 4 (Validasi): Konfirmasi trend DCS dan titrasi lab iodometri sebelum perubahan drastis."
-        ),
-    },
-    {
-        "title": "Model Prediksi Regresi Linier Berganda (MLR) & Analisis Dominansi T-Value",
-        "doc_type": "Riset Prediktif",
-        "reference_code": "MLR-CLO2-MOD01",
-        "version": "1.0",
-        "summary": "Persamaan regresi empiris Y = f(X1..X10) dan urutan signifikansi parameter operasional.",
-        "tags": ["clo2_concentration", "production_capacity", "reaction_efficiency"],
-        "content": (
-            "Persamaan MLR:\n"
-            "Y = 3.11 - 0.1407*X1 + 0.003192*X2 + 0.00613*X3 + 0.799*X4 + 0.2343*X5 - 0.0220*X7 - 0.0607*X9 - 0.02148*X10\n\n"
-            "Dominansi |T-Value|: (1) X5 Konsentrasi HCl, (2) X2 Konsentrasi NaClO₃, (3) X3 Konsentrasi NaCl, "
-            "(4) X4 Umpan HCl, (5) X1 Umpan NaClO₃, (6) X10 Laju Air Absorber, (7) X7 Suhu Generator, (8) X9 Suhu Air Pendingin."
-        ),
-    },
-    {
-        "title": "Standar Batas Toleransi Error Prediksi & Evaluasi Lab",
-        "doc_type": "Kriteria KPI",
-        "reference_code": "TOL-CLO2-KPI02",
-        "version": "1.1",
-        "summary": "Kriteria evaluasi deviasi prediksi terhadap analisa aktual lab.",
-        "tags": ["clo2_concentration", "turbidity"],
-        "content": (
-            "Evaluasi Akurasi Prediksi:\n"
-            "• Error <= 1%: Sangat Akurat (Target Utama)\n"
-            "• Error > 1% s/d 2%: Akurat (Masuk toleransi KPI utama)\n"
-            "• Error > 2% s/d 5%: Cukup (Di luar KPI utama, perlu review setpoint)\n"
-            "• Error > 5%: Kurang Akurat (Lakukan kalibrasi probe dan validasi reagen lab)"
-        ),
-    },
-    {
-        "title": "Catatan Kasus: Kenaikan ClO₂ akibat Dosis SO₂ Berlebih",
-        "doc_type": "Kasus Historis",
-        "reference_code": "CASE-2024-11",
-        "version": "1.0",
-        "summary": "Kasus historis dengan pola penyimpangan yang serupa.",
-        "tags": ["clo2_concentration", "so2_dosage", "ph"],
-        "content": (
-            "Kronologi: pH turun bertahap selama 40 menit, dosis SO₂ naik 12% dari set point, "
-            "konsentrasi ClO₂ melewati batas atas 25 menit kemudian.\n\n"
-            "Tindakan: dosis SO₂ dikembalikan ke set point, pH pulih dalam 20 menit, "
-            "konsentrasi ClO₂ kembali normal dalam 35 menit.\n\n"
-            "Pelajaran: pemantauan dini pada pH memberi waktu koreksi sebelum "
-            "konsentrasi ClO₂ menyimpang."
-        ),
-    },
-    {
-        "title": "SOP Mitigasi Kritis Dekomposisi Gas ClO₂ & Suhu Tinggi Generator",
-        "doc_type": "SOP Safety",
-        "reference_code": "SOP-CLO2-DEC01",
-        "version": "2.1",
-        "summary": "Protokol darurat saat konsentrasi ClO₂ melebihi 9.80 g/L atau suhu generator melebihi 47°C.",
-        "tags": ["clo2_concentration", "pressure", "temperature", "flow_rate"],
-        "content": (
-            "Prosedur Tindakan Cepat:\n"
-            "1. Jika konsentrasi ClO₂ terprediksi/terukur > 9.80 g/L, segera naikkan laju air absorber (X10) secara bertahap 3-5%.\n"
-            "2. Turunkan umpan HCl Feed (X4) sebesar 5% untuk meredam laju pembentukan gas berlebih.\n"
-            "3. Pastikan aliran gas purge inert (N₂/udara pengencer) mengalir stabil untuk menjaga konsentrasi gas ClO₂ di fasa uap < 10% vol (batas aman ledakan).\n"
-            "4. Verifikasi tekanan vakum generator (8.5 - 10.5 kPa)."
-        ),
-    },
-    {
-        "title": "SOP Pengendalian Suhu Chilled Water Absorber Column",
-        "doc_type": "SOP Operasi",
-        "reference_code": "SOP-CHW-ABS02",
-        "version": "1.8",
-        "summary": "Panduan menjaga temperatur air dingin absorber pada 6°C - 10°C untuk efisiensi penyerapan gas.",
-        "tags": ["absorber_water_temperature", "absorber_water_rate", "temperature"],
-        "content": (
-            "Pengendalian Suhu Absorpsi ClO₂:\n"
-            "• Suhu air pendingin absorber (X9) harus dijaga di bawah 9.0°C (optimum 7.0 - 8.5°C).\n"
-            "• Setiap kenaikan 1°C pada air pendingin akan menurunkan kelarutan gas ClO₂ dan memicu gas loss ke scrubber.\n"
-            "• Periksa kinerja chiller unit dan bersihkan strainer chilled water jika suhu terbaca > 10°C."
-        ),
-    },
-]
+
 
 
 def seed_process(db: Session) -> Process:
@@ -263,16 +91,20 @@ def seed_process(db: Session) -> Process:
 
 
 def seed_knowledge(db: Session) -> None:
-    existing_refs = {doc.reference_code for doc in db.scalars(select(KnowledgeDocument)).all()}
-    new_docs = [
-        KnowledgeDocument(**doc)
-        for doc in KNOWLEDGE_SEED
-        if doc.get("reference_code") not in existing_refs
+    """Knowledge base documents are managed by users via the UI. No auto-seeding.
+    Clean up old seed documents that were previously auto-inserted."""
+    from app.models import KnowledgeDocument
+    OLD_SEED_REFS = [
+        "SOP-CLO2-01", "OPR-CLO2-02", "TRB-PH-04", "PRC-LAB-07",
+        "CASE-2024-11", "DOC-CLO2-KB01", "SOP-CLO2-ADJ04",
+        "MLR-CLO2-MOD01", "TOL-CLO2-KPI02", "SOP-CLO2-DEC01", "SOP-CHW-ABS02",
     ]
-    if new_docs:
-        db.add_all(new_docs)
+    deleted = db.query(KnowledgeDocument).filter(
+        KnowledgeDocument.reference_code.in_(OLD_SEED_REFS)
+    ).delete(synchronize_session="fetch")
+    if deleted:
         db.commit()
-        logger.info("Seed %s dokumen knowledge base baru", len(new_docs))
+        logger.info("Dihapus %s dokumen seed lama dari knowledge base", deleted)
 
 
 import hashlib
