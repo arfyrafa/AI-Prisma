@@ -315,8 +315,8 @@ class OpenClawAgentProvider(AgentProvider):
                     "*(Rujukan: Dokumen Knowledge Base Model Prediksi MLR & Kamus Parameter)*"
                 )
 
-            # 2. Pengaruh Parameter / T-Value / Variabel Paling Dominan
-            elif any(k in q for k in ["t-value", "t value", "paling dominan", "signifikansi", "pengaruh parameter"]):
+            # 2. Pengaruh Parameter / T-Value / Pengaruh HCl Feed (X4)
+            elif any(k in q for k in ["t-value", "t value", "paling dominan", "signifikansi", "pengaruh parameter", "pengaruh hcl"]):
                 fallback_text = (
                     "### 📊 Analisis Pengaruh Parameter & T-Value Model MLR\n\n"
                     "Berdasarkan dokumen **Pengaruh Parameter dan T-Value**, urutan signifikansi statistik parameter terhadap konsentrasi produk ClO₂ adalah:\n\n"
@@ -331,22 +331,70 @@ class OpenClawAgentProvider(AgentProvider):
                     "*(Rujukan: Dokumen Knowledge Base Pengaruh Parameter dan T-Value)*"
                 )
 
-            # 3. Batas Keputusan AI & Human-in-the-Loop (HITL)
-            elif any(k in q for k in ["human in the loop", "hitl", "otoritas", "langsung", "tanpa persetujuan", "eksekusi valve", "keputusan ai"]):
+            # 3. Status & Kondisi Produksi Terkini
+            elif any(k in q for k in ["kondisi", "status", "saat ini", "telemetri", "baca sensor", "operasi saat ini"]):
+                status_header = (
+                    f"### 📊 Status & Kondisi Produksi ClO₂ Terkini\n\n"
+                    f"• **Konsentrasi Aktual ClO₂**: `{clo2_val:.2f} g/L` *(Target Spesifikasi: 9,70 – 9,80 g/L)*\n"
+                    f"• **Reaktan Utama (Klorat)**: NaClO₃ Feed = `{naclo3_feed:.2f} m³/h` | Konsentrasi = `{naclo3_conc:.1f} g/L`\n"
+                    f"• **Reaktan Asam**: HCl Feed = `{hcl_feed:.2f} m³/h` | Konsentrasi = `{hcl_conc:.1f}%`\n"
+                    f"• **Reaktor Generator**: Temperatur = `{gen_temp:.1f}°C`\n"
+                    f"• **Kolom Absorpsi**: Laju Air = `{chw_rate:.1f} m³/h` | Suhu Air Dingin = `{chw_temp:.1f}°C`\n\n"
+                )
+                if deviations_list:
+                    dev_texts = []
+                    for d in deviations_list:
+                        pname = d.get("display_name", d.get("parameter_name", ""))
+                        msg = d.get("message", "")
+                        dev_texts.append(f"- 🔴 **{pname}**: {msg}")
+                    status_header += "**⚠️ Deviasi Terdeteksi:**\n" + "\n".join(dev_texts) + "\n\n"
+                    if clo2_val < 9.70:
+                        status_header += (
+                            "**💡 Rekomendasi Tindakan Cepat:**\n"
+                            "1. Kurangi laju alir air pendingin *Absorber Water Rate* sebesar 2–3% untuk memekatkan larutan produk.\n"
+                            "2. Periksa kesetimbangan rasio umpan asam HCl terhadap klorat agar konversi pembentukan ClO₂ maksimal."
+                        )
+                    elif clo2_val > 9.80:
+                        status_header += (
+                            "**💡 Rekomendasi Tindakan Cepat:**\n"
+                            "1. Naikkan laju alir *Absorber Water Rate* sebesar 2–3% untuk mengencerkan produk ke rentang aman.\n"
+                            "2. Turunkan feed HCl sedikit untuk menurunkan laju generasi gas berlebih."
+                        )
+                else:
+                    status_header += "✅ **Status Keseluruhan**: Seluruh parameter operasional saat ini berada dalam batas normal operasi."
+                fallback_text = status_header
+
+            # 4. Rekomendasi ClO2 Di Atas Target (> 9.80 g/L atau terlalu tinggi)
+            elif any(k in q for k in ["> 9.8", ">9.8", "9.80", "terlalu tinggi", "di atas target", "melebihi target", "kepekatan tinggi"]):
                 fallback_text = (
-                    "### 🛡️ Batas Keputusan AI dan Human-in-the-Loop (HITL)\n\n"
-                    "Berdasarkan dokumen **Batas Keputusan AI dan Human in the Loop**:\n\n"
-                    "• **Tingkat Otoritas AI**: PRISMA AI beroperasi murni pada level **Advisory (Decision Support System)**.\n"
-                    "• **Larangan Eksekusi Otomatis**: Sistem **TIDAK PERNAH** melakukan penulisan (*setpoint write*) ke DCS atau memutar valve secara mandiri tanpa persetujuan manusia.\n"
-                    "• **Alur Verifikasi Operator**:\n"
-                    "  1. AI mendeteksi anomali telemetri dan menghitung rekomendasi optimasi.\n"
-                    "  2. Rekomendasi tampil di dashboard dengan status *Pending Verification*.\n"
-                    "  3. Process Operator / Engineer meninjau alasan kimiawi & SOP, lalu memilih: **Accept (Setuju)**, **Reject (Tolak)**, atau **Needs Analysis**.\n"
-                    "  4. Seluruh keputusan tercatat permanen di audit trail untuk kepatuhan ISO & keselamatan pabrik.\n\n"
-                    "*(Rujukan: Dokumen Knowledge Base Batas Keputusan AI dan Human in the Loop)*"
+                    "### 💡 Rekomendasi: Penanganan Konsentrasi ClO₂ di Atas Target (> 9.80 g/L)\n\n"
+                    "Berdasarkan **SOP Diagnosis ClO₂ di Atas Target** & SOP Lapangan 4-Tingkat:\n\n"
+                    "1. **Prioritas 1 — Kolom Absorpsi (Pengenceran Cepat)**:\n"
+                    f"   - Naikkan laju air absorber sebesar **3–5%** (dari `{chw_rate:.1f} m³/h` ke kisaran **`{chw_rate * 1.04:.1f} m³/h`**) untuk mengencerkan larutan produk.\n"
+                    f"   - Pastikan suhu chilled water tetap dingin **< 8,5°C** (aktual `{chw_temp:.1f}°C`) agar penyerapan tetap stabil.\n\n"
+                    "2. **Prioritas 2 — Reaktor Generator (Laju Reaksi)**:\n"
+                    f"   - Turunkan umpan asam **HCl Feed** sebesar **3–5%** (dari `{hcl_feed:.2f} m³/h` ke kisaran **`{hcl_feed * 0.96:.2f} m³/h`**) guna meredam laju pembentukan gas berlebih.\n"
+                    f"   - Jaga suhu generator di rentang aman **42–48°C** (aktual `{gen_temp:.1f}°C`).\n\n"
+                    "3. **Prioritas 3 — Verifikasi Laboratorium**:\n"
+                    "   - Lakukan uji titrasi iodometri manual untuk memastikan pembacaan analyzer online akurat.\n\n"
+                    "*(Rujukan: SOP-USR-16 Diagnosis ClO₂ di Atas Target)*"
                 )
 
-            # 4. Keselamatan ClO2, Puffing, & Bahaya Reaksi
+            # 5. Rekomendasi Suhu Generator Naik (> 47°C)
+            elif any(k in q for k in ["47", "suhu generator", "temperatur generator", "suhu naik"]):
+                fallback_text = (
+                    "### 🌡️ SOP Mitigasi: Temperatur Generator ClO₂ Tinggi (> 47°C)\n\n"
+                    "Berdasarkan dokumen **Diagnosis Deviasi Temperatur Generator** & Keselamatan ClO₂:\n\n"
+                    "• **Bahaya Kenaikan Suhu**: Suhu di atas 48°C mempercepat laju reaksi secara liar dan meningkatkan risiko dekomposisi termal (*puffing*).\n\n"
+                    "• **Langkah Pengendalian Lapangan**:\n"
+                    "  1. Kurangi pasokan steam pemanas ke reboiler/generator secara bertahap.\n"
+                    "  2. Periksa tekanan vakum generator (pastikan di rentang stabil 8.5 – 10.5 kPa).\n"
+                    "  3. Jika suhu terus naik mendekati 50°C, segera aktifkan injeksi udara pengencer (*dilution air*) dan turunkan feed reaktan HCl.\n"
+                    "  4. Pastikan sirkulasi sirkuit pendingin kondensor berjalan normal tanpa hambatan aliran.\n\n"
+                    "*(Rujukan: SOP Mitigasi Suhu Tinggi Generator & SOP-USR-15 Keselamatan ClO₂)*"
+                )
+
+            # 6. Keselamatan ClO2, Puffing, & Bahaya Reaksi
             elif any(k in q for k in ["puffing", "dekomposisi", "bahaya", "ledakan", "keselamatan", "kebocoran", "apd"]):
                 fallback_text = (
                     "### ⚠️ Keselamatan Proses & Pencegahan Dekomposisi (Puffing) ClO₂\n\n"
@@ -363,7 +411,22 @@ class OpenClawAgentProvider(AgentProvider):
                     "*(Rujukan: Dokumen Knowledge Base Keselamatan ClO₂ & Kimia ClO₂ dan Bahaya Proses)*"
                 )
 
-            # 5. Anomali Sensor vs Gangguan Proses Nyata
+            # 7. Batas Keputusan AI & Human-in-the-Loop (HITL)
+            elif any(k in q for k in ["human in the loop", "hitl", "otoritas", "langsung", "tanpa persetujuan", "eksekusi valve", "keputusan ai"]):
+                fallback_text = (
+                    "### 🛡️ Batas Keputusan AI dan Human-in-the-Loop (HITL)\n\n"
+                    "Berdasarkan dokumen **Batas Keputusan AI dan Human in the Loop**:\n\n"
+                    "• **Tingkat Otoritas AI**: PRISMA AI beroperasi murni pada level **Advisory (Decision Support System)**.\n"
+                    "• **Larangan Eksekusi Otomatis**: Sistem **TIDAK PERNAH** melakukan penulisan (*setpoint write*) ke DCS atau memutar valve secara mandiri tanpa persetujuan manusia.\n"
+                    "• **Alur Verifikasi Operator**:\n"
+                    "  1. AI mendeteksi anomali telemetri dan menghitung rekomendasi optimasi.\n"
+                    "  2. Rekomendasi tampil di dashboard dengan status *Pending Verification*.\n"
+                    "  3. Process Operator / Engineer meninjau alasan kimiawi & SOP, lalu memilih: **Accept (Setuju)**, **Reject (Tolak)**, atau **Needs Analysis**.\n"
+                    "  4. Seluruh keputusan tercatat permanen di audit trail untuk kepatuhan ISO & keselamatan pabrik.\n\n"
+                    "*(Rujukan: Dokumen Knowledge Base Batas Keputusan AI dan Human in the Loop)*"
+                )
+
+            # 8. Anomali Sensor vs Gangguan Proses Nyata
             elif any(k in q for k in ["anomali sensor", "drift", "validasi data", "kalibrasi", "titrasi"]):
                 fallback_text = (
                     "### 🔍 Diagnosis Anomali Sensor vs Gangguan Proses Aktual\n\n"
@@ -376,47 +439,7 @@ class OpenClawAgentProvider(AgentProvider):
                     "*(Rujukan: Dokumen Knowledge Base Anomali Sensor, DCS, Lab, dan Data)*"
                 )
 
-            # 6. Pencocokan Otomatis dari Dokumen RAG yang Relevan
-            elif getattr(context, "knowledge_refs", None) and any(d.get("content") for d in context.knowledge_refs):
-                best_doc = context.knowledge_refs[0]
-                doc_title = best_doc.get("title", "Dokumen Knowledge Base")
-                doc_code = best_doc.get("reference_code", "SOP")
-                doc_content = best_doc.get("content", "").strip()
-                fallback_text = (
-                    f"### 📖 {doc_title} [{doc_code}]\n\n"
-                    f"Berdasarkan dokumen Knowledge Base terkait:\n\n"
-                    f"{doc_content[:950]}\n\n"
-                    f"*(Sumber: {doc_title} · Kode {doc_code})*"
-                )
-
-            # 7. Status Kondisi Telemetri Terkini
-            elif any(k in q for k in ["kondisi", "status", "saat ini", "telemetri", "baca"]):
-                status_header = (
-                    f"### 📊 Status & Kondisi Produksi ClO₂ Terkini\n\n"
-                    f"• **Konsentrasi Aktual ClO₂**: `{clo2_val:.2f} g/L` *(Target Operasi: 9,50 – 9,80 g/L)*\n"
-                    f"• **Reaktan Utama (Klorat)**: NaClO₃ Feed = `{naclo3_feed:.2f} m³/h` | Konsentrasi = `{naclo3_conc:.1f} g/L`\n"
-                    f"• **Reaktan Asam**: HCl Feed = `{hcl_feed:.2f} m³/h` | Konsentrasi = `{hcl_conc:.1f}%`\n"
-                    f"• **Reaktor Generator**: Temperatur = `{gen_temp:.1f}°C`\n"
-                    f"• **Kolom Absorpsi**: Laju Air = `{chw_rate:.1f} m³/h` | Suhu Air Dingin = `{chw_temp:.1f}°C`\n\n"
-                )
-                if deviations_list:
-                    dev_texts = []
-                    for d in deviations_list:
-                        pname = d.get("display_name", d.get("parameter_name", ""))
-                        msg = d.get("message", "")
-                        dev_texts.append(f"- 🔴 **{pname}**: {msg}")
-                    status_header += "**⚠️ Deviasi Terdeteksi:**\n" + "\n".join(dev_texts) + "\n\n"
-                    if clo2_val < 9.50:
-                        status_header += (
-                            "**💡 Rekomendasi Segera:**\n"
-                            "1. Kurangi laju alir *Absorber Water Rate* sebesar 2–3 m³/h untuk menaikkan kepekatan larutan.\n"
-                            "2. Periksa rasio umpan asam HCl terhadap klorat agar reaksi pembentukan ClO₂ berjalan optimal."
-                        )
-                else:
-                    status_header += "✅ **Status Keseluruhan**: Seluruh parameter berada dalam batas normal operasi."
-                fallback_text = status_header
-
-            # 8. Rekomendasi Penyesuaian Parameter / Optimasi Target
+            # 9. Penyesuaian Setpoint untuk Target Tertentu (misal target 10.00 g/L)
             elif any(k in q for k in ["sesuaikan", "penyesuaian", "mencapai target", "naikkan target", "optimasi parameter", "turunkan target"]):
                 fallback_text = (
                     f"Untuk mencapai target konsentrasi **ClO₂ 10,00 g/L** dari kondisi aktual saat ini (`{clo2_val:.2f} g/L`), berikut parameter yang harus disesuaikan secara bertahap:\n\n"
@@ -429,6 +452,19 @@ class OpenClawAgentProvider(AgentProvider):
                     f"   - Pastikan suhu air absorber tetap dingin **< 8,5°C** (saat ini `{chw_temp:.1f}°C`) untuk memaksimalkan daya larut gas ClO₂.\n"
                     f"   - Pertahankan suhu generator di rentang aman **42–48°C** (saat ini `{gen_temp:.1f}°C`).\n\n"
                     f"*(Rujukan: SOP Penyesuaian Lapangan 4-Tingkat)*"
+                )
+
+            # 10. Pencocokan Otomatis dari Dokumen RAG (hanya jika pertanyaan menyebut dokumen / sop atau sebagai fallback cerdas)
+            elif getattr(context, "knowledge_refs", None) and any(d.get("content") for d in context.knowledge_refs):
+                best_doc = context.knowledge_refs[0]
+                doc_title = best_doc.get("title", "Dokumen Knowledge Base")
+                doc_code = best_doc.get("reference_code", "SOP")
+                doc_content = best_doc.get("content", "").strip()
+                fallback_text = (
+                    f"### 📖 {doc_title} [{doc_code}]\n\n"
+                    f"Berdasarkan dokumen Knowledge Base terkait:\n\n"
+                    f"{doc_content[:950]}\n\n"
+                    f"*(Sumber: {doc_title} · Kode {doc_code})*"
                 )
             else:
                 fallback_text = (
