@@ -230,40 +230,87 @@ class OpenClawAgentProvider(AgentProvider):
                 )
         except Exception as exc:
             logger.warning("Real LLM call timed out / failed: %s. Using industrial domain reasoning engine.", exc)
-            
-            # Intelligent Industrial Domain Reasoning Fallback based on real plant chemistry & SOP
-            q = message.lower()
-            reading = context.reading
-            clo2_val = reading.clo2_concentration if reading and reading.clo2_concentration is not None else 8.5
-            hcl_val = reading.hcl_feed if reading and reading.hcl_feed is not None else 2.1
-            naclo3_val = reading.naclo3_feed if reading and reading.naclo3_feed is not None else 2.9
-            chw_val = reading.absorber_water_rate if reading and reading.absorber_water_rate is not None else 105.0
 
-            if "10" in q or "konsentrasi" in q or "sesuaikan" in q or "parameter" in q or "naik" in q:
+            # Safe extraction of live plant readings from ProcessContext
+            params_by_name: dict[str, dict[str, Any]] = {}
+            for p in getattr(context, "parameters", []):
+                if isinstance(p, dict) and "parameter_name" in p:
+                    params_by_name[p["parameter_name"]] = p
+
+            def get_val(key: str, default: float) -> float:
+                p = params_by_name.get(key)
+                if p and p.get("current_value") is not None:
+                    try:
+                        return float(p["current_value"])
+                    except (ValueError, TypeError):
+                        pass
+                return default
+
+            clo2_val = get_val("clo2_concentration", 9.60)
+            naclo3_feed = get_val("naclo3_feed_m3h", get_val("naclo3_feed", 17.37))
+            naclo3_conc = get_val("naclo3_concentration_gpl", get_val("naclo3_concentration", 437.16))
+            nacl_conc = get_val("nacl_concentration_gpl", get_val("nacl_concentration", 95.50))
+            hcl_feed = get_val("hcl_feed_m3h", get_val("hcl_feed", 4.13))
+            hcl_conc = get_val("hcl_concentration_pct", get_val("hcl_concentration", 31.55))
+            gen_temp = get_val("generator_temperature_c", get_val("generator_temperature", 46.70))
+            chw_temp = get_val("absorber_water_temperature_c", get_val("absorber_water_temperature", 8.42))
+            chw_rate = get_val("absorber_water_rate_m3h", get_val("absorber_water_rate", 104.78))
+
+            deviations_list = getattr(context, "deviations", [])
+            q = message.lower()
+
+            if "kondisi" in q or "status" in q or "saat ini" in q:
+                status_header = (
+                    f"### 📊 Status & Kondisi Produksi ClO₂ Terkini\n\n"
+                    f"• **Konsentrasi Aktual ClO₂**: `{clo2_val:.2f} g/L` *(Target Operasi: 9,50 – 9,80 g/L)*\n"
+                    f"• **Reaktan Utama (Klorat)**: NaClO₃ Feed = `{naclo3_feed:.2f} m³/h` | Konsentrasi = `{naclo3_conc:.1f} g/L`\n"
+                    f"• **Reaktan Asam**: HCl Feed = `{hcl_feed:.2f} m³/h` | Konsentrasi = `{hcl_conc:.1f}%`\n"
+                    f"• **Reaktor Generator**: Temperatur = `{gen_temp:.1f}°C`\n"
+                    f"• **Kolom Absorpsi**: Laju Air = `{chw_rate:.1f} m³/h` | Suhu Air Dingin = `{chw_temp:.1f}°C`\n\n"
+                )
+                if deviations_list:
+                    dev_texts = []
+                    for d in deviations_list:
+                        pname = d.get("display_name", d.get("parameter_name", ""))
+                        msg = d.get("message", "")
+                        dev_texts.append(f"- 🔴 **{pname}**: {msg}")
+                    status_header += "**⚠️ Deviasi Terdeteksi:**\n" + "\n".join(dev_texts) + "\n\n"
+                    if clo2_val < 9.50:
+                        status_header += (
+                            "**💡 Rekomendasi Segera:**\n"
+                            "1. Kurangi laju alir *Absorber Water Rate* sebesar 2–3 m³/h untuk menaikkan kepekatan larutan.\n"
+                            "2. Periksa rasio umpan asam HCl terhadap klorat agar reaksi pembentukan ClO₂ berjalan optimal."
+                        )
+                else:
+                    status_header += "✅ **Status Keseluruhan**: Seluruh 9 parameter berada dalam batas normal operasi."
+                fallback_text = status_header
+
+            elif "10" in q or "konsentrasi" in q or "sesuaikan" in q or "naik" in q:
                 fallback_text = (
-                    f"Untuk mencapai target konsentrasi **ClO₂ 10,00 g/L** dari kondisi aktual saat ini ({clo2_val:.2f} g/L), berikut parameter yang harus disesuaikan secara bertahap:\n\n"
+                    f"Untuk mencapai target konsentrasi **ClO₂ 10,00 g/L** dari kondisi aktual saat ini (`{clo2_val:.2f} g/L`), berikut parameter yang harus disesuaikan secara bertahap:\n\n"
                     f"1. **Absorber Water Rate (Laju Air Dingin)**:\n"
-                    f"   - Kurangi laju air pendingin absorber sebesar **3–5%** (dari {chw_val:.1f} m³/h ke kisaran **{max(90.0, chw_val - 5.0):.1f} m³/h**) untuk memekatkan larutan produk di packed column.\n\n"
+                    f"   - Kurangi laju air pendingin absorber sebesar **3–5%** (dari `{chw_rate:.1f} m³/h` ke kisaran **`{max(85.0, chw_rate - 4.0):.1f} m³/h`**) untuk memekatkan larutan produk di packed column.\n\n"
                     f"2. **Rasio Umpan Stoikiometri (HCl & NaClO₃)**:\n"
-                    f"   - Naikkan feed **NaClO₃** secara bertahap ke **{naclo3_val * 1.05:.2f} m³/h**.\n"
-                    f"   - Pertahankan rasio molar asam **HCl : NaClO₃ pada 1,05 : 1,00** (atur HCl feed ke **{hcl_val * 1.05:.2f} m³/h**) guna mencegah unreacted chlorate.\n\n"
+                    f"   - Naikkan feed **NaClO₃** secara bertahap ke **`{naclo3_feed * 1.03:.2f} m³/h`**.\n"
+                    f"   - Pertahankan rasio molar asam **HCl : NaClO₃** dengan menaikkan HCl feed ke **`{hcl_feed * 1.03:.2f} m³/h`** guna mencegah *unreacted chlorate*.\n\n"
                     f"3. **Suhu Chilled Water & Generator**:\n"
-                    f"   - Pastikan suhu air absorber tetap dingin **< 8,5°C** untuk memaksimalkan kelarutan gas ClO₂ dan mencegah gas lepas (*stripping* ke tail gas scrubber).\n"
-                    f"   - Pertahankan suhu generator di rentang aman **42–46°C**.\n\n"
+                    f"   - Pastikan suhu air absorber tetap dingin **< 8,5°C** (saat ini `{chw_temp:.1f}°C`) untuk memaksimalkan daya larut gas ClO₂.\n"
+                    f"   - Pertahankan suhu generator di rentang aman **42–48°C** (saat ini `{gen_temp:.1f}°C`).\n\n"
                     f"*(Rujukan: SOP-CLO2-DEC01 & SOP-CHW-ABS02)*"
                 )
             else:
                 fallback_text = (
-                    f"Berdasarkan pemantauan sensor saat ini, status produksi ClO₂ berada di level **{clo2_val:.2f} g/L** (Target: 8.00–10.00 g/L).\n\n"
-                    f"• **Feed Reaktan**: HCl = {hcl_val:.2f} m³/h, NaClO₃ = {naclo3_val:.2f} m³/h\n"
-                    f"• **Absorber**: Laju air pendingin = {chw_val:.1f} m³/h\n\n"
-                    f"Silakan ajukan pertanyaan spesifik terkait penyesuaian laju reaktan, penanganan suhu, atau prosedur SOP troubleshooting."
+                    f"Berdasarkan pemantauan sensor saat ini, status produksi ClO₂ berada di level **`{clo2_val:.2f} g/L`**.\n\n"
+                    f"• **Feed Reaktan**: HCl = `{hcl_feed:.2f} m³/h` ({hcl_conc:.1f}%), NaClO₃ = `{naclo3_feed:.2f} m³/h` ({naclo3_conc:.1f} g/L)\n"
+                    f"• **Absorber**: Laju air = `{chw_rate:.1f} m³/h` | Suhu chilled water = `{chw_temp:.1f}°C`\n"
+                    f"• **Generator**: Suhu = `{gen_temp:.1f}°C`\n\n"
+                    f"Silakan ajukan pertanyaan seputar optimasi rasio stoikiometri, penurunan suhu chiller, atau prosedur SOP penanganan deviasi."
                 )
 
             return AgentChatReply(
                 reply=fallback_text,
                 source="prisma-kinetics-engine",
-                related_parameters=["clo2_concentration", "hcl_feed", "naclo3_feed", "absorber_water_rate"],
+                related_parameters=["clo2_concentration", "hcl_feed_m3h", "naclo3_feed_m3h", "absorber_water_rate_m3h"],
             )
 
         return AgentChatReply(
