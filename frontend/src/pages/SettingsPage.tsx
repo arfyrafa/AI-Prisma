@@ -1,5 +1,7 @@
 import {
   Check,
+  Eye,
+  EyeOff,
   KeyRound,
   Plus,
   Shield,
@@ -42,6 +44,9 @@ export function SettingsPage() {
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [showCurrentPass, setShowCurrentPass] = useState(false)
+  const [showNewPass, setShowNewPass] = useState(false)
+  const [showConfirmPass, setShowConfirmPass] = useState(false)
   const [passwordMsg, setPasswordMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   // AI Diagnostic State
@@ -512,35 +517,65 @@ export function SettingsPage() {
 
  <div className="space-y-1">
  <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Kata Sandi Saat Ini</label>
+ <div className="relative">
  <input
- type="password"
+ type={showCurrentPass ? 'text' : 'password'}
  value={currentPassword}
  onChange={(e) => setCurrentPassword(e.target.value)}
- className="field"
+ className="field pr-10"
  placeholder="••••••••"
  />
+ <button
+ type="button"
+ onClick={() => setShowCurrentPass((prev) => !prev)}
+ className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-hidden"
+ title={showCurrentPass ? 'Sembunyikan' : 'Tampilkan'}
+ >
+ {showCurrentPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+ </button>
+ </div>
  </div>
 
  <div className="space-y-1">
  <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Kata Sandi Baru</label>
+ <div className="relative">
  <input
- type="password"
+ type={showNewPass ? 'text' : 'password'}
  value={newPassword}
  onChange={(e) => setNewPassword(e.target.value)}
- className="field"
+ className="field pr-10"
  placeholder="Minimal 6 karakter"
  />
+ <button
+ type="button"
+ onClick={() => setShowNewPass((prev) => !prev)}
+ className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-hidden"
+ title={showNewPass ? 'Sembunyikan' : 'Tampilkan'}
+ >
+ {showNewPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+ </button>
+ </div>
  </div>
 
  <div className="space-y-1">
  <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Konfirmasi Kata Sandi Baru</label>
+ <div className="relative">
  <input
- type="password"
+ type={showConfirmPass ? 'text' : 'password'}
  value={confirmPassword}
  onChange={(e) => setConfirmPassword(e.target.value)}
- className="field"
+ className="field pr-10"
  placeholder="Ulangi kata sandi baru"
  />
+ <button
+ type="button"
+ onClick={() => setShowConfirmPass((prev) => !prev)}
+ className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-hidden"
+ title={showConfirmPass ? 'Sembunyikan' : 'Tampilkan'}
+ >
+ {showConfirmPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+ </button>
+ </div>
  </div>
 
  <div className="pt-2">

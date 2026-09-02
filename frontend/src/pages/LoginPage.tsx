@@ -1,3 +1,4 @@
+import { Eye, EyeOff } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
@@ -7,6 +8,7 @@ export function LoginPage() {
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const sessionExpired = localStorage.getItem('prisma_session_expired_notice') === 'true'
@@ -38,42 +40,44 @@ export function LoginPage() {
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-slate-950 px-4 py-12 text-slate-100 overflow-hidden">
       {/* Ambient background glows */}
-      <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-sky-500/10 blur-[120px]" />
-      <div className="absolute -right-32 -bottom-32 h-96 w-96 rounded-full bg-purple-600/10 blur-[120px]" />
+      <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[500px] w-[500px] rounded-full bg-gradient-to-tr from-sky-600/20 via-blue-600/20 to-purple-600/10 blur-[120px]" />
+      <div className="pointer-events-none absolute -bottom-40 right-10 h-[400px] w-[400px] rounded-full bg-gradient-to-br from-indigo-600/15 via-sky-600/10 to-transparent blur-[100px]" />
 
-      <div className="relative z-10 w-full max-w-md space-y-8">
-        {/* Branding header */}
-        <div className="text-center space-y-3">
-          <div className="inline-flex items-center justify-center gap-3">
-            <img
-              src="/assets/img/logo only prisma.png"
-              alt="PRISMA AI Icon"
-              className="h-12 w-auto object-contain filter drop-shadow-[0_0_18px_rgba(56,189,248,0.45)] transition-transform hover:scale-105"
-            />
-            <div className="flex items-center gap-2">
-              <span className="text-3xl font-black tracking-wider text-white">
-                PRISMA
+      <div className="relative z-10 w-full max-w-md space-y-6">
+        {/* Brand Header */}
+        <div className="text-center space-y-2">
+          <div className="inline-flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 shadow-lg shadow-sky-500/25">
+              <img
+                src="/assets/img/logo only prisma.png"
+                alt="PRISMA AI Logo"
+                className="h-7 w-7 object-contain drop-shadow"
+              />
+            </div>
+            <div className="text-left">
+              <span className="text-2xl font-black tracking-wider text-white">
+                PRISMA <span className="text-sky-400">AI</span>
               </span>
-              <span className="text-xl font-extrabold text-sky-400 bg-sky-500/20 border border-sky-400/30 px-2.5 py-0.5 rounded-lg shadow-inner">
-                AI
-              </span>
+              <p className="text-[11px] font-medium tracking-wide text-slate-400">
+                INDUSTRIAL PROCESS OPTIMIZER
+              </p>
             </div>
           </div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-400">
-            Industrial Decision Support Platform
-          </p>
-          <p className="text-xs text-slate-400 max-w-xs mx-auto">
-            Sistem pemantauan &amp; prediksi realtime proses industri ClO₂. Silakan masuk sesuai hak akses akun Anda.
-          </p>
         </div>
 
-        {/* Login Card */}
-        <div className="rounded-2xl border border-slate-800/80 bg-slate-900/90 p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {sessionExpired && (
-              <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-3.5 text-xs text-amber-300 font-medium leading-relaxed flex items-center gap-2.5">
-                <span className="flex h-2 w-2 rounded-full bg-amber-400 animate-ping" />
-                <span>Sesi Anda telah berakhir setelah 1 jam demi keamanan sistem. Silakan masuk kembali.</span>
+        {/* Card Form */}
+        <div className="rounded-3xl border border-slate-800 bg-slate-900/80 p-7 shadow-2xl backdrop-blur-xl">
+          <div className="mb-6 text-center">
+            <h1 className="text-lg font-bold text-white">Masuk ke Sistem</h1>
+            <p className="mt-1 text-xs text-slate-400">
+              Gunakan akun resmi untuk mengakses dashboard kendali proses
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {sessionExpired && !error && (
+              <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3.5 text-xs text-amber-300 font-medium leading-relaxed">
+                Sesi Anda telah kedaluwarsa. Silakan login kembali untuk melanjutkan.
               </div>
             )}
 
@@ -103,19 +107,27 @@ export function LoginPage() {
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-300" htmlFor="password">
                   Kata Sandi
                 </label>
-                <span className="text-[11px] text-sky-400 hover:underline cursor-pointer">
-                  Lupa sandi?
-                </span>
               </div>
-              <input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full rounded-xl border border-slate-700 bg-slate-800/80 px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:border-sky-400 focus:outline-hidden focus:ring-2 focus:ring-sky-400/20 transition-all"
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full rounded-xl border border-slate-700 bg-slate-800/80 px-4 py-2.5 pr-11 text-sm text-white placeholder-slate-500 focus:border-sky-400 focus:outline-hidden focus:ring-2 focus:ring-sky-400/20 transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1 text-slate-400 hover:text-slate-200 focus:outline-hidden focus:ring-2 focus:ring-sky-400/30 transition-colors"
+                  title={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+                  aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center justify-between text-xs text-slate-400">
