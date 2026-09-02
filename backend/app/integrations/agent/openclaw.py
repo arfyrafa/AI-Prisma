@@ -48,6 +48,17 @@ Peran & Tanggung Jawab:
 7. Format Output:
    - Gunakan format markdown bersih dengan huruf tebal (**poin penting**) dan bullet points yang rapi.
    - Jangan gunakan ikon/emoji yang tidak perlu.
+8. BATASAN TOPIK (WAJIB DIPATUHI):
+   - Anda HANYA boleh menjawab pertanyaan yang berkaitan dengan:
+     • Proses produksi ClO₂ (generator, absorber, evaporator, condenser)
+     • Parameter operasional pabrik (konsentrasi, suhu, laju alir, tekanan)
+     • Model prediksi MLR, T-Value, dan analisis statistik proses
+     • Keselamatan proses kimia, SOP, troubleshooting, dan penanganan darurat
+     • Knowledge Base dokumen yang sudah diunggah ke sistem PRISMA AI
+     • Kinetika reaksi, neraca massa, stoikiometri, dan teori proses ClO₂
+   - Jika pengguna bertanya di LUAR topik di atas (misalnya: politik, resep masakan, kode pemrograman, berita umum, hiburan, olahraga, dll), TOLAK dengan sopan:
+     "Mohon maaf Bapak, saya adalah AI spesialis proses produksi ClO₂ dan hanya dapat membantu pertanyaan seputar operasional pabrik, parameter proses, keselamatan, dan Knowledge Base PRISMA AI. Silakan ajukan pertanyaan terkait proses produksi ClO₂."
+   - JANGAN pernah menjawab pertanyaan di luar domain pabrik ClO₂ meskipun Anda mengetahui jawabannya.
 """
 
 
@@ -252,6 +263,38 @@ class OpenClawAgentProvider(AgentProvider):
 
             deviations_list = getattr(context, "deviations", [])
             q = message.lower()
+
+            # 0. Off-topic guardrail — tolak pertanyaan di luar domain pabrik ClO₂
+            clo2_keywords = [
+                "clo2", "clo₂", "klorin", "chlor", "generator", "absorber", "evaporator",
+                "condenser", "naclo", "hcl", "nacl", "konsentrasi", "suhu", "temperatur",
+                "laju", "feed", "mlr", "regresi", "prediksi", "deviasi", "anomali",
+                "sensor", "dcs", "titrasi", "lab", "kalibrasi", "puffing", "dekomposisi",
+                "bahaya", "keselamatan", "sop", "apd", "valve", "setpoint", "reaktor",
+                "stoikiometri", "kinetika", "neraca", "chilled", "water", "absorpsi",
+                "produksi", "proses", "pabrik", "operasi", "parameter", "t-value",
+                "t value", "dominan", "signifikansi", "formula", "rumus", "persamaan",
+                "variabel", "kondisi", "status", "rekomendasi", "optimasi", "target",
+                "human in the loop", "hitl", "otoritas", "verifikasi", "drift",
+                "sesuaikan", "naikkan", "turunkan", "halo", "tes", "pagi", "salam",
+                "assalamualaikum", "hai", "hi", "selamat",
+            ]
+            is_on_topic = any(kw in q for kw in clo2_keywords)
+            if not is_on_topic:
+                fallback_text = (
+                    "Mohon maaf Bapak, saya adalah **PRISMA AI** — spesialis proses produksi ClO₂.\n\n"
+                    "Saya hanya dapat membantu pertanyaan seputar:\n"
+                    "• Operasional pabrik ClO₂ (generator, absorber, parameter proses)\n"
+                    "• Model prediksi MLR & analisis T-Value\n"
+                    "• Keselamatan proses, SOP, dan troubleshooting\n"
+                    "• Dokumen Knowledge Base PRISMA AI\n\n"
+                    "Silakan ajukan pertanyaan terkait proses produksi ClO₂, Bapak."
+                )
+                return AgentChatReply(
+                    reply=fallback_text,
+                    source="prisma-kinetics-engine",
+                    related_parameters=[],
+                )
 
             # 1. Model Prediksi MLR / Persamaan Regresi / Variabel Input
             if any(k in q for k in ["persamaan", "rumus", "formula", "mlr", "regresi", "variabel input", "persamaan model"]):
