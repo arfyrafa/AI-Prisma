@@ -264,6 +264,19 @@ class OpenClawAgentProvider(AgentProvider):
             deviations_list = getattr(context, "deviations", [])
             q = message.lower()
 
+            target_match = re.search(r'(?:ke|target|mencapai)\s*([0-9]+[.,]?[0-9]*)\s*(?:g/l|gpl)?', q)
+            target_val = None
+            if target_match:
+                try:
+                    target_val = float(target_match.group(1).replace(',', '.'))
+                except ValueError:
+                    pass
+
+            is_adjustment_query = any(k in q for k in [
+                "menaik", "naik", "menurun", "turun", "sesuai", "target", "angka",
+                "parameter apa yang harus", "secara signifikan", "berapa angka", "hitung"
+            ])
+
             # 0. Off-topic guardrail — tolak pertanyaan di luar domain pabrik ClO₂
             clo2_keywords = [
                 "clo2", "clo₂", "klorin", "chlor", "generator", "absorber", "evaporator",
@@ -365,7 +378,7 @@ class OpenClawAgentProvider(AgentProvider):
                 fallback_text = status_header
 
             # 4. Rekomendasi ClO2 Di Atas Target (> 9.80 g/L atau terlalu tinggi)
-            elif any(k in q for k in ["> 9.8", ">9.8", "9.80", "terlalu tinggi", "di atas target", "melebihi target", "kepekatan tinggi"]):
+            elif any(k in q for k in ["> 9.8", ">9.8", "9.80", "di atas 9.8", "terlalu tinggi", "di atas target", "melebihi target", "kepekatan tinggi"]):
                 fallback_text = (
                     "### 💡 Rekomendasi: Penanganan Konsentrasi ClO₂ di Atas Target (> 9.80 g/L)\n\n"
                     "Berdasarkan **SOP Diagnosis ClO₂ di Atas Target** & SOP Lapangan 4-Tingkat:\n\n"
@@ -377,7 +390,50 @@ class OpenClawAgentProvider(AgentProvider):
                     f"   - Jaga suhu generator di rentang aman **42–48°C** (aktual `{gen_temp:.1f}°C`).\n\n"
                     "3. **Prioritas 3 — Verifikasi Laboratorium**:\n"
                     "   - Lakukan uji titrasi iodometri manual untuk memastikan pembacaan analyzer online akurat.\n\n"
-                    "*(Rujukan: SOP-USR-16 Diagnosis ClO₂ di Atas Target)*"
+                    "*(Rujukan: SOP-USR-16 Diagnosis ClO₂ di Atas Target & SOP Lapangan 4-Tingkat)*"
+                )
+
+            # 4b. Rekomendasi ClO2 Di Bawah Target (< 9.70 g/L atau terlalu rendah)
+            elif any(k in q for k in ["< 9.7", "<9.7", "di bawah 9.7", "terlalu rendah", "di bawah target", "kurang pekat", "konsentrasi rendah"]):
+                fallback_text = (
+                    "### 💡 Rekomendasi: Penanganan Konsentrasi ClO₂ di Bawah Target (< 9.70 g/L)\n\n"
+                    "Berdasarkan **SOP Diagnosis ClO₂ di Bawah Target (SOP-USR-7)** & SOP Lapangan 4-Tingkat:\n\n"
+                    "1. **Prioritas 1 — Kolom Absorpsi (Pemekatan Larutan)**:\n"
+                    f"   - Kurangi laju alir air pendingin absorber sebesar **2–4%** (dari `{chw_rate:.1f} m³/h` ke kisaran **`{max(85.0, chw_rate - 3.5):.1f} m³/h`**) untuk memekatkan produk di packed column.\n"
+                    f"   - Pastikan suhu chilled water tetap dingin **< 8.5°C** (aktual `{chw_temp:.1f}°C`).\n\n"
+                    "2. **Prioritas 2 — Reaktor Generator (Peningkatan Yield)**:\n"
+                    f"   - Naikkan umpan asam **HCl Feed (X₄)** secara bertahap **2–3%** (dari `{hcl_feed:.2f} m³/h` ke kisaran **`{hcl_feed * 1.025:.2f} m³/h`**) untuk mendongkrak konversi klorat.\n"
+                    f"   - Pastikan rasio molar asam terhadap umpan klorat terjaga optimal.\n\n"
+                    "3. **Prioritas 3 — Kualitas Kimia & Validasi**:\n"
+                    "   - Periksa konsentrasi asam klorida (spesifikasi 31–33%) dan larutan klorat (430–450 g/L).\n"
+                    "   - Konfirmasi dengan titrasi iodometri laboratorium untuk memastikan tidak ada deviasi pembacaan analyzer online.\n\n"
+                    "*(Rujukan: SOP-USR-7 Diagnosis ClO₂ di Bawah Target & SOP Lapangan 4-Tingkat)*"
+                )
+
+            # 4c. Rekomendasi Umum / Rekomendasi Terbaik Saat Ini
+            elif any(k in q for k in ["rekomendasi terbaik", "rekomendasi", "saran terbaik", "langkah terbaik", "solusi terbaik", "apa saran"]):
+                absorber_advice = (
+                    f"Pertahankan laju alir air pendingin di `{chw_rate:.1f} m³/h` untuk menjaga konsentrasi larutan stabil."
+                    if 9.70 <= clo2_val <= 9.80 else
+                    f"Kurangi laju air absorber secara bertahap 2–3% (ke kisaran `{max(85.0, chw_rate - 3.0):.1f} m³/h`) untuk memekatkan konsentrasi produk."
+                    if clo2_val < 9.70 else
+                    f"Naikkan laju air absorber 3–5% (ke kisaran `{min(120.0, chw_rate + 4.0):.1f} m³/h`) untuk mengencerkan produk ke rentang spesifikasi."
+                )
+                fallback_text = (
+                    f"### 💡 Rekomendasi Optimasi Proses ClO₂ (Hierarki 4-Tingkat)\n\n"
+                    f"Berdasarkan evaluasi telemetri aktual pabrik saat ini (Konsentrasi ClO₂: `{clo2_val:.2f} g/L`, Target: **9.70 – 9.80 g/L**):\n\n"
+                    f"**1. Prioritas 1 — Kolom Absorpsi (Penyerapan & Konsentrasi):**\n"
+                    f"• {absorber_advice}\n"
+                    f"• Pastikan suhu chilled water tetap dingin **< 8.5°C** (aktual `{chw_temp:.1f}°C`) untuk mempertahankan daya larut gas ClO₂.\n\n"
+                    f"**2. Prioritas 2 — Reaktor Generator (Keseimbangan Stoikiometri):**\n"
+                    f"• Umpan reaktan saat ini: HCl = `{hcl_feed:.2f} m³/h`, NaClO₃ = `{naclo3_feed:.2f} m³/h`.\n"
+                    f"• Pertahankan rasio molar umpan asam terhadap klorat agar konversi reaksi sempurna tanpa *unreacted chlorate*.\n"
+                    f"• Jaga temperatur generator stabil pada rentang **42–48°C** (aktual `{gen_temp:.1f}°C`).\n\n"
+                    f"**3. Prioritas 3 — Kualitas Kimia Bahan Baku:**\n"
+                    f"• Verifikasi kemurnian HCl (spesifikasi 31–33%) dan konsentrasi larutan klorat (430–450 g/L).\n\n"
+                    f"**4. Prioritas 4 — Validasi Lapangan & Human-in-the-Loop:**\n"
+                    f"• Konfirmasi pembacaan analyzer online dengan titrasi iodometri laboratorium sebelum melakukan penyesuaian setpoint di DCS.\n\n"
+                    f"*(Rujukan: SOP Lapangan 4-Tingkat & Model Prediksi MLR SOP-USR-18)*"
                 )
 
             # 5. Rekomendasi Suhu Generator Naik (> 47°C)
@@ -440,20 +496,7 @@ class OpenClawAgentProvider(AgentProvider):
                 )
 
             # 9. Penyesuaian Setpoint & Perhitungan Matematis Model MLR (SOP-USR-18 & SOP-USR-19)
-            target_match = re.search(r'(?:ke|target|mencapai)\s*([0-9]+[.,]?[0-9]*)\s*(?:g/l|gpl)?', q)
-            target_val = None
-            if target_match:
-                try:
-                    target_val = float(target_match.group(1).replace(',', '.'))
-                except ValueError:
-                    pass
-
-            is_adjustment_query = any(k in q for k in [
-                "menaik", "naik", "menurun", "turun", "sesuai", "target", "angka",
-                "parameter apa yang harus", "secara signifikan", "berapa angka", "hitung"
-            ])
-
-            if (target_val is not None or is_adjustment_query) and not any(k in q for k in ["persamaan", "rumus", "formula", "apa itu", "kondisi saat ini"]):
+            elif (target_val is not None or is_adjustment_query) and not any(k in q for k in ["persamaan", "rumus", "formula", "apa itu", "kondisi saat ini"]):
                 target_num = target_val if target_val is not None else 9.70
                 delta_y = target_num - clo2_val
                 delta_x4 = delta_y / 0.799
@@ -485,17 +528,16 @@ class OpenClawAgentProvider(AgentProvider):
                     f"*(Rujukan: SOP-USR-18 Model Prediksi MLR & SOP-USR-19 Pengaruh Parameter dan T-Value)*"
                 )
 
-            # 10. Pencocokan Otomatis dari Dokumen RAG (hanya jika pertanyaan menyebut dokumen / sop atau sebagai fallback cerdas)
-            elif getattr(context, "knowledge_refs", None) and any(d.get("content") for d in context.knowledge_refs):
+            # 10. Pertanyaan Spesifik Tentang Isi Dokumen SOP
+            elif any(k in q for k in ["isi dokumen", "baca dokumen", "tampilkan sop", "teks sop", "ringkasan sop"]) and getattr(context, "knowledge_refs", None) and any(d.get("content") for d in context.knowledge_refs):
                 best_doc = context.knowledge_refs[0]
                 doc_title = best_doc.get("title", "Dokumen Knowledge Base")
                 doc_code = best_doc.get("reference_code", "SOP")
-                doc_content = best_doc.get("content", "").strip()
+                doc_summary = best_doc.get("summary") or best_doc.get("content", "")[:350]
                 fallback_text = (
-                    f"### 📖 {doc_title} [{doc_code}]\n\n"
-                    f"Berdasarkan dokumen Knowledge Base terkait:\n\n"
-                    f"{doc_content[:950]}\n\n"
-                    f"*(Sumber: {doc_title} · Kode {doc_code})*"
+                    f"### 📖 Ringkasan Dokumen: {doc_title} [{doc_code}]\n\n"
+                    f"{doc_summary}\n\n"
+                    f"*(Sumber: Dokumen Knowledge Base {doc_title} · Kode {doc_code})*"
                 )
             else:
                 fallback_text = (
