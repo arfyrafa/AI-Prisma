@@ -1,4 +1,14 @@
-import { Download, PlusCircle, Printer, RefreshCw, Sparkles } from 'lucide-react'
+import {
+  ChevronDown,
+  Clock,
+  Database,
+  Download,
+  FileSpreadsheet,
+  PlusCircle,
+  Printer,
+  RefreshCw,
+  Sparkles,
+} from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { DeviationPanel } from '../components/DeviationPanel'
@@ -16,7 +26,12 @@ import { useAsync } from '../hooks/useAsync'
 import { useProcessContext } from '../hooks/useProcessContext'
 import { api, isAgentUnavailable } from '../services/api'
 import type { Recommendation, TimeRange } from '../types'
-import { exportParametersToCSV, printProcessReport } from '../utils/exportReport'
+import {
+  exportAllShiftDataToCSV,
+  exportHistoryToCSV,
+  exportParametersToCSV,
+  printProcessReport,
+} from '../utils/exportReport'
 import { formatDateTime, formatNumber, formatRelative } from '../utils/format'
 
 const PRIMARY_PARAMETER = 'clo2_concentration'
@@ -25,6 +40,7 @@ export function DashboardPage() {
   const { processId, snapshot, loading, error, refresh } = useProcessContext()
   const [range, setRange] = useState<TimeRange>('7d')
   const [manualEntryOpen, setManualEntryOpen] = useState(false)
+  const [exportMenuOpen, setExportMenuOpen] = useState(false)
   const [analyzing, setAnalyzing] = useState(false)
   const [agentDown, setAgentDown] = useState(false)
   const [analysisError, setAnalysisError] = useState<string | null>(null)
@@ -260,21 +276,96 @@ export function DashboardPage() {
                 <span>+ Input Data Shift</span>
               </button>
 
-              <button
-                type="button"
-                onClick={() =>
-                  exportParametersToCSV(
-                    snapshot?.parameters ?? [],
-                    snapshot?.process.name,
-                    snapshot?.reading?.timestamp,
-                  )
-                }
-                title="Download Data CSV"
-                className="btn bg-white/10 text-white hover:bg-white/20 border border-white/20 shadow-sm backdrop-blur-sm px-2.5 py-1.5 text-xs font-medium inline-flex items-center gap-1.5"
-              >
-                <Download className="h-3.5 w-3.5 text-sky-300" />
-                <span className="hidden sm:inline">Export CSV</span>
-              </button>
+              {/* EXPORT DROPDOWN MENU */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setExportMenuOpen((prev) => !prev)}
+                  title="Opsi Download Data CSV"
+                  className="btn bg-white/10 text-white hover:bg-white/20 border border-white/20 shadow-sm backdrop-blur-sm px-2.5 py-1.5 text-xs font-medium inline-flex items-center gap-1.5"
+                >
+                  <Download className="h-3.5 w-3.5 text-sky-300" />
+                  <span className="hidden sm:inline">Export CSV</span>
+                  <ChevronDown className="h-3 w-3 text-slate-300 ml-0.5" />
+                </button>
+
+                {exportMenuOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setExportMenuOpen(false)}
+                    />
+                    <div className="absolute right-0 top-full mt-1.5 z-50 w-72 rounded-xl border border-slate-700/80 bg-slate-900/95 p-1.5 shadow-2xl backdrop-blur-md text-left animate-in fade-in slide-in-from-top-1 duration-150">
+                      <div className="px-2.5 py-1.5 border-b border-slate-800 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        Pilih Data yang Diexport
+                      </div>
+
+                      {/* Opsi 1: Snapshot Parameter Hari Ini */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setExportMenuOpen(false)
+                          exportParametersToCSV(
+                            snapshot?.parameters ?? [],
+                            snapshot?.process.name,
+                            snapshot?.reading?.timestamp,
+                          )
+                        }}
+                        className="w-full rounded-lg p-2 text-left hover:bg-slate-800/80 transition-colors flex items-start gap-2.5 group"
+                      >
+                        <div className="p-1.5 rounded-md bg-sky-500/10 text-sky-400 group-hover:bg-sky-500/20 mt-0.5">
+                          <FileSpreadsheet className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <div className="text-xs font-semibold text-white">Data Hari Ini (Snapshot)</div>
+                          <div className="text-[10px] text-slate-400 mt-0.5">9 parameter proses, deviasi &amp; status operasional terkini.</div>
+                        </div>
+                      </button>
+
+                      {/* Opsi 2: Semua Data Shift Pabrik (297 Baris untuk Manager) */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setExportMenuOpen(false)
+                          void exportAllShiftDataToCSV(snapshot?.process.name)
+                        }}
+                        className="w-full rounded-lg p-2 text-left hover:bg-slate-800/80 transition-colors flex items-start gap-2.5 group border-t border-slate-800/60"
+                      >
+                        <div className="p-1.5 rounded-md bg-emerald-500/10 text-emerald-400 group-hover:bg-emerald-500/20 mt-0.5">
+                          <Database className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <div className="text-xs font-semibold text-emerald-400 flex items-center gap-1.5">
+                            Semua Data Shift Pabrik
+                            <span className="rounded bg-emerald-500/20 text-emerald-300 text-[9px] font-bold px-1.5 py-0.5">297 Shift</span>
+                          </div>
+                          <div className="text-[10px] text-slate-400 mt-0.5">Database lengkap riwayat 99 hari shift industri ClO₂ (CSV Manager).</div>
+                        </div>
+                      </button>
+
+                      {/* Opsi 3: Riwayat Time-Series Sensor 7 Hari */}
+                      {history.data?.points && history.data.points.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setExportMenuOpen(false)
+                            exportHistoryToCSV(history.data!.points, snapshot?.process.name)
+                          }}
+                          className="w-full rounded-lg p-2 text-left hover:bg-slate-800/80 transition-colors flex items-start gap-2.5 group border-t border-slate-800/60"
+                        >
+                          <div className="p-1.5 rounded-md bg-purple-500/10 text-purple-400 group-hover:bg-purple-500/20 mt-0.5">
+                            <Clock className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <div className="text-xs font-semibold text-purple-300">Riwayat Telemetri Sensor</div>
+                            <div className="text-[10px] text-slate-400 mt-0.5">Data time-series DCS {history.data.points.length} titik rekaman.</div>
+                          </div>
+                        </button>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
 
               <button
                 type="button"

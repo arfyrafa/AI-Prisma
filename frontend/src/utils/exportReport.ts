@@ -86,6 +86,54 @@ export function exportHistoryToCSV(
   URL.revokeObjectURL(url)
 }
 
+export async function exportAllShiftDataToCSV(processName = 'Proses Produksi ClO2') {
+  try {
+    const res = await fetch('/PRISMA_AI_Real_Plant_Logsheet.csv')
+    if (!res.ok) throw new Error('File dataset tidak ditemukan')
+    const rawText = await res.text()
+
+    // Format header with executive-level industrial labels
+    const lines = rawText.split(/\r?\n/).filter(Boolean)
+    if (lines.length > 0) {
+      lines[0] = [
+        'Waktu Shift (Timestamp)',
+        'NaClO3 Feed (m3/h)',
+        'NaClO3 Concentration (g/L)',
+        'NaCl Concentration (g/L)',
+        'HCl Feed (m3/h)',
+        'HCl Concentration (%)',
+        'Generator Temp (°C)',
+        'Absorber Water Temp (°C)',
+        'Absorber Water Rate (m3/h)',
+        'Konsentrasi ClO2 Aktual (g/L)',
+        'Catatan Logsheet Shift',
+      ].join(',')
+    }
+
+    const formattedCsv = lines.join('\r\n')
+    const blob = new Blob(['\uFEFF' + formattedCsv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    const cleanName = processName.replace(/\s+/g, '_')
+    const dateStr = new Date().toISOString().slice(0, 10)
+    link.href = url
+    link.setAttribute('download', `PRISMA_AI_${cleanName}_Semua_Data_Shift_Pabrik_297_Rows_${dateStr}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  } catch {
+    // Fallback: direct download link
+    const cleanName = processName.replace(/\s+/g, '_')
+    const link = document.createElement('a')
+    link.href = '/PRISMA_AI_Real_Plant_Logsheet.csv'
+    link.setAttribute('download', `PRISMA_AI_${cleanName}_Semua_Data_Shift_Pabrik_297_Rows.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+}
+
 export function printProcessReport(
   processName = 'Proses Produksi ClO2',
   timestamp?: string | null,
