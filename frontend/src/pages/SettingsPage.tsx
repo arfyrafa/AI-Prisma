@@ -624,7 +624,7 @@ export function SettingsPage() {
  </dl>
 
  <p className="mt-4 text-[11px] text-slate-400 border-t border-slate-100 pt-3">
- OpenClaw ClO₂ Industrial Decision Support System menghubungkan telemetri 8 parameter sensor dengan model prediksi dan SOP operasional.
+ OpenClaw ClO₂ Industrial Decision Support System menghubungkan telemetri 9 parameter sensor dengan model prediksi dan SOP operasional.
  </p>
  </Panel>
  </div>

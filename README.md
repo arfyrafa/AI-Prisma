@@ -79,7 +79,7 @@ Gunakan kredensial berikut untuk mengakses sistem:
 - **RAG integration**: Menjawab berdasarkan Knowledge Base yang di-upload
 
 ### 📊 Model Prediksi MLR
-- **Persamaan empiris** dengan 8 variabel independen operasional
+- **Persamaan empiris** dengan 9 parameter proses (8 input + 1 output)
 - **T-Value ranking** untuk identifikasi parameter paling berpengaruh
 - **Prediksi konsentrasi** ClO₂ 30 menit ke depan
 - **Target spesifikasi**: 9.70 – 9.80 g/L

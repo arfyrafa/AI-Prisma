@@ -5,7 +5,6 @@
 - Injects live plant telemetry, 8 chemical process variables, trends, & SOP knowledge directly into LLM working memory
 - Full transparent diagnostics (no fake if-else templates)
 """
-
 import json
 import logging
 import re
@@ -309,13 +308,41 @@ class OpenClawAgentProvider(AgentProvider):
                     related_parameters=[],
                 )
 
+            # 0b. Sapaan / Test Koneksi Singkat (Greeting & Ping Guardrail)
+            greeting_words = [
+                "tes", "test", "halo", "hai", "hi", "ping", "pagi", "selamat pagi",
+                "siang", "selamat siang", "sore", "selamat sore", "malam", "selamat malam",
+                "assalamualaikum", "assalamu'alaikum"
+            ]
+            technical_keywords = [
+                "persamaan", "rumus", "mlr", "t-value", "t value", "setpoint", "puffing",
+                "kenapa", "mengapa", "bagaimana", "optimasi", "rekomendasi", "sop", "kinetika",
+                "sensor", "analisis", "hitung", "kondisi", "status", "suhu", "feed",
+                "konsentrasi", "hcl", "clo2", "clo₂", "baca", "dokumen"
+            ]
+            q_clean = q.strip().rstrip("!?.,")
+            is_simple_greeting = (
+                any(q_clean == g or q_clean.startswith(g + " ") for g in greeting_words)
+                and not any(tk in q for tk in technical_keywords)
+            )
+            if is_simple_greeting:
+                fallback_text = (
+                    "Halo Bapak! Sistem PRISMA AI aktif dan siap membantu operasional pabrik ClO₂.\n\n"
+                    "Silakan tanyakan seputar evaluasi proses generator & absorber, model prediksi MLR, rekomendasi setpoint, keselamatan reaksi, atau SOP pabrik."
+                )
+                return AgentChatReply(
+                    reply=fallback_text,
+                    source="prisma-kinetics-engine",
+                    related_parameters=["clo2_concentration"],
+                )
+
             # 1. Model Prediksi MLR / Persamaan Regresi / Variabel Input
             if any(k in q for k in ["persamaan", "rumus", "formula", "mlr", "regresi", "variabel input", "persamaan model"]):
                 fallback_text = (
                     "### 📐 Model Prediksi Multiple Linear Regression (MLR) ClO₂\n\n"
                     "Berdasarkan dokumen riset **Model Prediksi MLR**, persamaan empiris untuk memprediksi konsentrasi produk ClO₂ (**Y**) adalah:\n\n"
                     "> **Y = 3.11 - 0.1407·X₁ + 0.003192·X₂ + 0.00613·X₃ + 0.799·X₄ + 0.2343·X₅ - 0.0220·X₇ - 0.0607·X₉ - 0.02148·X₁₀**\n\n"
-                    "**8 Variabel Input Utama Operasional:**\n"
+                    "**9 Parameter Proses (8 Input + 1 Output):**\n"
                     "1. **X₁ — NaClO₃ Feed** (`m³/h`): Laju alir umpan natrium klorat (koefisien `-0.1407`).\n"
                     "2. **X₂ — NaClO₃ Concentration** (`g/L`): Kepekatan natrium klorat umpan (koefisien `+0.003192`).\n"
                     "3. **X₃ — NaCl Concentration** (`g/L`): Konsentrasi garam pembawa (koefisien `+0.00613`).\n"
@@ -323,7 +350,8 @@ class OpenClawAgentProvider(AgentProvider):
                     "5. **X₅ — HCl Concentration** (`%`): Kepekatan asam klorida umpan (koefisien `+0.2343`).\n"
                     "6. **X₇ — Generator Temperature** (`°C`): Temperatur reaksi generator (koefisien `-0.0220`).\n"
                     "7. **X₉ — Absorber Water Temperature** (`°C`): Suhu air pendingin absorber (koefisien `-0.0607`).\n"
-                    "8. **X₁₀ — Absorber Water Rate** (`m³/h`): Laju alir air pendingin absorber (koefisien `-0.02148`).\n\n"
+                    "8. **X₁₀ — Absorber Water Rate** (`m³/h`): Laju alir air pendingin absorber (koefisien `-0.02148`).\n"
+                    "9. **Y — Konsentrasi ClO₂** (`g/L`): Variabel output / respons model.\n\n"
                     "• **Target Spesifikasi Produk ClO₂ (Y)**: **9.70 – 9.80 g/L**.\n"
                     "*(Rujukan: Dokumen Knowledge Base Model Prediksi MLR & Kamus Parameter)*"
                 )
