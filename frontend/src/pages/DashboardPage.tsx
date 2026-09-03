@@ -221,9 +221,11 @@ export function DashboardPage() {
   return (
     <div className="space-y-5">
       {/* Hero Branding Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 p-5 sm:p-6 text-white shadow-xl border border-slate-800/80">
-        <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-cyan-500/10 blur-3xl" />
-        <div className="absolute -left-16 -bottom-16 h-48 w-48 rounded-full bg-blue-500/10 blur-3xl" />
+      <div className="relative z-30 rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 p-5 sm:p-6 text-white shadow-xl border border-slate-800/80">
+        <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
+          <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-cyan-500/10 blur-3xl" />
+          <div className="absolute -left-16 -bottom-16 h-48 w-48 rounded-full bg-blue-500/10 blur-3xl" />
+        </div>
 
         <div className="relative z-10 flex flex-wrap items-center justify-between gap-5">
           <div className="flex items-center gap-4 sm:gap-6">
@@ -292,10 +294,10 @@ export function DashboardPage() {
                 {exportMenuOpen && (
                   <>
                     <div
-                      className="fixed inset-0 z-40"
+                      className="fixed inset-0 z-[998]"
                       onClick={() => setExportMenuOpen(false)}
                     />
-                    <div className="absolute right-0 top-full mt-1.5 z-50 w-72 rounded-xl border border-slate-700/80 bg-slate-900/95 p-1.5 shadow-2xl backdrop-blur-md text-left animate-in fade-in slide-in-from-top-1 duration-150">
+                    <div className="absolute right-0 top-full mt-2 z-[999] w-72 sm:w-80 rounded-xl border border-slate-700 bg-slate-900 p-2 shadow-2xl backdrop-blur-md text-left animate-in fade-in slide-in-from-top-1 duration-150">
                       <div className="px-2.5 py-1.5 border-b border-slate-800 text-[10px] font-bold uppercase tracking-wider text-slate-400">
                         Pilih Data yang Diexport
                       </div>
