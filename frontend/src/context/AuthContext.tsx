@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { api, ApiError } from '../services/api'
 
-export type UserRole = 'Admin' | 'Operator'
+export type UserRole = 'Admin' | 'Operator' | 'Engineer'
 
 export interface UserProfile {
   id: string
@@ -344,7 +344,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 }
 
 function newUserRoleMapper(role: UserRole): string {
-  return role === 'Admin' ? 'Admin' : 'Operator'
+  if (role === 'Admin') return 'Admin'
+  if (role === 'Engineer') return 'Engineer'
+  return 'Operator'
 }
 
 export function useAuth() {

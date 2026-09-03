@@ -7,7 +7,6 @@ from fastapi import APIRouter, HTTPException, status
 
 from typing import Any
 from sqlalchemy import select
-
 from app.api.deps import DbSession
 from app.integrations.agent.base import AgentUnavailableError
 from app.models.ai import ChatMessageRecord
