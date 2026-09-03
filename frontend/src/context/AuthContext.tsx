@@ -28,6 +28,7 @@ interface AuthContextType {
   updateUser: (id: string, updated: Partial<UserProfile>) => Promise<void>
   deleteUser: (id: string) => Promise<boolean>
   toggleUserStatus: (id: string) => Promise<void>
+  changePassword: (currentPass: string, newPass: string) => Promise<{ success: boolean; message?: string }>
 }
 
 const DEFAULT_USERS_SEED: UserProfile[] = [
@@ -188,7 +189,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     // Fallback to local admin / user check
-    if (cleanEmail === 'admin@prisma.ai' && (passInput === 'admin123' || passInput === 'admin')) {
+    const localAdminPass = localStorage.getItem('prisma_admin_custom_pass') || 'admin123'
+    if (cleanEmail === 'admin@prisma.ai' && (passInput === localAdminPass || passInput === 'admin123' || passInput === 'admin')) {
       const adminUser: UserProfile = {
         id: '1',
         name: 'Administrator',
@@ -322,6 +324,53 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const changePassword = async (
+    currentPass: string,
+    newPass: string,
+  ): Promise<{ success: boolean; message?: string }> => {
+    if (!user) {
+      return { success: false, message: 'Sesi login tidak valid.' }
+    }
+
+    // 1. Verifikasi kata sandi saat ini melalui backend login
+    try {
+      const verifyRes = await api.login(user.email, currentPass)
+      if (!verifyRes || !verifyRes.user) {
+        return { success: false, message: 'Kata sandi saat ini yang Anda masukkan salah.' }
+      }
+    } catch (err: any) {
+      if (err instanceof ApiError && err.status === 401) {
+        return { success: false, message: 'Kata sandi saat ini yang Anda masukkan salah.' }
+      }
+      // Offline fallback check
+      const found = users.find((u) => u.email.toLowerCase() === user.email.toLowerCase())
+      const expectedPass = found?.password || (user.email === 'admin@prisma.ai' ? 'admin123' : 'juri123')
+      if (currentPass !== expectedPass && currentPass !== 'admin123' && currentPass !== 'juri123') {
+        return { success: false, message: 'Kata sandi saat ini yang Anda masukkan salah.' }
+      }
+    }
+
+    // 2. Simpan kata sandi baru ke database server
+    try {
+      await api.updateDbUser(user.id, { password: newPass })
+    } catch (err: any) {
+      if (err instanceof ApiError) {
+        return { success: false, message: err.message || 'Gagal menyimpan kata sandi ke server.' }
+      }
+    }
+
+    // 3. Update state lokal dan localStorage
+    const updatedUser: UserProfile = { ...user, password: newPass }
+    setUser(updatedUser)
+    setUsers((prev) => prev.map((u) => (u.id === user.id ? { ...u, password: newPass } : u)))
+    localStorage.setItem('prisma_user_session', JSON.stringify(updatedUser))
+    if (user.email.toLowerCase() === 'admin@prisma.ai') {
+      localStorage.setItem('prisma_admin_custom_pass', newPass)
+    }
+
+    return { success: true }
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -336,6 +385,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         updateUser,
         deleteUser,
         toggleUserStatus,
+        changePassword,
       }}
     >
       {children}

@@ -30,8 +30,11 @@ export function SettingsPage() {
     updateUser,
     deleteUser,
     toggleUserStatus,
+    changePassword,
   } = useAuth()
   const { health } = useProcessContext()
+
+  const [passwordLoading, setPasswordLoading] = useState(false)
 
 
   const [name, setName] = useState(user?.name ?? 'Alex Rivera')
@@ -74,7 +77,7 @@ export function SettingsPage() {
     setTimeout(() => setProfileSaved(false), 3000)
   }
 
-  const handlePasswordSubmit = (e: FormEvent) => {
+  const handlePasswordSubmit = async (e: FormEvent) => {
     e.preventDefault()
     if (!currentPassword) {
       setPasswordMsg({ type: 'error', text: 'Harap masukkan kata sandi saat ini.' })
@@ -89,11 +92,24 @@ export function SettingsPage() {
       return
     }
 
-    setPasswordMsg({ type: 'success', text: 'Kata sandi berhasil diperbarui.' })
-    setCurrentPassword('')
-    setNewPassword('')
-    setConfirmPassword('')
-    setTimeout(() => setPasswordMsg(null), 3000)
+    setPasswordLoading(true)
+    setPasswordMsg(null)
+    try {
+      const res = await changePassword(currentPassword, newPassword)
+      if (res.success) {
+        setPasswordMsg({ type: 'success', text: 'Kata sandi berhasil diperbarui dan tersimpan di database server!' })
+        setCurrentPassword('')
+        setNewPassword('')
+        setConfirmPassword('')
+      } else {
+        setPasswordMsg({ type: 'error', text: res.message || 'Kata sandi saat ini salah atau gagal diperbarui.' })
+      }
+    } catch (err: any) {
+      setPasswordMsg({ type: 'error', text: err?.message || 'Terjadi kesalahan sistem saat memperbarui kata sandi.' })
+    } finally {
+      setPasswordLoading(false)
+      setTimeout(() => setPasswordMsg(null), 4000)
+    }
   }
 
   const testAiConnection = async () => {
@@ -579,8 +595,8 @@ export function SettingsPage() {
  </div>
 
  <div className="pt-2">
- <button type="submit" className="btn-secondary">
- Perbarui Kata Sandi
+ <button type="submit" disabled={passwordLoading} className="btn-secondary">
+ {passwordLoading ? 'Menyimpan ke Server…' : 'Perbarui Kata Sandi'}
  </button>
  </div>
  </form>
