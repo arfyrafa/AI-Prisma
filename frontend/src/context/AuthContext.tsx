@@ -40,6 +40,33 @@ const DEFAULT_USERS_SEED: UserProfile[] = [
     isActive: true,
     createdAt: '2026-01-01T00:00:00Z',
   },
+  {
+    id: '2',
+    name: 'Juri 1',
+    email: 'juri1@prisma.ai',
+    password: 'juri123',
+    role: 'Engineer',
+    isActive: true,
+    createdAt: '2026-01-01T00:00:00Z',
+  },
+  {
+    id: '3',
+    name: 'Juri 2',
+    email: 'juri2@prisma.ai',
+    password: 'juri123',
+    role: 'Engineer',
+    isActive: true,
+    createdAt: '2026-01-01T00:00:00Z',
+  },
+  {
+    id: '4',
+    name: 'Operator Demo',
+    email: 'operator@prisma.ai',
+    password: 'operator123',
+    role: 'Operator',
+    isActive: true,
+    createdAt: '2026-01-01T00:00:00Z',
+  },
 ]
 
 // 1 Hour Session Lifespan in milliseconds (60 minutes * 60 seconds * 1000 ms)

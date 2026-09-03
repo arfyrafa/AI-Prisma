@@ -1,190 +1,315 @@
-# PRISMA AI — Industrial AI Monitoring & Decision Support
+<p align="center">
+  <img src="docs/prisma-logo.png" alt="PRISMA AI Logo" width="120" />
+</p>
 
-Dashboard web untuk memantau proses industri, mendeteksi penyimpangan, menampilkan prediksi,
-dan menyajikan rekomendasi yang dapat dijelaskan. Studi kasus awal: **proses produksi ClO₂**.
+<h1 align="center">PRISMA AI</h1>
+<h3 align="center">Predictive & Real-time Industrial Smart Monitoring with AI</h3>
+<p align="center">
+  <em>Industrial AI Decision Support System untuk Proses Produksi ClO₂</em>
+</p>
 
-Alur produk yang diwujudkan aplikasi ini:
-
-```
-Data Operasional → Validasi → Prediksi → Analisis → Rekomendasi → Verifikasi Engineer
-```
-
-Sistem ini **decision support**, bukan sistem kendali. Tidak ada endpoint, tombol, atau proses
-latar belakang yang mengubah parameter peralatan. Keputusan akhir selalu milik engineer.
+<p align="center">
+  <a href="https://aiprisma.tech">🌐 Live Demo</a> •
+  <a href="#-akun-demo-untuk-juri">🔑 Akun Juri</a> •
+  <a href="#-fitur-utama">✨ Fitur</a> •
+  <a href="#-arsitektur">🏗 Arsitektur</a> •
+  <a href="#-menjalankan-lokal">🚀 Instalasi</a>
+</p>
 
 ---
 
-## 1. Menjalankan dengan Docker (cara yang disarankan)
+## 📋 Tentang PRISMA AI
+
+**PRISMA AI** adalah platform **Decision Support System** berbasis kecerdasan buatan untuk industri proses kimia. Studi kasus utama: **proses produksi Chlorine Dioxide (ClO₂)** pada pabrik pulp & paper.
+
+Sistem ini membantu engineer dan operator pabrik untuk:
+- **Memantau** 9 parameter proses kritis secara real-time
+- **Mendeteksi** penyimpangan operasional dengan evaluasi otomatis
+- **Memprediksi** tren konsentrasi produk menggunakan model Multiple Linear Regression (MLR)
+- **Menerima rekomendasi** aksi berbasis hierarki 4-tingkat yang *actionable*
+- **Berdialog** dengan AI Assistant yang memahami konteks proses dan Knowledge Base pabrik
+- **Memverifikasi** setiap rekomendasi AI dengan keputusan engineer (*Human-in-the-Loop*)
+
+> **Prinsip utama**: PRISMA AI adalah *decision support*, bukan sistem kendali. Tidak ada endpoint atau proses yang mengubah parameter peralatan. **Keputusan akhir selalu milik engineer.**
+
+---
+
+## 🌐 Live Demo
+
+Aplikasi sudah di-deploy dan dapat diakses langsung:
+
+| Layanan | URL |
+|---------|-----|
+| **Dashboard PRISMA AI** | [https://aiprisma.tech](https://aiprisma.tech) |
+| **API Documentation (Swagger)** | [https://aiprisma.tech/api/docs](https://aiprisma.tech/api/docs) |
+| **Health Check** | [https://aiprisma.tech/api/health](https://aiprisma.tech/api/health) |
+
+---
+
+## 🔑 Akun Demo untuk Juri
+
+Gunakan kredensial berikut untuk mengakses sistem:
+
+| Role | Email | Password | Akses |
+|------|-------|----------|-------|
+| **Admin** | `admin@prisma.ai` | `admin123` | Akses penuh: Dashboard, Pengaturan, Manajemen User, Knowledge Base, AI Chat |
+| **Juri 1** | `juri1@prisma.ai` | `juri123` | Engineer view: Dashboard, Monitoring, Prediksi, Rekomendasi, AI Chat |
+| **Juri 2** | `juri2@prisma.ai` | `juri123` | Engineer view: Dashboard, Monitoring, Prediksi, Rekomendasi, AI Chat |
+| **Operator** | `operator@prisma.ai` | `operator123` | Operator view: Dashboard, Monitoring proses, AI Chat |
+
+> Setiap akun memiliki **riwayat chat AI tersendiri** yang tersimpan di database dan persisten antar sesi login.
+
+---
+
+## ✨ Fitur Utama
+
+### 🖥 Dashboard Real-time
+- **9 KPI Card** dengan indikator status hijau/kuning/merah
+- **Grafik tren** interaktif (30 menit–24 jam) dengan data WebSocket real-time
+- **Pipeline strip** visual alur proses Generator → Absorber → Produk
+- **Panel deviasi** otomatis dengan severity WARNING/CRITICAL
+- **Alert timeline** dan notifikasi pop-up
+
+### 🤖 AI Assistant (PRISMA Chat)
+- **Floating chat widget** dengan konteks proses terintegrasi
+- **Domain-aware**: Hanya menjawab pertanyaan seputar proses ClO₂
+- **Kalkulasi MLR otomatis**: "Saya ingin menaikkan ke 9,7 g/L" → langsung menghitung ΔY, ΔX₄ (HCl Feed), dan set point baru berdasarkan persamaan regresi
+- **Rekomendasi hierarki 4-tingkat**: Absorpsi → Generator → Kualitas Kimia → Validasi Lab
+- **Riwayat chat persisten per user** (tersimpan di PostgreSQL)
+- **RAG integration**: Menjawab berdasarkan Knowledge Base yang di-upload
+
+### 📊 Model Prediksi MLR
+- **Persamaan empiris** dengan 8 variabel independen operasional
+- **T-Value ranking** untuk identifikasi parameter paling berpengaruh
+- **Prediksi konsentrasi** ClO₂ 30 menit ke depan
+- **Target spesifikasi**: 9.70 – 9.80 g/L
+
+### 📚 Knowledge Base
+- Upload dokumen SOP, prosedur, dan referensi teknis melalui UI
+- Mendukung format Markdown dengan kode referensi unik
+- Pencarian semantik otomatis untuk konteks AI
+- Tagging dan kategorisasi dokumen
+
+### 👥 Manajemen User & Keamanan
+- Autentikasi berbasis email/password dengan hashing SHA-256
+- Role-based access: Admin, Engineer, Operator
+- Sesi otomatis kadaluarsa setelah 1 jam
+- Manajemen user dari panel Admin
+
+### 🔧 Konfigurasi & Pengaturan
+- **Rentang operasi** parameter dapat diubah langsung dari UI
+- **Verifikasi engineer** pada setiap rekomendasi AI (Accept/Reject/Modify)
+- **Audit trail** lengkap untuk setiap keputusan
+
+---
+
+## 🏗 Arsitektur
+
+```
+ SENSOR / DCS / SCADA            AI Engine (OpenClaw / 9Router)
+         │                                    │
+         │  JSON / REST                       │  LLM Chat Completion
+         ▼                                    ▼
+┌─────────────────────────────────────────────────────┐
+│                   FastAPI Backend                    │
+│  ┌───────────┐  ┌──────────┐  ┌──────────────────┐  │
+│  │ Ingestion │  │ AI Agent │  │ Predictive Model │  │
+│  │ & Sensor  │  │ OpenClaw │  │  MLR Regression  │  │
+│  └─────┬─────┘  └────┬─────┘  └────────┬─────────┘  │
+│        │             │                 │             │
+│        ▼             ▼                 ▼             │
+│  ┌─────────────────────────────────────────────┐     │
+│  │         PostgreSQL Database                 │     │
+│  │  sensor_readings | alerts | recommendations │     │
+│  │  knowledge_docs  | users | chat_messages    │     │
+│  └─────────────────────────────────────────────┘     │
+└──────────────────────┬──────────────────────────────┘
+                       │  REST + WebSocket
+                       ▼
+              ┌─────────────────┐
+              │  React + Vite   │
+              │  Web Dashboard  │
+              │  (TypeScript)   │
+              └─────────────────┘
+```
+
+### Prinsip Desain
+
+- **Frontend tidak menyentuh database** — semua data melalui API backend
+- **Frontend tidak menghitung status** — evaluasi parameter dilakukan di backend
+- **AI Agent di balik abstraksi** — provider dapat ditukar via environment variable
+- **Human-in-the-Loop** — setiap rekomendasi AI memerlukan verifikasi engineer
+
+---
+
+## 🛠 Tech Stack
+
+| Layer | Teknologi |
+|-------|-----------|
+| **Frontend** | React 18, TypeScript, Vite, Recharts, CSS |
+| **Backend** | Python 3.11+, FastAPI, SQLAlchemy, Pydantic |
+| **Database** | PostgreSQL 16 |
+| **AI/ML** | scikit-learn (MLR), OpenClaw LLM Integration |
+| **Infra** | Docker Compose, Nginx, Ubuntu VPS |
+
+---
+
+## 🚀 Menjalankan Lokal
+
+### Dengan Docker (Direkomendasikan)
 
 Prasyarat: Docker Desktop / Docker Engine dengan Docker Compose v2.
 
 ```bash
-cp .env.example .env      # opsional, nilai default sudah bisa dipakai
+git clone https://github.com/arfyrafa/AI-Prisma.git
+cd AI-Prisma
+
+# Buat file .env dari template
+cp .env.example .env
+
+# Jalankan seluruh stack
 docker compose up --build
 ```
 
-Tunggu sampai ketiga container sehat (build pertama 3–6 menit), lalu buka:
+Tunggu hingga ketiga container sehat (build pertama 3–6 menit), lalu buka:
 
 | Alamat | Isi |
-| --- | --- |
-| http://localhost:8080 | Dashboard PRISMA AI |
-| http://localhost:8000/docs | Dokumentasi API interaktif (Swagger) |
-| http://localhost:8000/api/health | Status layanan |
+|--------|-----|
+| `http://localhost:8080` | Dashboard PRISMA AI |
+| `http://localhost:8000/docs` | API Documentation (Swagger) |
+| `http://localhost:8000/api/health` | Health Check |
 
-Saat pertama kali dijalankan, backend otomatis membuat skema database, mengisi parameter proses
-dan Knowledge Base, lalu men-seed riwayat 24 jam agar grafik dan model regresi langsung berisi.
-Simulator kemudian menghasilkan pembacaan baru setiap 5 detik.
-
-Menghentikan:
+Saat pertama kali, backend otomatis:
+1. Membuat skema database
+2. Men-seed akun user (Admin, Juri, Operator)
+3. Mengisi parameter proses ClO₂
+4. Men-seed riwayat 24 jam agar grafik dan model regresi langsung terisi
+5. Simulator menghasilkan pembacaan baru setiap 5 detik
 
 ```bash
 docker compose down          # hentikan
-docker compose down -v       # hentikan sekaligus hapus data database
+docker compose down -v       # hentikan + hapus data database
 ```
 
-## 2. Menjalankan tanpa Docker (mode pengembangan)
+### Tanpa Docker (Mode Pengembangan)
 
-Backend (butuh Python 3.11+ dan PostgreSQL yang sudah berjalan):
+**Backend** (Python 3.11+ dan PostgreSQL):
 
 ```bash
 cd backend
-python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
+python -m venv .venv && source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 export DATABASE_URL="postgresql+psycopg2://prisma:prisma@localhost:5432/prisma_ai"
 uvicorn app.main:app --reload
 ```
 
-Frontend:
+**Frontend**:
 
 ```bash
 cd frontend
 npm install
-npm run dev     # http://localhost:5173, sudah diproxy ke backend :8000
+npm run dev     # http://localhost:5173
 ```
 
 ---
 
-## 3. Arsitektur
-
-```
-SENSOR / DCS / SCADA / AI Agent (OpenClaw)
-                 │  JSON / REST
-                 ▼
-         ┌───────────────┐
-         │    FastAPI    │──── PostgreSQL
-         │    Backend    │──── ML / Agent Integration
-         └───────┬───────┘
-                 │  REST + WebSocket
-                 ▼
-        React Web Dashboard
-```
-
-Aturan yang dipegang konsisten di seluruh kode:
-
-- Frontend **tidak pernah** menyentuh database, dan tidak pernah memanggil AI Agent langsung.
-- Frontend **tidak pernah** menghitung status parameter sendiri; status datang dari backend
-  sehingga mengubah rentang operasi di halaman Pengaturan langsung mengubah seluruh sistem.
-- AI Agent dan model prediktif berada di balik antarmuka abstrak — ditukar lewat `.env`.
-
-Struktur direktori:
+## 📂 Struktur Proyek
 
 ```
 prisma-ai/
 ├── backend/app/
-│   ├── api/routes/       endpoint REST + WebSocket
-│   ├── models/           tabel SQLAlchemy
-│   ├── schemas/          kontrak API (Pydantic)
-│   ├── repositories/     query database
-│   ├── services/         logika bisnis (deviasi, alert, AI, prediksi, audit)
-│   ├── integrations/     adapter agent & model prediktif (base/mock/openclaw)
-│   ├── simulations/      simulator proses ClO₂
-│   └── realtime/         manajer koneksi WebSocket
+│   ├── api/routes/          # Endpoint REST + WebSocket
+│   ├── core/                # Konfigurasi aplikasi
+│   ├── db/                  # Inisialisasi database & seeding
+│   ├── models/              # Tabel SQLAlchemy (ORM)
+│   ├── schemas/             # Kontrak API (Pydantic)
+│   ├── repositories/        # Query database
+│   ├── services/            # Logika bisnis (deviasi, alert, AI, prediksi)
+│   ├── integrations/
+│   │   ├── agent/           # AI Agent adapter (base/mock/openclaw)
+│   │   └── predictive/      # Model prediktif (regression/mock)
+│   ├── simulations/         # Simulator proses ClO₂
+│   └── realtime/            # WebSocket connection manager
 ├── frontend/src/
-│   ├── components/       komponen UI yang dapat dipakai ulang
-│   ├── pages/            10 halaman aplikasi
-│   ├── hooks/            data live (WebSocket + fallback polling)
-│   ├── services/         klien API terpusat
-│   └── types/            tipe yang mencerminkan kontrak backend
-└── docs/                 skenario demo, referensi API, catatan arsitektur
+│   ├── components/          # 16 komponen UI reusable
+│   ├── pages/               # 9 halaman aplikasi
+│   ├── hooks/               # Data live (WebSocket + polling fallback)
+│   ├── context/             # Auth context & state management
+│   ├── services/            # Klien API terpusat
+│   └── types/               # TypeScript types
+├── docs/                    # Dokumentasi teknis
+│   ├── API.md               # Daftar endpoint & payload
+│   ├── ARCHITECTURE.md      # Keputusan desain
+│   ├── DEMO.md              # Skenario demo
+│   └── DEPLOYMENT_GUIDE.md  # Panduan deployment VPS
+├── docker-compose.yml       # Orchestration (3 services)
+├── deploy.sh                # Script deployment VPS otomatis
+└── .env.example             # Template konfigurasi
 ```
 
 ---
 
-## 4. Menghubungkan AI Agent (OpenClaw)
+## 🔌 Menghubungkan AI Agent
 
-Secara default `AGENT_PROVIDER=mock`: agent simulasi berbasis aturan yang membaca data proses
-nyata dari database. Semua keluarannya berlabel `mock-agent`, dan **tidak pernah** melaporkan
-confidence score yang dikarang.
+Secara default, agent menggunakan **OpenClaw** dengan fallback ke *industrial domain reasoning engine* berbasis aturan yang membaca data proses nyata dari database.
 
-Untuk beralih ke agent sungguhan, ubah `.env`:
+Untuk mengonfigurasi AI Agent, edit `.env`:
 
 ```env
 AGENT_PROVIDER=openclaw
-AGENT_API_URL=http://alamat-agent:9000
-AGENT_API_KEY=kunci-rahasia
+AGENT_API_URL=http://alamat-agent:port/v1
+AGENT_API_KEY=kunci-rahasia-anda
 ```
-
-Agent tersebut cukup menyediakan tiga endpoint:
-
-| Endpoint | Request | Response |
-| --- | --- | --- |
-| `POST /analyze` | `{ "context": {...} }` | `{ "insight": {...}, "recommendations": [...] }` |
-| `POST /chat` | `{ "context": {...}, "message": "...", "history": [...] }` | `{ "reply": "...", "related_parameters": [...] }` |
-| `GET /health` | — | status < 400 bila agent siap |
-
-Isi `context` (parameter, rentang operasi, penyimpangan, tren, referensi Knowledge Base) dibangun
-di `backend/app/services/ai.py`. Bentuk lengkapnya ada di `docs/API.md`.
-
-Bila agent mati atau membalas format tak dikenal, backend membalas `503` dan dashboard menampilkan
-status "AI Agent sedang tidak tersedia" — pemantauan, deteksi penyimpangan, dan alert tetap jalan.
-Tidak ada jawaban AI yang dikarang saat agent tidak tersedia.
 
 ---
 
-## 5. Mengirim data sensor sungguhan
+## 📡 Mengirim Data Sensor Sungguhan
 
-Matikan simulator (`SIMULATION_MODE=false`), lalu kirim pembacaan ke:
+Matikan simulator (`SIMULATION_MODE=false`), lalu kirim pembacaan ke API:
 
 ```bash
 curl -X POST http://localhost:8000/api/ingestion/sensor \
   -H "Content-Type: application/json" \
   -d '{
     "process_id": 1,
-    "timestamp": "2026-08-16T15:20:00Z",
+    "timestamp": "2026-09-03T10:00:00Z",
     "source": "dcs",
     "parameters": {
-      "clo2_concentration": 9.5,
-      "temperature": 15.2,
-      "pressure": 9.7,
-      "ph": 4.3,
-      "flow_rate": 27.5,
-      "so2_dosage": 0.48,
-      "orp": 182,
-      "turbidity": 0.8
+      "clo2_concentration": 9.72,
+      "hcl_feed_m3h": 4.15,
+      "naclo3_feed_m3h": 17.40,
+      "generator_temperature_c": 46.5,
+      "absorber_water_rate_m3h": 104.5
     }
   }'
 ```
 
-Payload divalidasi Pydantic (field wajib, tipe numerik, timestamp, process_id, nama parameter).
-Payload tak dikenal ditolak dengan pesan yang jelas. Kunci lama `co2_concentration` tetap
-diterima sebagai alias dari `clo2_concentration`.
+---
 
-Satu permintaan langsung memicu: simpan pembacaan → evaluasi rentang operasi → buat/perbarui/
-selesaikan alert → siarkan lewat WebSocket ke seluruh dashboard yang terbuka.
+## 🔐 Catatan Keamanan & Kejujuran Data
+
+- **Tidak ada API key atau kredensial** yang di-hardcode dalam source code
+- Semua secret dibaca dari environment variable (`.env`)
+- Selama `SIMULATION_MODE=true`, banner **SIMULATION MODE** ditampilkan di dashboard
+- Setiap pembacaan simulasi disimpan dengan `source="simulation"`
+- Confidence score hanya ditampilkan bila AI Agent benar-benar melaporkannya
+- Rekomendasi selalu disertai peringatan verifikasi engineer diperlukan
+- Keputusan engineer disimpan terpisah dari rekomendasi AI (audit trail)
 
 ---
 
-## 6. Catatan kejujuran data
+## 📄 Dokumen Pendukung
 
-- Selama `SIMULATION_MODE=true`, header dashboard menampilkan banner **SIMULATION MODE** dan
-  setiap pembacaan disimpan dengan `source="simulation"`.
-- Hasil prediksi ditandai `is_simulated` selama modelnya dilatih dari data studi kasus.
-- Confidence score hanya ditampilkan bila agent benar-benar melaporkannya.
-- Rekomendasi selalu disertai peringatan bahwa verifikasi engineer diperlukan, dan keputusan
-  engineer disimpan terpisah dari rekomendasi AI.
+| Dokumen | Isi |
+|---------|-----|
+| [`docs/API.md`](docs/API.md) | Daftar endpoint dan format payload |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Keputusan desain dan roadmap |
+| [`docs/DEMO.md`](docs/DEMO.md) | Skenario demo kompetisi |
+| [`docs/DEPLOYMENT_GUIDE.md`](docs/DEPLOYMENT_GUIDE.md) | Panduan deployment ke VPS |
 
-## 7. Dokumen lain
+---
 
-- `docs/DEMO.md` — skenario demo kompetisi 5 menit
-- `docs/API.md` — daftar endpoint dan bentuk payload
-- `docs/ARCHITECTURE.md` — keputusan desain dan jalur pengembangan lanjutan
+<p align="center">
+  <strong>PRISMA AI</strong> — Predictive & Real-time Industrial Smart Monitoring with AI<br>
+  <em>Dibuat untuk kompetisi inovasi industri proses kimia</em>
+</p>

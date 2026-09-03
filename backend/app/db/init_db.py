@@ -114,30 +114,61 @@ USER_SEED = [
     {
         "name": "Administrator",
         "email": "admin@prisma.ai",
-        "password_hash": hashlib.sha256(b"admin123").hexdigest(),
+        "password": "admin123",
         "role": "Admin",
+        "department": "IT & Engineering",
+        "is_active": True,
+    },
+    {
+        "name": "Juri 1",
+        "email": "juri1@prisma.ai",
+        "password": "juri123",
+        "role": "Engineer",
+        "department": "Dewan Juri",
+        "is_active": True,
+    },
+    {
+        "name": "Juri 2",
+        "email": "juri2@prisma.ai",
+        "password": "juri123",
+        "role": "Engineer",
+        "department": "Dewan Juri",
+        "is_active": True,
+    },
+    {
+        "name": "Operator Demo",
+        "email": "operator@prisma.ai",
+        "password": "operator123",
+        "role": "Operator",
+        "department": "Produksi ClO₂",
         "is_active": True,
     },
 ]
 
 
 def seed_users(db: Session) -> None:
-    admin_hash = hashlib.sha256(b"admin123").hexdigest()
-    admin_user = db.scalar(select(User).where(User.email == "admin@prisma.ai"))
-    if admin_user:
-        admin_user.password_hash = admin_hash
-        admin_user.is_active = True
-        db.commit()
-    else:
-        db.add(User(
-            name="Administrator",
-            email="admin@prisma.ai",
-            password_hash=admin_hash,
-            role="Admin",
-            is_active=True,
-        ))
-        db.commit()
-    logger.info("Verifikasi akun Administrator admin@prisma.ai selesai.")
+    for u in USER_SEED:
+        pw_hash = hashlib.sha256(u["password"].encode()).hexdigest()
+        existing = db.scalar(select(User).where(User.email == u["email"]))
+        if existing:
+            existing.password_hash = pw_hash
+            existing.is_active = True
+            existing.name = u["name"]
+            existing.role = u["role"]
+            if u.get("department"):
+                existing.department = u["department"]
+            db.commit()
+        else:
+            db.add(User(
+                name=u["name"],
+                email=u["email"],
+                password_hash=pw_hash,
+                role=u["role"],
+                department=u.get("department"),
+                is_active=True,
+            ))
+            db.commit()
+        logger.info("Verifikasi akun %s (%s) selesai.", u["name"], u["email"])
 
 
 def init_db() -> None:
